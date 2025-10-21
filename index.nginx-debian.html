@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页样式导航中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            background-color: #f9f9f9;
+        }
+
+        body.dark {
+            color: #eee;
+            background-color: #121212;
+        }
+
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 1s ease-in-out;
+            z-index: -1;
+        }
+
+        .bg-vertical { background-image: url('1.png'); opacity: 0; }
+        .bg-horizontal { background-image: url('2.png'); opacity: 0; }
+
+        @media (aspect-ratio < 1) {
+            .bg-vertical { opacity: 1; }
+            .bg-horizontal { opacity: 0; }
+        }
+        @media (aspect-ratio > 1) {
+            .bg-vertical { opacity: 0; }
+            .bg-horizontal { opacity: 1; }
+        }
+        @media (aspect-ratio: 1) {
+            .bg-vertical { opacity: 0; }
+            .bg-horizontal { opacity: 1; }
+        }
+
+        @media (aspect-ratio < 1) {
+            body.dark .bg-vertical { opacity: 0.3; }
+            body.dark .bg-horizontal { opacity: 0; }
+        }
+        @media (aspect-ratio > 1) {
+            body.dark .bg-vertical { opacity: 0; }
+            body.dark .bg-horizontal { opacity: 0.3; }
+        }
+        @media (aspect-ratio: 1) {
+            body.dark .bg-vertical { opacity: 0; }
+            body.dark .bg-horizontal { opacity: 0.3; }
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #4D1DA3;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        body.dark .theme-toggle {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffcc00;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        body.dark .theme-toggle:hover {
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.5s ease;
+        }
+        body.dark header {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #222;
+            text-shadow: 0 2px 5px rgba(255, 255, 255, 0.5);
+            transition: all 0.5s ease;
+        }
+        body.dark h1 {
+            color: #fff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #444;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+            transition: all 0.5s ease;
+        }
+        body.dark .subtitle {
+            color: #ddd;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .grid-item {
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.5s ease;
+        }
+        body.dark .grid-item {
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .grid-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.25);
+        }
+        body.dark .grid-item:hover {
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .grid-item:active {
+            transform: scale(0.97);
+        }
+
+        .item-header {
+            padding: 25px 20px 15px;
+            background: rgba(255, 255, 255, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+        body.dark .item-header {
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        .item-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #4D1DA3;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+        }
+        body.dark .item-title {
+            color: #ffcc00;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .item-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-desc {
+            font-size: 1.05rem;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: center;
+            opacity: 0.95;
+            font-weight: 500;
+            transition: all 0.5s ease;
+        }
+        body.dark .item-desc {
+            color: #ddd;
+        }
+
+        .item-footer {
+            margin-top: auto;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.22);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.5s ease;
+        }
+        body.dark .item-footer {
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        .category-tag {
+            background: rgba(255, 255, 255, 0.3);
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.5s ease;
+        }
+        body.dark .category-tag {
+            background: rgba(0, 0, 0, 0.5);
+            color: #ddd;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .item-link {
+            color: #4D1DA3;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s ease;
+        }
+        body.dark .item-link {
+            color: #ffcc00;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .item-link i {
+            margin-left: 5px;
+            transition: transform 0.3s;
+        }
+        .grid-item:hover .item-link i {
+            transform: translateX(5px);
+        }
+
+        /* 核心修改：添加 font-weight: 500 增大页脚文字字重 */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            color: #444;
+            font-weight: 500; /* 中等粗细，比默认粗，不突兀 */
+            transition: color 0.5s ease;
+        }
+        body.dark footer {
+            color: #ddd;
+            /* 暗色模式继承字重，无需额外设置 */
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .item-title {
+                font-size: 1.6rem;
+            }
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .subtitle {
+                font-size: 1rem;
+            }
+            .item-title {
+                font-size: 1.5rem;
+            }
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <div class="bg-layer bg-vertical"></div>
+    <div class="bg-layer bg-horizontal"></div>
+
+    <div class="container">
+        <header>
+            <h1>我の一些奇思妙想的合辑</h1>
+            <p class="subtitle">点击任意方格访问不同的内容模块</p>
+        </header>
+        
+        <div class="grid-container">
+            <div class="grid-item" onclick="window.location.href='Uiverse Card.html'">
+                <div class="item-header">
+                    <h3 class="item-title">动态Card</h3>
+                </div>
+                <div class="item-content">
+                    <p class="item-desc">Uiverse Card 悬停动画</p>
+                    <div class="item-footer">
+                        <span class="category-tag">Uiverse Card</span>
+                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid-item" onclick="window.location.href='web designed by AI.html'">
+                <div class="item-header">
+                    <h3 class="item-title">现代简约网页</h3>
+                </div>
+                <div class="item-content">
+                    <p class="item-desc">AI写的现代化（？）网页</p>
+                    <div class="item-footer">
+                        <span class="category-tag">Nice web</span>
+                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-item" onclick="window.location.href='verification code.html'">
+                <div class="item-header">
+                    <h3 class="item-title">赤石科技</h3>
+                </div>
+                <div class="item-content">
+                    <p class="item-desc">我们修复了填写验证码过于简单的bug（doge）</p>
+                    <div class="item-footer">
+                        <span class="category-tag">新时代の验证码滑块</span>
+                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>LC（Lcat）© 2025 | 页面部分源码由AI生成</p>
+        </footer>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            if (body.classList.contains('dark')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        document.querySelectorAll('.grid-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

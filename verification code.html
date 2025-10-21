@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8">
+    <title>赤石科技</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+        
+        body {
+            background: #1a2a6c;
+            padding: 20px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .security-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 20px;
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .subtitle {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .code-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1a2a6c;
+            margin: 20px 0;
+            letter-spacing: 5px;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .slider-container {
+            background: #f1f1f1;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 40px;
+            margin: 10px 0;
+            -webkit-appearance: none; /* Webkit浏览器 */
+            -moz-appearance: none;    /* Firefox */
+            appearance: none;         /* 标准属性 */
+            background: linear-gradient(to right, #1a2a6c, #b21f1f, #fdbb2d);
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border: 3px solid #1a2a6c;
+            transition: all 0.3s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        .current-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a2a6c;
+            margin: 15px 0;
+        }
+        
+        .attempts {
+            font-size: 14px;
+            color: #e74c3c;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            background: #b21f1f;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-reset {
+            background: #fdbb2d;
+            color: #333;
+        }
+        
+        .btn-reset:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .message {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 20px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .success {
+            color: #27ae60;
+            background-color: rgba(39, 174, 96, 0.1);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .failure {
+            color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+                border-radius: 8px;
+            }
+            
+            h1 {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            
+            .subtitle {
+                font-size: 13px;
+                margin-bottom: 15px;
+            }
+            
+            .code-display {
+                font-size: 28px;
+                margin: 15px 0;
+                letter-spacing: 3px;
+            }
+            
+            .slider-container {
+                padding: 10px;
+            }
+            
+            .slider {
+                height: 35px;
+            }
+            
+            .slider::-webkit-slider-thumb {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .current-value {
+                font-size: 20px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                min-width: 120px;
+            }
+            
+            .message {
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+            
+            .code-display {
+                font-size: 24px;
+            }
+            
+            .slider-labels {
+                font-size: 12px;
+            }
+            
+            .slider {
+                height: 30px;
+            }
+            
+            .slider::-webkit-slider-thumb {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .current-value {
+                font-size: 18px;
+            }
+            
+            .btn {
+                padding: 8px 15px;
+                font-size: 13px;
+                min-width: 100px;
+            }
+            
+            .message {
+                font-size: 13px;
+            }
+        }
+        
+        /* 横屏适配 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .container {
+                max-width: 90%;
+                padding: 10px;
+            }
+            
+            .code-display {
+                font-size: 24px;
+                margin: 10px 0;
+            }
+            
+            .slider-container {
+                margin: 10px 0;
+                padding: 8px;
+            }
+            
+            .btn-container {
+                margin: 10px 0;
+            }
+        }
+    </style>
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="container">
+        <div class="security-badge">防键盘作弊</div>
+        <h1>滑块验证码</h1>
+        <p class="subtitle">滑动滑块匹配下方的4位验证码。<span class="highlight">键盘方向键已被禁用</span>，请使用触摸操作。</p>
+        
+        <div class="code-display" id="targetCode">0000</div>
+        
+        <div class="slider-container">
+            <div class="slider-labels">
+                <span>0000</span>
+                <span>滑动滑块</span>
+                <span>9999</span>
+            </div>
+            <input type="range" min="0" max="9999" value="0" class="slider" id="codeSlider">
+            <div class="current-value" id="currentValue">0000</div>
+        </div>
+        
+        <div class="attempts" id="attempts">尝试次数: 0</div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="btn-container">
+            <button class="btn" id="submitBtn">提交验证</button>
+            <button class="btn btn-reset" id="resetBtn">刷新数字</button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素（兼容IE8）
+        function $(id) {
+            return document.getElementById(id);
+        }
+        
+        var targetCodeEl = $('targetCode');
+        var codeSlider = $('codeSlider');
+        var currentValueEl = $('currentValue');
+        var attemptsEl = $('attempts');
+        var messageEl = $('message');
+        var submitBtn = $('submitBtn');
+        var resetBtn = $('resetBtn');
+        
+        // 初始化变量
+        var targetCode = '';
+        var attempts = 0;
+        var lastKeyPressTime = 0;
+        
+        // 生成随机4位验证码
+        function generateCode() {
+            return Math.floor(Math.random() * 10000).toString();
+        }
+        
+        // 补零函数（兼容IE8）
+        function padZero(num, len) {
+            var str = num.toString();
+            while (str.length < len) {
+                str = '0' + str;
+            }
+            return str;
+        }
+        
+        // 更新当前滑块值显示
+        function updateCurrentValue() {
+            var value = padZero(codeSlider.value, 4);
+            currentValueEl.innerHTML = value;
+        }
+        
+        // 重置挑战
+        function resetChallenge() {
+            targetCode = padZero(generateCode(), 4);
+            targetCodeEl.innerHTML = targetCode;
+            codeSlider.value = 0;
+            attempts = 0;
+            attemptsEl.innerHTML = '尝试次数: 0';
+            messageEl.innerHTML = '';
+            messageEl.className = 'message';
+            updateCurrentValue();
+        }
+        
+        // 提交验证
+        function submitAttempt() {
+            attempts++;
+            attemptsEl.innerHTML = '尝试次数: ' + attempts;
+            
+            var userValue = padZero(codeSlider.value, 4);
+            
+            if (userValue === targetCode) {
+                messageEl.innerHTML = '🎉 验证成功！你匹配成功了！ 🎉';
+                messageEl.className = 'message success';
+            } else {
+                var diff = Math.abs(parseInt(targetCode) - parseInt(userValue));
+                messageEl.innerHTML = '匹配失败！相差 ' + diff + ' 个数字';
+                messageEl.className = 'message failure';
+                
+                // 显示差异
+                setTimeout(function() {
+                    messageEl.innerHTML = '目标: ' + targetCode + ' | 你的输入: ' + userValue;
+                }, 1500);
+            }
+        }
+        
+        // 防止键盘作弊的函数
+        function preventKeyboardCheating(event) {
+            event = event || window.event;
+            var key = event.key || event.keyCode;
+            
+            // 检查是否按下了方向键或其他可能控制滑块的键
+            var forbiddenKeys = [
+                'ArrowLeft', 'Left', 37,
+                'ArrowRight', 'Right', 39,
+                'ArrowUp', 'Up', 38,
+                'ArrowDown', 'Down', 40,
+                'Home', 36,
+                'End', 35
+            ];
+            
+            // 检查按键是否在禁止列表中
+            var isForbidden = false;
+            for (var i = 0; i < forbiddenKeys.length; i++) {
+                if (key === forbiddenKeys[i] || event.keyCode === forbiddenKeys[i]) {
+                    isForbidden = true;
+                    break;
+                }
+            }
+            
+            if (isForbidden) {
+                // 阻止默认行为（移动滑块）
+                if (event.preventDefault) {
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
+                
+                // 显示警告信息
+                showKeyWarning(key);
+            }
+        }
+        
+        // 显示按键警告
+        function showKeyWarning(key) {
+            var now = new Date().getTime();
+            // 防止过于频繁的警告
+            if (now - lastKeyPressTime > 1000) {
+                lastKeyPressTime = now;
+                
+                var keyMap = {
+                    'ArrowLeft': '←', 'Left': '←', 37: '←',
+                    'ArrowRight': '→', 'Right': '→', 39: '→',
+                    'ArrowUp': '↑', 'Up': '↑', 38: '↑',
+                    'ArrowDown': '↓', 'Down': '↓', 40: '↓',
+                    'Home': 'Home', 36: 'Home',
+                    'End': 'End', 35: 'End'
+                };
+                
+                var keyDisplay = keyMap[key] || key;
+                
+                var warning = document.createElement('div');
+                warning.innerHTML = '检测到作弊按键 "' + keyDisplay + '" 已被屏蔽！请使用触摸操作。';
+                warning.className = 'message warning';
+                
+                messageEl.parentNode.insertBefore(warning, messageEl.nextSibling);
+                
+                // 3秒后移除警告
+                setTimeout(function() {
+                    if (warning.parentNode) {
+                        warning.parentNode.removeChild(warning);
+                    }
+                }, 3000);
+            }
+        }
+        
+        // 事件监听（兼容IE8）
+        if (codeSlider.addEventListener) {
+            codeSlider.addEventListener('input', updateCurrentValue);
+            submitBtn.addEventListener('click', submitAttempt);
+            resetBtn.addEventListener('click', resetChallenge);
+            codeSlider.addEventListener('keydown', preventKeyboardCheating);
+        } else if (codeSlider.attachEvent) {
+            codeSlider.attachEvent('oninput', updateCurrentValue);
+            submitBtn.attachEvent('onclick', submitAttempt);
+            resetBtn.attachEvent('onclick', resetChallenge);
+            codeSlider.attachEvent('onkeydown', preventKeyboardCheating);
+        } else {
+            codeSlider.oninput = updateCurrentValue;
+            submitBtn.onclick = submitAttempt;
+            resetBtn.onclick = resetChallenge;
+            codeSlider.onkeydown = preventKeyboardCheating;
+        }
+        
+        // 初始化
+        resetChallenge();
+    </script>
+</body>
+</html>

@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>现代简约网页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 核心修改1：移除原来的 Google Fonts 链接 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4A44B3;
+            --accent: #FF6584;
+            --light: #F8F9FA;
+            --dark: #2A2A3C;
+            --gray: #8A8A9C;
+            --transition: all 0.4s ease;
+        }
+
+        /* 核心修改2：用系统默认字体栈替代 Google 字体 */
+        /* 正文字体：优先用各系统默认无衬线字体，兼顾兼容性 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            overflow-x: hidden;
+        }
+
+        /* 标题字体：用稍粗的系统字体，保持标题辨识度 */
+        h1, h2, h3, h4, h5 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Bold", Roboto Bold, "Microsoft YaHei Bold", "微软雅黑 Bold", Arial Bold, sans-serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏样式（不变） */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* 移动端菜单按钮（不变） */
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            color: var(--dark);
+            cursor: pointer;
+        }
+
+        /* 英雄区域样式（不变） */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .hero-content {
+            flex: 1;
+            padding-right: 50px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--gray);
+            max-width: 600px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            margin-left: 15px;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* 服务区域样式（不变） */
+        .services {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: var(--gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: var(--transition);
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 30px;
+            color: var(--primary);
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .service-card p {
+            color: var(--gray);
+        }
+
+        /* 功能区域样式（不变） */
+        .features {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e6e9f0 100%);
+        }
+
+        .features-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .features-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .features-image img {
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .features-text {
+            flex: 1;
+        }
+
+        .features-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .features-text p {
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .feature-item {
+            display: flex;
+            margin-bottom: 25px;
+        }
+
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .feature-text h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .feature-text p {
+            margin-bottom: 0;
+        }
+
+        /* 统计区域样式（不变） */
+        .stats {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* 联系区域样式（不变） */
+        .contact {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .contact-container {
+            display: flex;
+            gap: 50px;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .contact-info p {
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(108, 99, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        .contact-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .contact-details p {
+            margin-bottom: 0;
+            color: var(--gray);
+        }
+
+        .contact-form {
+            flex: 1;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", Arial, sans-serif; /* 同步默认字体 */
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* 页脚样式（不变） */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 70px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        /* 动画效果（不变） */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 修复移动端白边问题（不变） */
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @media (max-width: 992px) {
+            .hero {
+                height: auto;
+                padding: 150px 0 80px;
+            }
+            
+            .hero-content, .hero-image {
+                flex: 100%;
+                text-align: center;
+                padding: 0;
+            }
+            
+            .hero-content {
+                margin-bottom: 50px;
+                padding: 0 20px;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero-image {
+                width: 100%;
+                max-width: 100%;
+                padding: 0 20px;
+            }
+            
+            .hero-image svg {
+                max-width: 100%;
+                height: auto;
+            }
+            
+            .features-content, .contact-container {
+                flex-direction: column;
+            }
+            
+            .features-image svg {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .container {
+                padding: 0 15px;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            /* 移动端导航样式（不变） */
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                height: auto;
+                background: white;
+                padding: 20px 0;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                transition: 0.3s ease-in-out;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links li {
+                margin: 0;
+                text-align: center;
+                padding: 15px 0;
+            }
+
+            .nav-links a {
+                font-size: 1.1rem;
+            }
+
+            .nav-links a::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo"><i class="fas fa-cube"></i>L-cat</a>
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#">首页</a></li>
+                    <li><a href="#">服务</a></li>
+                    <li><a href="#">功能</a></li>
+                    <li><a href="#">作品</a></li>
+                    <li><a href="#">联系</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>创造<span>卓越</span>的数字体验</h1>
+                <p>我们帮助品牌通过精心设计的数字解决方案讲述他们的故事，连接用户并推动业务增长。</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn">开始项目</a>
+                    <a href="#" class="btn btn-outline">了解更多</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <svg width="400" height="300" viewBox="0 0 600 450">
+                    <rect x="50" y="50" width="500" height="350" rx="20" fill="#6C63FF" opacity="0.2"/>
+                    <rect x="100" y="100" width="400" height="250" rx="20" fill="#6C63FF" opacity="0.4"/>
+                    <rect x="150" y="150" width="300" height="150" rx="20" fill="#6C63FF"/>
+                    <circle cx="300" cy="225" r="50" fill="#FF6584"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- 服务区域 -->
+    <section class="services">
+        <div class="container">
+            <div class="section-title">
+                <h2>我们的专业服务</h2>
+                <p>我们提供全方位的数字解决方案，帮助您的业务在数字时代蓬勃发展</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3>网站开发</h3>
+                    <p>打造响应式、高性能的网站和Web应用，提供卓越的用户体验和强大的功能。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>移动应用</h3>
+                    <p>设计并开发直观、高效的移动应用程序，满足iOS和Android平台的需求。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>UI/UX设计</h3>
+                    <p>创建以用户为中心的设计解决方案，提升用户参与度和满意度。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能区域 -->
+    <section class="features">
+        <div class="container">
+            <div class="features-content">
+                <div class="features-image">
+                    <svg width="500" height="400" viewBox="0 0 600 480">
+                        <rect x="50" y="50" width="500" height="380" rx="20" fill="#f0f4f8"/>
+                        <circle cx="150" cy="150" r="80" fill="#6C63FF" opacity="0.3"/>
+                        <circle cx="300" cy="250" r="80" fill="#FF6584" opacity="0.3"/>
+                        <circle cx="450" cy="150" r="80" fill="#4A44B3" opacity="0.3"/>
+                        <rect x="100" y="350" width="400" height="50" rx="25" fill="#8A8A9C" opacity="0.2"/>
+                    </svg>
+                </div>
+                <div class="features-text">
+                    <h2>创新功能驱动业务增长</h2>
+                    <p>我们的解决方案结合了前沿技术和创新思维，为您提供竞争优势。</p>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>高性能架构</h3>
+                            <p>优化代码和基础设施，确保您的应用快速响应且稳定可靠。</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>企业级安全</h3>
+                            <p>多层安全防护，保护您的数据和用户隐私免受威胁。</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>持续更新</h3>
+                            <p>定期更新和维护，确保您的应用始终使用最新技术和功能。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 统计区域 -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>114+</h3>
+                    <p>完成项目</p>
+                </div>
+                <div class="stat-item">
+                    <h3>514%</h3>
+                    <p>客户满意度</p>
+                </div>
+                <div class="stat-item">
+                    <h3>1919+</h3>
+                    <p>专业团队成员</p>
+                </div>
+                <div class="stat-item">
+                    <h3>810+</h3>
+                    <p>行业奖项</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系区域 -->
+    <section class="contact">
+        <div class="container">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h2>联系我们</h2>
+                    <p>有任何问题或想开始新项目？请随时联系我们，我们期待与您合作。</p>
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>地址</h3>
+                            <p>太阳系移居带</p>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>电话</h3>
+                            <p>+86 12345678</p>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>邮箱</h3>
+                            <p>contact@email.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <label for="name">姓名</label>
+                            <input type="text" id="name" class="form-control" placeholder="请输入您的姓名">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" id="email" class="form-control" placeholder="请输入您的邮箱">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">留言</label>
+                            <textarea id="message" class="form-control" placeholder="请告诉我们您的需求"></textarea>
+                        </div>
+                        <button type="submit" class="btn">发送消息</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>L-cat</h3>
+                    <p>我们致力于创造卓越的数字体验，帮助企业在数字时代取得成功。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>快速链接</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">首页</a></li>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">服务</a></li>
+                        <li><a href="#">作品集</a></li>
+                        <li><a href="#">博客</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>服务</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">网站开发</a></li>
+                        <li><a href="#">移动应用</a></li>
+                        <li><a href="#">UI/UX设计</a></li>
+                        <li><a href="#">品牌设计</a></li>
+                        <li><a href="#">数字营销</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>订阅通讯</h3>
+                    <p>订阅我们的通讯，获取最新行业趋势和技巧。</p>
+                    <form>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="您的邮箱地址">
+                        </div>
+                        <button type="submit" class="btn">订阅</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>LC（Lcat）© 2025 | 页面内容由deepsleep一次生成并由人工 + Claude AI调整（doge）。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 简单的滚动动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 服务卡片动画
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // 导航栏滚动效果
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('header');
+                if (window.scrollY > 100) {
+                    header.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.1)';
+                    header.style.background = 'rgba(255, 255, 255, 0.98)';
+                } else {
+                    header.style.boxShadow = '0 2px 15px rgba(0, 0, 0, 0.1)';
+                    header.style.background = 'rgba(255, 255, 255, 0.95)';
+                }
+            });
+            
+            // 表单提交处理
+            const contactForm = document.querySelector('.contact-form form');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('感谢您的留言！我们会尽快与您联系。');
+                    contactForm.reset();
+                });
+            }
+
+            // 移动端菜单切换
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            const menuIcon = menuToggle.querySelector('i');
+
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                menuIcon.classList.toggle('fa-bars');
+                menuIcon.classList.toggle('fa-times');
+            });
+
+            // 点击链接后关闭菜单
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
