@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我让你关闭广告了啊！</title>
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 配置Tailwind -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4361EE',
+            accent: '#FF3366',
+            neutral: '#F8F9FA'
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <!-- 自定义工具类 -->
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .ad-shadow {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      }
+      .float-animation {
+        animation: float 3s ease-in-out infinite;
+      }
+      .pulse-animation {
+        animation: pulse 0.5s ease-in-out infinite alternate;
+      }
+    }
+  </style>
+  
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 1; }
+      to { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .shake {
+      animation: shake 0.3s ease-in-out;
+    }
+    
+    @keyframes slide-in {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .slide-in {
+      animation: slide-in 0.3s ease-out forwards;
+    }
+
+    /* 测试开关样式 */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #4361EE;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen font-inter flex items-center justify-center p-4 overflow-x-hidden">
+  <!-- 背景装饰 -->
+  <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- 音频元素：添加loop属性实现循环播放，需替换src为你的音乐文件路径 -->
+  <audio id="switch-music" preload="auto" loop controls style="display: none;">
+    <!-- 建议提供多种格式兼容不同浏览器，替换为实际文件路径 -->
+    <source src="./audio/小杂鱼-歌爱雪.WAV" type="audio/wav">
+    您的浏览器不支持音频播放
+  </audio>
+  
+  <!-- 广告遮罩层 -->
+  <div id="ad-overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300"></div>
+  
+  <!-- 广告框容器 -->
+  <div id="ad-container" class="relative z-50 bg-white rounded-2xl ad-shadow max-w-md w-full overflow-hidden float-animation">
+    <!-- 广告头部标签 -->
+    <div class="bg-primary text-white text-center py-1.5 text-sm font-medium">
+      芝士一个广告
+    </div>
+    
+    <!-- 广告内容 -->
+    <div class="p-6">
+      <h3 class="text-[clamp(1.25rem,3vw,1.75rem)] font-bold text-gray-800 mb-3">什么，你不想看可爱的广告菌？</h3>
+      <p class="text-gray-600 mb-4">现在加入会员即可享受免广告权益，充钱使你强大。</p>
+      
+      <div class="bg-red-50 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full inline-block mb-4">
+        低价限时114小时 · 仅剩514个名额
+      </div>
+      
+      <div class="flex gap-3 mb-5">
+        <div class="flex-1 bg-neutral rounded-lg p-3 text-center">
+          <div class="text-2xl font-bold text-primary">¥1919</div>
+          <div class="text-gray-500 text-sm">/年</div>
+        </div>
+        <div class="flex-1 bg-neutral rounded-lg p-3 text-center">
+          <div class="text-2xl font-bold text-primary">¥810</div>
+          <div class="text-gray-500 text-sm">/月</div>
+        </div>
+      </div>
+      
+      <button class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg shadow-primary/20">
+        即刻强化！ <span class="ml-1">→</span>
+      </button>
+
+      <!-- 细狗开关（开启播放循环音乐） -->
+      <div class="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500">
+        <span>细狗开关（小杂鱼按不到按钮吧，打开这个开关吧）</span>
+        <label class="switch">
+          <input type="checkbox" id="fix-btn-switch">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    
+    <!-- 关闭按钮 -->
+    <button id="close-btn" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center text-xl font-bold cursor-pointer transition-all duration-200 shadow-md hover:bg-accent/90 active:scale-90 z-20">
+      ×
+    </button>
+    
+    <!-- 提示信息 (默认隐藏) -->
+    <div id="message" class="hidden absolute top-16 right-0 bg-gray-800 text-white text-sm py-1.5 px-3 rounded-lg shadow-lg z-30 slide-in whitespace-nowrap">
+      再按到我一次才能关闭广告哦
+    </div>
+  </div>
+
+  <script>
+    // 获取DOM元素
+    const closeBtn = document.getElementById('close-btn');
+    const adContainer = document.getElementById('ad-container');
+    const adOverlay = document.getElementById('ad-overlay');
+    const message = document.getElementById('message');
+    const fixBtnSwitch = document.getElementById('fix-btn-switch');
+    const switchMusic = document.getElementById('switch-music'); // 音频元素
+    
+    // 状态变量
+    let clickCount = 0;
+    let isMoving = false;
+    let moveInterval;
+    let isFixed = false; 
+    let isClickLocked = false; 
+    const LOCK_DURATION = 500; // 0.5秒锁定时长
+    
+    // 细狗开关事件（控制音乐循环播放和按钮固定）
+    fixBtnSwitch.addEventListener('change', (e) => {
+      isFixed = e.target.checked;
+      if (isFixed) {
+        // 开启开关：固定按钮 + 播放循环音乐
+        stopMovingButton();
+        closeBtn.style.left = 'auto';
+        closeBtn.style.right = '1rem';
+        closeBtn.style.top = '1rem';
+        // 播放音乐（处理浏览器自动播放限制）
+        switchMusic.play().catch(err => {
+          console.log('音乐播放失败：', err);
+          alert('请先点击页面任意位置，再开启开关（浏览器安全限制）');
+        });
+      } else {
+        // 关闭开关：暂停音乐 + 恢复按钮移动（若已点击过一次）
+        switchMusic.pause();
+        switchMusic.currentTime = 0; // 重置播放位置
+        if (clickCount === 1) {
+          startMovingButton();
+        }
+      }
+    });
+    
+    // 点击关闭按钮逻辑
+    closeBtn.addEventListener('click', () => {
+      if (isClickLocked) return;
+      
+      clickCount++;
+      
+      if (clickCount === 1) {
+        isClickLocked = true;
+        message.classList.remove('hidden');
+        closeBtn.classList.add('pulse-animation');
+        adContainer.classList.add('shake');
+        setTimeout(() => adContainer.classList.remove('shake'), 300);
+        
+        if (!isFixed) {
+          startMovingButton();
+        }
+        
+        setTimeout(() => {
+          isClickLocked = false;
+        }, LOCK_DURATION);
+        
+      } else if (clickCount === 2) {
+        // 关闭广告时同步停止音乐
+        stopMovingButton();
+        switchMusic.pause();
+        switchMusic.currentTime = 0;
+        closeAdvertisement();
+      }
+    });
+    
+    // 随机移动按钮函数
+    function startMovingButton() {
+      isMoving = true;
+      const adRect = adContainer.getBoundingClientRect();
+      const btnSize = 40;
+      
+      moveInterval = setInterval(() => {
+        if (!isMoving || isFixed) return;
+        
+        const maxX = adRect.width - btnSize;
+        const maxY = adRect.height - btnSize;
+        const randomX = Math.floor(Math.random() * maxX);
+        const randomY = Math.floor(Math.random() * maxY);
+        
+        closeBtn.style.left = `${randomX}px`;
+        closeBtn.style.top = `${randomY}px`;
+        closeBtn.style.right = 'auto';
+      }, 150);
+    }
+    
+    // 停止移动按钮
+    function stopMovingButton() {
+      isMoving = false;
+      clearInterval(moveInterval);
+      closeBtn.classList.remove('pulse-animation');
+    }
+    
+    // 关闭广告
+    function closeAdvertisement() {
+      adContainer.style.opacity = '0';
+      adContainer.style.transform = 'scale(0.8) translateY(30px)';
+      adOverlay.style.opacity = '0';
+      
+      setTimeout(() => {
+        adContainer.remove();
+        adOverlay.remove();
+      }, 500);
+    }
+    
+    adContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // 页面首次点击初始化（解决浏览器自动播放限制）
+    document.body.addEventListener('click', () => {
+      switchMusic.load(); // 预加载音频，提升播放流畅度
+    }, { once: true });
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>哈基米之音（Hachimi Sound）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* 防止页面滚动 */
+    }
+    .content-auto {
+      content-visibility: auto;
+    }
+    .grid-container {
+      width: 100vw;
+      height: calc(100vh - 12rem); /* 减去头部和底部高度，确保铺满中间区域 */
+    }
+    .grid-cell {
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      background-color: #f8fafc;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .grid-cell:hover {
+      background-color: #f1f5f9;
+    }
+    .grid-cell:active, .grid-cell.active {
+      background-color: #e2e8f0; /* 点击/划过时的视觉反馈 */
+    }
+  </style>
+</head>
+<body class="bg-[#f8fafc] flex flex-col">
+  <!-- 页面头部 -->
+  <header class="py-6 px-4 text-center bg-white/80 backdrop-blur-sm shadow-sm">
+    <h1 class="text-[clamp(1.8rem,5vw,3rem)] font-bold bg-gradient-to-r from-[#4f46e5] to-[#60a5fa] bg-clip-text text-transparent mb-2">
+      哈基米之音
+    </h1>
+    <p class="text-gray-500 max-w-md mx-auto">点击或按住鼠标划过格子播放声音</p>
+  </header>
+
+  <!-- 主要内容区：10个格子（2行5列，无间隙） -->
+  <main class="flex-grow flex items-center justify-center">
+    <div class="grid-container grid grid-cols-5 grid-rows-2">
+      <div class="grid-cell" data-sound="1"></div>
+      <div class="grid-cell" data-sound="2"></div>
+      <div class="grid-cell" data-sound="3"></div>
+      <div class="grid-cell" data-sound="4"></div>
+      <div class="grid-cell" data-sound="5"></div>
+      <div class="grid-cell" data-sound="6"></div>
+      <div class="grid-cell" data-sound="7"></div>
+      <div class="grid-cell" data-sound="8"></div>
+      <div class="grid-cell" data-sound="9"></div>
+      <div class="grid-cell" data-sound="10"></div>
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="py-4 px-4 text-center text-gray-500 text-sm border-t border-gray-100">
+    <p>LC（Lcat）© 2025 哈基米之音</p>
+  </footer>
+
+  <!-- 音频元素 -->
+  <div class="hidden">
+    <audio id="sound-1" src="audio/曼波曼波，欧码吉利曼波.WAV" preload="auto"></audio>
+    <audio id="sound-2" src="audio/哈基米哈基米哈基米.WAV" preload="auto"><RichMediaReference>
+    <audio id="sound-3" src="audio/哦南北绿豆.WAV" preload="auto"><RichMediaReference>
+    <audio id="sound-4" src="audio/WOW.WAV" preload="auto">
+    <audio id="sound-5" src="audio/你哈牛魔啊.WAV" preload="auto">
+    <audio id="sound-6" src="audio/阿米诺斯.WAV" preload="auto">
+    <audio id="sound-7" src="audio/呵呵呵.WAV" preload="auto">
+    <audio id="sound-8" src="audio/欧耶.WAV" preload="auto">
+    <audio id="sound-9" src="audio/duang.WAV" preload="auto">
+    <audio id="sound-10" src="audio/不给！.WAV" preload="auto">
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const gridCells = document.querySelectorAll('.grid-cell');
+      let isMouseDown = false; // 仅跟踪鼠标是否按下，移除lastPlayed限制
+      
+      // 播放音频核心函数（无重复限制）
+      function playSound(cell) {
+        const soundId = cell.getAttribute('data-sound');
+        const audioElement = document.getElementById(`sound-${soundId}`);
+        
+        if (audioElement) {
+          // 每次触发都从头播放（支持快速重复）
+          audioElement.currentTime = 0;
+          audioElement.play().catch(error => {
+            console.error('播放失败:', error);
+            alert(`声音 ${soundId} 播放失败，请检查音频文件路径是否正确`);
+          });
+          
+          // 视觉反馈：添加active状态，200ms后移除
+          cell.classList.add('active');
+          setTimeout(() => cell.classList.remove('active'), 200);
+        }
+      }
+      
+      // 鼠标按下：开启划过检测，若在格子上按下则直接播放
+      document.addEventListener('mousedown', (e) => {
+        isMouseDown = true;
+        if (e.target.classList.contains('grid-cell')) {
+          playSound(e.target);
+        }
+      });
+      
+      // 鼠标释放/离开页面：关闭划过检测
+      document.addEventListener('mouseup', () => isMouseDown = false);
+      document.addEventListener('mouseleave', () => isMouseDown = false);
+      
+      // 格子事件监听
+      gridCells.forEach(cell => {
+        // 点击播放
+        cell.addEventListener('click', () => playSound(cell));
+        
+        // 鼠标划过播放（仅当鼠标按下时）
+        cell.addEventListener('mouseenter', () => {
+          if (isMouseDown) playSound(cell);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
