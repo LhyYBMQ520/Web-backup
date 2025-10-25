@@ -73,12 +73,15 @@
       animation: slide-in 0.3s ease-out forwards;
     }
 
-    /* 测试开关样式 */
+    /* 开关样式：固定尺寸，确保不被压缩 */
     .switch {
       position: relative;
       display: inline-block;
-      width: 40px;
-      height: 20px;
+      width: 40px; /* 固定宽度，不允许收缩 */
+      height: 20px; /* 固定高度 */
+      cursor: pointer;
+      user-select: none; /* 防止点击时选中文字 */
+      flex-shrink: 0; /* 禁止flex布局下被压缩 */
     }
     
     .switch input {
@@ -116,7 +119,7 @@
     }
     
     input:checked + .slider:before {
-      transform: translateX(20px);
+      transform: translateX(20px); /* 位移匹配开关宽度，避免超出 */
     }
   </style>
 </head>
@@ -168,9 +171,9 @@
         即刻强化！ <span class="ml-1">→</span>
       </button>
 
-      <!-- 细狗开关（开启播放循环音乐） -->
-      <div class="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500">
-        <span>细狗开关（小杂鱼按不到按钮吧，打开这个开关吧）</span>
+      <!-- 小杂鱼开关：优化布局，文字自动换行，开关不压缩 -->
+      <div class="mt-4 flex items-center justify-between gap-2 text-sm text-gray-500 flex-wrap">
+        <span>小杂鱼按不到按钮吧，打开这个开关试试？</span>
         <label class="switch">
           <input type="checkbox" id="fix-btn-switch">
           <span class="slider"></span>
@@ -206,7 +209,7 @@
     let isClickLocked = false; 
     const LOCK_DURATION = 500; // 0.5秒锁定时长
     
-    // 细狗开关事件（控制音乐循环播放和按钮固定）
+    // 小杂鱼开关事件（控制音乐循环播放和按钮固定）
     fixBtnSwitch.addEventListener('change', (e) => {
       isFixed = e.target.checked;
       if (isFixed) {
