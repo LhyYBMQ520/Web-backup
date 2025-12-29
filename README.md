@@ -7,8 +7,8 @@
 
 ### L Jun's unique obsession with IPv6 (😋😋😋)
 
-## 备份记录我的一些奇思妙想的静态网页，持续更新（？）
+## L菌の导航站
 
-### Backing up the static webpage that records some of my whimsical ideas, with continuous updates (?).
+### L-Cat's Navigation site
 
 [IPV4访问链接（IPV4 Visit link）](http://www.lcatnya.top/)
