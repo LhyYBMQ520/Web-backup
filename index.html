@@ -304,6 +304,11 @@
             color: #ddd;
             /* 暗色模式继承字重，无需额外设置 */
         }
+        
+            /* 新增：深色模式下页脚链接的颜色 */
+        body.dark footer a {
+            color: #ffcc00; /* 与 item-title 在深色模式下的颜色一致 */
+        }
 
         @media (max-width: 768px) {
             .grid-container {
