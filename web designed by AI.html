@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>现代简约网页</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 核心修改1：移除原来的 Google Fonts 链接 -->
     <style>
         * {
             margin: 0;
@@ -23,7 +22,6 @@
             --transition: all 0.4s ease;
         }
 
-        /* 核心修改2：用系统默认字体栈替代 Google 字体 */
         /* 正文字体：优先用各系统默认无衬线字体，兼顾兼容性 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
@@ -913,13 +911,34 @@
                     </form>
                 </div>
             </div>
+
             <div class="copyright">
-                <p>LC（Lcat）© 2025 | 页面内容由deepsleep一次生成并由人工 + Claude AI调整（doge）。</p>
+                <p>
+            LC（Lcat）© <span id="copyright-year-range"></span> | 
+            页面内容由Deepsleep一次生成并由人工 + Claude AI调整😋。</p>
             </div>
+
         </div>
     </footer>
 
     <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 月份补零，如 01、02...
+      
+      // 起始年份固定为 2025
+      const startYear = 2025;
+      
+      // 如果当前年份就是 2025，则只显示 "2025"；否则显示 "2025 - YYYY/MM"
+      const displayText = currentYear === startYear 
+        ? `${startYear}` 
+        : `${startYear} - ${currentYear}/${currentMonth}`;
+      
+      document.getElementById('copyright-year-range').textContent = displayText;
+    });
+
         // 简单的滚动动画效果
         document.addEventListener('DOMContentLoaded', function() {
             // 服务卡片动画

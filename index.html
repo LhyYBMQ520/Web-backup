@@ -469,11 +469,33 @@
         </div>
         
         <footer>
-            <p>LC（Lcat）© 2025 | 页面部分源码由AI生成 | <a href="https://github.com/LhyYBMQ520/Web-backup">Github Page</a></p>
+        <p>
+            LC（Lcat）© <span id="copyright-year-range"></span> | 
+            页面部分源码由AI生成 | 
+            <a href="https://github.com/LhyYBMQ520/Web-backup">Github Page</a>
+        </p>
         </footer>
+
     </div>
 
     <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 月份补零，如 01、02...
+        
+        // 起始年份固定为 2025
+        const startYear = 2025;
+        
+        // 如果当前年份就是 2025，则只显示 "2025"；否则显示 "2025 - YYYY/MM"
+        const displayText = currentYear === startYear 
+        ? `${startYear}` 
+        : `${startYear} - ${currentYear}/${currentMonth}`;
+        
+        document.getElementById('copyright-year-range').textContent = displayText;
+    });
+
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
 

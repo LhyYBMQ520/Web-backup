@@ -103,7 +103,7 @@
 
   <!-- 页脚 -->
   <footer class="py-4 px-4 text-center text-gray-500 text-sm border-t border-gray-100">
-    <p>LC（Lcat）© 2025 哈基米之音</p>
+    <p>LC（Lcat）© <span id="copyright-year-range"></span> | 哈基米之音</p>
   </footer>
 
   <!-- 音频资源 -->
@@ -121,6 +121,23 @@
   </div>
 
 <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 月份补零，如 01、02...
+      
+      // 起始年份固定为 2025
+      const startYear = 2025;
+      
+      // 如果当前年份就是 2025，则只显示 "2025"；否则显示 "2025 - YYYY/MM"
+      const displayText = currentYear === startYear 
+        ? `${startYear}` 
+        : `${startYear} - ${currentYear}/${currentMonth}`;
+      
+      document.getElementById('copyright-year-range').textContent = displayText;
+    });
+
   document.addEventListener('DOMContentLoaded', () => {
     const gridCells = document.querySelectorAll('.grid-cell');
     const audios = document.querySelectorAll('audio');
