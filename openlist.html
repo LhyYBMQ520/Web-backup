@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>按钮跳转链接页面</title>
+    <style>
+        /* 页面整体样式 */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column; /* 改为垂直布局，标题在上，按钮在下 */
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 标题样式 */
+        .page-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 40px; /* 标题和按钮之间的间距 */
+            text-align: center;
+            font-weight: 600;
+            line-height: 1.4; /* 适配长标题换行 */
+        }
+
+        /* 按钮容器 */
+        .button-container {
+            display: flex;
+            gap: 20px; /* 按钮之间的间距 */
+            flex-wrap: wrap; /* 适配小屏幕，按钮自动换行 */
+            justify-content: center;
+        }
+
+        /* 按钮样式 */
+        .link-button {
+            padding: 15px 30px;
+            font-size: 16px;
+            color: white;
+            background-color: #1677ff; /* 阿里云蓝，常用的主色调 */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* 点击过渡效果 */
+            text-decoration: none; /* 去除链接默认下划线 */
+        }
+
+        /* 鼠标悬停效果 */
+        .link-button:hover {
+            background-color: #0958d9;
+        }
+
+        /* 点击时的按压效果 */
+        .link-button:active {
+            background-color: #0640a0;
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <!-- 新增的标题 -->
+    <h1 class="page-title">openlist on aliyun vps线路切换中转站</h1>
+    
+    <div class="button-container">
+        <!-- 按钮1：替换 href 里的链接和按钮文字即可 -->
+        <a href="http://120.24.150.149:5244" target="_blank" class="link-button">IPv4 直连</a>
+        <!-- 按钮2 -->
+        <a href="http://edgeone.ybmq.dpdns.org" target="_blank" class="link-button">Tencent edgeone 线路</a>
+        <!-- 按钮3 -->
+        <a href="http://esa.ybmq.dpdns.org" target="_blank" class="link-button">Aliyun esa 线路</a>
+    </div>
+</body>
+</html>
