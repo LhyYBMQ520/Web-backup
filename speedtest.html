@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测速站前置页</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            dark: '#1D2129',
+            light: '#F2F3F5'
+          }
+        },
+      }
+    }
+  </script>
+
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .btn-hover {
+        @apply transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95;
+      }
+      .card-glow {
+        @apply shadow-[0_0_20px_rgba(22,93,255,0.2)];
+      }
+      .node-active {
+        @apply bg-primary text-white;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-dark dark:to-slate-900 min-h-screen flex flex-col items-center justify-center p-4 text-slate-800 dark:text-slate-100 transition-colors duration-300">
+  <!-- 背景装饰元素 -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="relative z-10 max-w-4xl w-full mx-auto flex flex-col items-center mb-8">
+    <!-- 标题区域 - 加宽容器宽度 -->
+    <div class="text-center mb-8 w-full">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 dark:bg-primary/20 mb-6">
+        <span class="text-3xl">⚡</span>
+      </div>
+      <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+        Lcat&杂鱼依凌 の 测速站前置页
+      </h1>
+      <p class="text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
+        请选择服务器节点，然后点击下方按钮进入对应的测速页面
+      </p>
+    </div>
+
+    <!-- 服务器节点选择区域 - 居中显示 -->
+    <div class="w-full mb-10">
+      <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3 px-2 text-center">选择服务器节点</h3>
+      <div class="flex flex-wrap gap-3 justify-center" id="serverNodes">
+        <!-- 节点按钮会通过JS动态生成 -->
+      </div>
+    </div>
+
+    <!-- 按钮容器 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+      <!-- IPV4通道按钮 -->
+      <button id="ipv4Btn" class="btn-hover bg-white dark:bg-slate-800 rounded-xl p-6 card-glow flex flex-col items-center justify-center text-center">
+        <div class="w-14 h-14 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center mb-4">
+          <span class="text-2xl">📶</span>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">IPV4通道</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400" id="ipv4UrlDisplay">加载中...</p>
+      </button>
+
+      <!-- IPV6通道按钮 -->
+      <button id="ipv6Btn" class="btn-hover bg-white dark:bg-slate-800 rounded-xl p-6 card-glow flex flex-col items-center justify-center text-center">
+        <div class="w-14 h-14 rounded-full bg-secondary/10 dark:bg-secondary/20 flex items-center justify-center mb-4">
+          <span class="text-2xl">📡</span>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">IPV6通道</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400" id="ipv6UrlDisplay">加载中...</p>
+      </button>
+    </div>
+
+    <!-- 额外信息区域 -->
+    <div class="mt-16 mb-8 text-center text-sm text-slate-500 dark:text-slate-400 max-w-xl">
+      <p>测试结果仅供参考，实际网络性能可能受多种因素影响</p>
+    </div>
+  </div>
+
+  <footer class="text-center text-xs text-slate-400 pb-4 max-w-4xl w-full mx-auto px-4">
+    <p>LC（Lcat）© <span id="copyright-year-range"></span> 测速站前置页 | 测速站本体基于开源项目LibreSpeed | 
+      <a href="https://github.com/librespeed" class="text-primary hover:text-primary/80 font-medium underline transition-colors">Github Page</a>
+    </p>
+  </footer>
+
+  <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 月份补零，如 01、02...
+      
+      // 起始年份固定为 2025
+      const startYear = 2025;
+      
+      // 如果当前年份就是 2025，则只显示 "2025"；否则显示 "2025 - YYYY/MM"
+      const displayText = currentYear === startYear 
+        ? `${startYear}` 
+        : `${startYear} - ${currentYear}/${currentMonth}`;
+      
+      document.getElementById('copyright-year-range').textContent = displayText;
+    });
+
+    // 服务器节点配置
+    const serverNodes = [
+      {
+        id: 'node1',
+        name: 'Librespeed 官方测速站（含多节点）',
+        ipv4Url: 'https://librespeed.org',
+        ipv6Url: 'https://librespeed.org'
+      },
+      {
+        id: 'node2',
+        name: 'DMIT 美国 CN2 GIA线（千兆）',
+        ipv4Url: 'http://www.lcatnya.top:59210',
+        ipv6Url: 'http://www.6.lcatnya.top:59210'
+      },
+      {
+        id: 'node3',
+        name: '中国科学技术大学测速网站',
+        ipv4Url: 'http://test.ustc.edu.cn',
+        ipv6Url: 'http://test6.ustc.edu.cn'
+      },
+      {
+        id: 'node4',
+        name: '阿里云 广东深圳线（200兆峰值）',
+        ipv4Url: 'http://120.24.150.149:59210',
+        ipv6Url: ''
+      },
+      {
+        id: 'node5',
+        name: '阿里云 上海线（200兆峰值）',
+        ipv4Url: 'https://47.117.115.180:59210',
+        ipv6Url: ''
+      },
+      {
+        id: 'node6',
+        name: '腾讯云 江苏南京线（200兆峰值）',
+        ipv4Url: 'https://speedtest-nor.dorimu.cn',
+        ipv6Url: 'https://speedtest-nor.dorimu.cn'
+      },
+      {
+        id: 'node7',
+        name: 'Netcup 德国线（2.5G）',
+        ipv4Url: 'http://159.195.53.76:59210',
+        ipv6Url: 'http://[2a0a:4cc0:c1:da18::1010:113a]:59210'
+      },
+      {
+        id: 'node8',
+        name: 'WapAc LXC 台湾线（千兆）',
+        ipv4Url: 'https://tw-e5-lxc-ipv4.wapac-ddns.eutopia.eu.org:32252',
+        ipv6Url: 'https://tw-e5-lxc-ipv6.wapac-ddns.eutopia.eu.org:32252'
+      }
+    ];
+
+    // 当前选中的节点索引
+    let currentNodeIndex = 0;
+
+    // DOM元素
+    const serverNodesContainer = document.getElementById('serverNodes');
+    const ipv4Btn = document.getElementById('ipv4Btn');
+    const ipv6Btn = document.getElementById('ipv6Btn');
+    const ipv4UrlDisplay = document.getElementById('ipv4UrlDisplay');
+    const ipv6UrlDisplay = document.getElementById('ipv6UrlDisplay');
+
+    // 初始化节点按钮
+    function initServerNodes() {
+      serverNodes.forEach((node, index) => {
+        const nodeBtn = document.createElement('button');
+        nodeBtn.id = node.id;
+        nodeBtn.className = `px-4 py-2 rounded-full text-sm transition-all duration-200 whitespace-nowrap ${
+          index === currentNodeIndex ? 'node-active' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
+        }`;
+        nodeBtn.textContent = node.name;
+        nodeBtn.addEventListener('click', () => {
+          switchNode(index);
+        });
+        serverNodesContainer.appendChild(nodeBtn);
+      });
+
+      // 设置初始链接
+      updateButtonUrls();
+    }
+
+    // 切换节点
+    function switchNode(index) {
+      if (index === currentNodeIndex) return;
+
+      // 更新按钮样式
+      document.getElementById(serverNodes[currentNodeIndex].id).classList.remove('node-active');
+      document.getElementById(serverNodes[currentNodeIndex].id).classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200', 'hover:bg-slate-200', 'dark:hover:bg-slate-700');
+
+      document.getElementById(serverNodes[index].id).classList.add('node-active');
+      document.getElementById(serverNodes[index].id).classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200', 'hover:bg-slate-200', 'dark:hover:bg-slate-700');
+
+      // 更新当前节点索引
+      currentNodeIndex = index;
+
+      // 更新按钮链接
+      updateButtonUrls();
+
+      // 添加切换动画效果
+      ipv4Btn.classList.add('scale-95', 'opacity-70');
+      ipv6Btn.classList.add('scale-95', 'opacity-70');
+
+      setTimeout(() => {
+        ipv4Btn.classList.remove('scale-95', 'opacity-70');
+        ipv6Btn.classList.remove('scale-95', 'opacity-70');
+      }, 200);
+    }
+
+    // 更新按钮链接
+    function updateButtonUrls() {
+      const currentNode = serverNodes[currentNodeIndex];
+
+      // 更新显示的URL（简化显示）
+      const simplifiedIpv4 = currentNode.ipv4Url.replace('http://', '').replace('https://', '');
+      const simplifiedIpv6 = currentNode.ipv6Url.replace('http://', '').replace('https://', '');
+
+      ipv4UrlDisplay.textContent = simplifiedIpv4;
+      ipv6UrlDisplay.textContent = simplifiedIpv6 || '暂不支持';
+
+      // 设置按钮点击事件 - 使用 window.open 在新窗口/标签页打开链接
+      ipv4Btn.onclick = () => {
+        if (currentNode.ipv4Url) { // 增加一个检查，确保 URL 存在
+          window.open(currentNode.ipv4Url, '_blank'); // '_blank' 指定在新窗口/标签页打开
+        }
+      };
+
+      ipv6Btn.onclick = () => {
+        if (currentNode.ipv6Url) { // 增加一个检查，确保 URL 存在且非空
+          window.open(currentNode.ipv6Url, '_blank');
+        }
+      };
+    }
+
+    // 初始化页面
+    window.addEventListener('DOMContentLoaded', initServerNodes);
+  </script>
+</body>
+</html>
