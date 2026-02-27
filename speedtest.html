@@ -98,9 +98,38 @@
   </div>
 
   <footer class="text-center text-xs text-slate-400 pb-4 max-w-4xl w-full mx-auto px-4">
-    <p>LC（Lcat）© <span id="copyright-year-range"></span> 测速站前置页 | 测速站本体基于开源项目LibreSpeed | 
-      <a href="https://github.com/librespeed" class="text-primary hover:text-primary/80 font-medium underline transition-colors">Github Page</a>
+    
+    <!-- 功能图标区域 -->
+    <div class="flex justify-center items-center gap-3 mb-4 flex-wrap text-sm md:text-base">
+      <a href="https://ipw.cn/ipv6webcheck/?site=https://speedtest.lcatnya.top" 
+        title="本站支持IPv6访问" target="_blank">
+        <img class="inline-block align-middle h-8 md:h-10 transition-transform hover:scale-110"
+            alt="本站支持IPv6访问" 
+            src="https://static.ipw.cn/icon/ipv6-s1.svg"></a>
+
+      <a href="https://ipw.cn/ssl/?site=https://speedtest.lcatnya.top" 
+        title="本站支持SSL安全访问" target="_blank">
+        <img class="inline-block align-middle h-8 md:h-10 transition-transform hover:scale-110" 
+            alt="本站支持SSL安全访问" 
+            src="https://static.ipw.cn/icon/ssl-s1.svg"></a>
+
+      <a href="https://http3check.net/?host=https://speedtest.lcatnya.top" 
+        title="本站已支持HTTP/3" 
+        target="_blank"
+        class="text-primary font-semibold hover:text-primary/80 transition-all hover:scale-110">
+        本站已支持HTTP/3</a>
+    </div>
+
+    <!-- 版权信息区域 -->
+    <p>
+      LC（Lcat）© <span id="copyright-year-range"></span> 
+      测速站前置页 | 测速站本体基于开源项目 LibreSpeed | 
+      <a href="https://github.com/librespeed" 
+        class="text-primary hover:text-primary/80 font-medium underline transition-colors">
+        Github Page
+      </a>
     </p>
+
   </footer>
 
   <script>
