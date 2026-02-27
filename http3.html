@@ -97,8 +97,16 @@
             justify-content: center;
             align-items: flex-start;
             gap: 20px;
-            max-width: 800px;
+            max-width: 1000px; /* 增大容器宽度，给两个按钮足够空间 */
             margin: 0 auto;
+        }
+
+        /* 按钮列容器 - 分离按钮和注意事项的关键 */
+        .btn-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 0 0 auto; /* 关键：按钮列不拉伸，只占自身宽度 */
         }
 
         /* 按钮通用样式 */
@@ -114,7 +122,7 @@
             box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
             text-decoration: none;
             display: inline-block;
-            white-space: nowrap;
+            white-space: nowrap; /* 按钮文字不换行 */
         }
 
         .test-btn:hover {
@@ -143,16 +151,17 @@
             background-color: #27ae60;
         }
 
-        /* 注意事项提示框 */
+        /* 注意事项提示框 - 调整 */
         .note-box {
             background-color: #fef9e7;
             border-left: 4px solid #f39c12;
             padding: 1rem 1.5rem;
             border-radius: 8px;
-            margin-top: 10px;
+            margin-top: 15px; /* 按钮和提示框间距 */
             text-align: left;
-            flex: 1;
-            min-width: 300px;
+            min-width: 300px; /* 保留最小宽度 */
+            max-width: 580px; /* 最大宽度 */
+            white-space: pre-line; /* 只在<br>处换行 */
         }
 
         .note-box h4 {
@@ -164,14 +173,11 @@
         .note-box p {
             color: #7f8c8d;
             font-size: 0.95rem;
-            line-height: 1.5;
+            line-height: 0.95;
         }
 
-        .local-btn-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 400px;
+        .note-box strong {
+            color: #2c3e50; /* 强调文字用深色 */
         }
 
         /* 响应式适配 */
@@ -187,16 +193,17 @@
             .test-btn {
                 padding: 0.8rem 2rem;
                 font-size: 1rem;
-                width: 100%;
+                width: 100%; /* 移动端按钮占满宽度 */
             }
 
             .btn-group {
-                flex-direction: column;
+                flex-direction: column; /* 移动端按钮垂直排列 */
                 align-items: stretch;
             }
 
-            .local-btn-wrapper {
-                max-width: 100%;
+            .note-box {
+                width: 100%; /* 移动端提示框占满宽度 */
+                max-width: none;
             }
         }
     </style>
@@ -229,26 +236,29 @@
             <p>HTTP/2 虽然解决了 HTTP/1.1 的许多问题，但仍基于 TCP 协议，存在队头阻塞问题。当一个 TCP 数据包丢失时，所有在该连接上的数据流都会被阻塞。而 HTTP/3 基于 UDP 的 QUIC 协议，每个数据流都有独立的传输路径，单个数据流的丢包不会影响其他数据流。</p>
         </section>
 
-        <!-- 按钮区域 -->
+        <!-- 按钮区域 - 核心结构调整 -->
         <div class="btn-container">
             <div class="btn-group">
-                <!-- 在线测试按钮 -->
-                <a href="https://http3check.net/?host=https://www.lcatnya.top" target="_blank" class="test-btn online-btn">
-                    在线测试：我的网站支持 HTTP/3 吗？
-                </a>
+                <!-- 在线测试按钮列 -->
+                <div class="btn-column">
+                    <a href="https://http3check.net/?host=https://www.lcatnya.top" target="_blank" class="test-btn online-btn">
+                        在线测试：我的网站支持 HTTP/3 吗？
+                    </a>
+                </div>
 
-                <!-- 本地测试按钮及注意事项 -->
-                <div class="local-btn-wrapper">
+                <!-- 本地测试按钮列（按钮+注意事项） -->
+                <div class="btn-column">
                     <a href="https://www.lcatnya.top/isHttp3" target="_blank" class="test-btn local-btn">
                         本地测试 HTTP/3 服务
                     </a>
-                    <!-- 自定义注意事项 -->
+                    <!-- 注意事项跟随在本地按钮下方，不影响按钮排布 -->
                     <div class="note-box">
                         <h4>📢 本地测试注意事项</h4>
-                        <p>第一次访问本地测试页大概率显示false（不支持http3）<br>
-                            请关闭代理软件并多次刷新网页，必要时清除网页数据<br>
-                            一般来说支持h3的浏览器刷新几次后都会显示true（支持http3）<br>
-                            如果一直是false则说明你当前浏览器或网络环境不支持HTTP/3。</p>
+                        <p>1. 首次访问本地测试页，大概率显示 <strong>false</strong>（表示暂不支持 HTTP/3）<br>
+                        2. 建议先关闭代理软件，再多次刷新网页（必要时可清除浏览器缓存）<br>
+                        3. 正常情况下，支持 HTTP/3 的浏览器刷新几次后会显示 <strong>true</strong><br>
+                        4. 若始终显示 false，大概率当前浏览器/网络环境暂不支持 HTTP/3<br>
+                        5. 不过这个测试不准啊，您就当图一乐😂</p>
                     </div>
                 </div>
             </div>
