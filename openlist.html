@@ -1,80 +1,158 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>线路中转站</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
-        /* 页面整体样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
             display: flex;
-            flex-direction: column; /* 改为垂直布局，标题在上，按钮在下 */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
+            min-height: 100vh;
             padding: 20px;
-            box-sizing: border-box;
+            color: #333;
+        }
+
+        /* 主容器：卡片式设计 */
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
         }
 
         /* 标题样式 */
         .page-title {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 40px; /* 标题和按钮之间的间距 */
-            text-align: center;
-            font-weight: 600;
-            line-height: 1.4; /* 适配长标题换行 */
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .page-title::after {
+            content: "";
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(to right, #1677ff, #722ed1);
+            margin: 12px auto 0;
+            border-radius: 2px;
         }
 
         /* 按钮容器 */
         .button-container {
             display: flex;
-            gap: 20px; /* 按钮之间的间距 */
-            flex-wrap: wrap; /* 适配小屏幕，按钮自动换行 */
+            flex-wrap: wrap;
+            gap: 18px;
             justify-content: center;
         }
 
-        /* 按钮样式 */
+        /* 按钮样式 - 现代渐变+悬停 */
         .link-button {
-            padding: 15px 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
             font-size: 16px;
+            font-weight: 600;
             color: white;
-            background-color: #1677ff; /* 阿里云蓝，常用的主色调 */
+            text-decoration: none;
             border: none;
-            border-radius: 8px;
+            border-radius: 14px;
             cursor: pointer;
-            transition: background-color 0.3s ease; /* 点击过渡效果 */
-            text-decoration: none; /* 去除链接默认下划线 */
+            transition: all 0.3s ease;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(22, 119, 255, 0.25);
+            background: linear-gradient(135deg, #1677ff, #3d9eff);
         }
 
-        /* 鼠标悬停效果 */
         .link-button:hover {
-            background-color: #0958d9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(22, 119, 255, 0.4);
+            background: linear-gradient(135deg, #1884ff, #4da6ff);
         }
 
-        /* 点击时的按压效果 */
         .link-button:active {
-            background-color: #0640a0;
-            transform: scale(0.98);
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(22, 119, 255, 0.3);
+        }
+
+        /* 不同按钮的个性化配色（可选） */
+        .link-button:nth-child(2) {
+            background: linear-gradient(135deg, #00b173, #00d18f);
+            box-shadow: 0 4px 12px rgba(0, 177, 115, 0.25);
+        }
+        .link-button:nth-child(2):hover {
+            background: linear-gradient(135deg, #00c180, #00e09a);
+            box-shadow: 0 6px 16px rgba(0, 177, 115, 0.4);
+        }
+
+        .link-button:nth-child(3) {
+            background: linear-gradient(135deg, #ff6b35, #ff8e53);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+        }
+        .link-button:nth-child(3):hover {
+            background: linear-gradient(135deg, #ff7a45, #ffa066);
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+        }
+
+        .link-button:nth-child(4) {
+            background: linear-gradient(135deg, #722ed1, #974eff);
+            box-shadow: 0 4px 12px rgba(114, 46, 209, 0.25);
+        }
+        .link-button:nth-child(4):hover {
+            background: linear-gradient(135deg, #7e3ad9, #a35dff);
+            box-shadow: 0 6px 16px rgba(114, 46, 209, 0.4);
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            .page-title {
+                font-size: 20px;
+            }
+            .link-button {
+                min-width: 100%;
+                padding: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 新增的标题 -->
-    <h1 class="page-title">Openlist on my Aliyun vps の 线路切换中转站</h1>
-    
-    <div class="button-container">
-        <!-- 按钮1：替换 href 里的链接和按钮文字即可 -->
-        <a href="http://120.24.150.149:5244" target="_blank" class="link-button">HTTP IPv4 直连</a>
-        <!-- 按钮2 -->
-        <a href="https://edgeone.ybmq.dpdns.org" target="_blank" class="link-button">HTTPS Tencent edgeone 线路</a>
-        <!-- 按钮3 -->
-        <a href="http://esa.ybmq.dpdns.org" target="_blank" class="link-button">HTTP Aliyun esa 线路</a>
-        <!-- 按钮4 -->
-        <a href="https://cloudflared.ybmq.dpdns.org/" target="_blank" class="link-button">HTTPS Cloudflared 线路</a>
+    <div class="container">
+        <h1 class="page-title">Openlist on my Aliyun VPS の 线路切换中转站</h1>
+        <div class="button-container">
+            <a href="http://120.24.150.149:5244" target="_blank" class="link-button">
+                <i class="fas fa-link"></i> HTTP IPv4 直连
+            </a>
+            <a href="https://edgeone.ybmq.dpdns.org" target="_blank" class="link-button">
+                <i class="fas fa-shield-alt"></i> HTTPS Tencent EdgeOne
+            </a>
+            <a href="http://esa.ybmq.dpdns.org" target="_blank" class="link-button">
+                <i class="fas fa-cloud"></i> HTTP Aliyun ESA
+            </a>
+            <a href="https://cloudflared.ybmq.dpdns.org/" target="_blank" class="link-button">
+                <i class="fas fa-lock"></i> HTTPS Cloudflared
+            </a>
+        </div>
     </div>
 </body>
 </html>
