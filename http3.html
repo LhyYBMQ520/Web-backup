@@ -15,7 +15,7 @@
 
         /* 页面主体样式 */
         body {
-            line-height: 1.6;
+            line-height: 1.6; /* 全局默认行高，统一基准 */
             color: #333;
             background-color: #f8f9fa;
             padding-bottom: 50px;
@@ -97,24 +97,31 @@
             justify-content: center;
             align-items: flex-start;
             gap: 20px;
-            max-width: 1000px; /* 增大容器宽度，给两个按钮足够空间 */
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 0; /* 移除默认内边距，避免移动端偏右 */
+            /* 添加过渡属性，让布局变化更平滑 */
+            transition: all 0.5s ease-in-out;
         }
 
-        /* 按钮列容器 - 分离按钮和注意事项的关键 */
+        /* 按钮列容器 */
         .btn-column {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 0 0 auto; /* 关键：按钮列不拉伸，只占自身宽度 */
+            flex: 0 0 auto;
+            width: 100%; /* 移动端占满宽度，解决偏右问题 */
+            max-width: 400px; /* 宽屏限制列宽，避免按钮过宽 */
+            /* 添加过渡属性 */
+            transition: all 0.5s ease-in-out;
         }
 
-        /* 按钮通用样式 */
+        /* 按钮通用样式 - 修复文字溢出问题 */
         .test-btn {
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 1rem 2.5rem;
+            padding: 1rem 1.5rem; /* 减小左右内边距，避免窄屏溢出 */
             font-size: 1.1rem;
             border-radius: 50px;
             cursor: pointer;
@@ -122,7 +129,14 @@
             box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
             text-decoration: none;
             display: inline-block;
-            white-space: nowrap; /* 按钮文字不换行 */
+            white-space: normal; /* 改为normal，允许文字换行 */
+            word-wrap: break-word; /* 长单词换行 */
+            line-height: 1.4; /* 调整行高，优化换行后的排版 */
+            width: 100%; /* 按钮占满列宽度，移动端居中 */
+            max-width: 100%; /* 宽屏跟随列宽 */
+            text-align: center; /* 确保文字居中 */
+            /* 添加过渡属性，让按钮尺寸和样式变化更平滑 */
+            transition: all 0.5s ease-in-out;
         }
 
         .test-btn:hover {
@@ -151,36 +165,60 @@
             background-color: #27ae60;
         }
 
-        /* 注意事项提示框 - 调整 */
+        /* 注意事项提示框 - 统一间距，修复排版不和谐问题 */
         .note-box {
             background-color: #fef9e7;
             border-left: 4px solid #f39c12;
             padding: 1rem 1.5rem;
             border-radius: 8px;
-            margin-top: 15px; /* 按钮和提示框间距 */
+            margin-top: 15px;
             text-align: left;
-            min-width: 300px; /* 保留最小宽度 */
-            max-width: 580px; /* 最大宽度 */
-            white-space: pre-line; /* 只在<br>处换行 */
+            max-width: 580px;
+            white-space: normal; /* 改为normal，统一排版逻辑 */
+            width: 100%; /* 占满列宽度，移动端居中 */
+            line-height: 1.5; /* 优化行高，减少多余间距 */
+            /* 添加过渡属性 */
+            transition: all 0.5s ease-in-out;
         }
 
         .note-box h4 {
             color: #d35400;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem; /* 调整标题下边距 */
             font-size: 1.05rem;
+            line-height: 1.4; /* 标题行高 */
         }
 
         .note-box p {
             color: #7f8c8d;
             font-size: 0.95rem;
-            line-height: 0.95;
+            line-height: 1.5; /* 统一行高 */
+            margin: 0; /* 移除默认margin */
+        }
+
+        .note-box p br {
+            display: block;
+            margin: 0.3rem 0; /* 统一每行之间的间距 */
+            content: "";
         }
 
         .note-box strong {
-            color: #2c3e50; /* 强调文字用深色 */
+            color: #2c3e50;
         }
 
-        /* 响应式适配 */
+        /* 响应式适配 - 简化逻辑，保证居中 */
+        @media (min-width: 769px) {
+            /* 宽屏时按钮列不占满宽度，保持并排 */
+            .btn-column {
+                width: auto;
+                max-width: none;
+            }
+            .test-btn {
+                width: auto; /* 宽屏按钮恢复自适应宽度 */
+                white-space: nowrap; /* 宽屏时文字不换行 */
+                padding: 1rem 2.5rem; /* 宽屏恢复原有内边距 */
+            }
+        }
+
         @media (max-width: 768px) {
             header h1 {
                 font-size: 1.8rem;
@@ -191,19 +229,18 @@
             }
             
             .test-btn {
-                padding: 0.8rem 2rem;
+                padding: 0.8rem 1.2rem; /* 移动端进一步减小内边距 */
                 font-size: 1rem;
-                width: 100%; /* 移动端按钮占满宽度 */
             }
 
             .btn-group {
-                flex-direction: column; /* 移动端按钮垂直排列 */
-                align-items: stretch;
+                flex-direction: column;
+                align-items: center; /* 改为center，确保移动端居中 */
             }
 
             .note-box {
-                width: 100%; /* 移动端提示框占满宽度 */
                 max-width: none;
+                line-height: 1.4; /* 移动端进一步优化行高 */
             }
         }
     </style>
@@ -236,7 +273,7 @@
             <p>HTTP/2 虽然解决了 HTTP/1.1 的许多问题，但仍基于 TCP 协议，存在队头阻塞问题。当一个 TCP 数据包丢失时，所有在该连接上的数据流都会被阻塞。而 HTTP/3 基于 UDP 的 QUIC 协议，每个数据流都有独立的传输路径，单个数据流的丢包不会影响其他数据流。</p>
         </section>
 
-        <!-- 按钮区域 - 核心结构调整 -->
+        <!-- 按钮区域 -->
         <div class="btn-container">
             <div class="btn-group">
                 <!-- 在线测试按钮列 -->
@@ -246,12 +283,11 @@
                     </a>
                 </div>
 
-                <!-- 本地测试按钮列（按钮+注意事项） -->
+                <!-- 本地测试按钮列 -->
                 <div class="btn-column">
                     <a href="https://www.lcatnya.top/isHttp3" target="_blank" class="test-btn local-btn">
                         本地测试 HTTP/3 服务
                     </a>
-                    <!-- 注意事项跟随在本地按钮下方，不影响按钮排布 -->
                     <div class="note-box">
                         <h4>📢 本地测试注意事项</h4>
                         <p>1. 首次访问本地测试页，大概率显示 <strong>false</strong>（表示暂不支持 HTTP/3）<br>
