@@ -169,7 +169,6 @@
             cursor: pointer;
             position: relative;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.5s ease;
         }
         body.dark .grid-item {
             background: rgba(0, 0, 0, 0.4);
@@ -345,6 +344,46 @@
                 font-size: 1rem;
             }
         }
+
+        /* 友链入口样式 */
+        .friend-link {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(77, 29, 163, 0.2);
+            color: #4D1DA3;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.3rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(77, 29, 163, 0.3);
+            pointer-events: none; /* 默认不可点击 */
+        }
+
+        body.dark .friend-link {
+            background: rgba(255, 204, 0, 0.2);
+            color: #ffcc00;
+            border-color: rgba(255, 204, 0, 0.3);
+        }
+
+        /* 悬停/激活时的效果 */
+        header.active h1,
+        header.active .subtitle {
+            transform: translateX(-200px);
+            transition: transform 0.4s ease;
+        }
+
+        header.active .friend-link {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto; /* 可点击 */
+        }
     </style>
 </head>
 <body>
@@ -359,10 +398,11 @@
         <header>
             <h1>L菌の导航站</h1>
             <p class="subtitle">点击下方方格访问不同的内容模块</p>
+            <!-- 新增：友链入口 -->
+            <a href="friend-links.html" class="friend-link" target="_blank">这里是友链入口哦~</a>
         </header>
         
         <div class="grid-container">
-            <!-- 关键修改：将 window.location.href 替换为 window.open(链接, '_blank') -->
             <div class="grid-item" onclick="window.open('https://lhyybmq520.github.io', '_blank')">
                 <div class="item-header">
                     <h3 class="item-title">L菌の主页</h3>
@@ -503,48 +543,120 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+        /* ===== 版权年份 ===== */
         const now = new Date();
         const currentYear = now.getFullYear();
-        const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 月份补零，如 01、02...
-        
-        // 起始年份固定为 2025
+        const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
         const startYear = 2025;
-        
-        // 如果当前年份就是 2025，则只显示 "2025"；否则显示 "2025 - YYYY/MM"
-        const displayText = currentYear === startYear 
-        ? `${startYear}` 
-        : `${startYear} - ${currentYear}/${currentMonth}`;
-        
-        document.getElementById('copyright-year-range').textContent = displayText;
-    });
 
+        const displayText = currentYear === startYear 
+            ? `${startYear}` 
+            : `${startYear} - ${currentYear}/${currentMonth}`;
+
+        document.getElementById('copyright-year-range').textContent = displayText;
+
+
+        /* ===== 三态主题系统 ===== */
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
 
-        if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark');
-            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-        }
+        const THEMES = {
+            SYSTEM: 'system',
+            LIGHT: 'light',
+            DARK: 'dark'
+        };
 
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark');
-            if (body.classList.contains('dark')) {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                localStorage.setItem('theme', 'dark');
-            } else {
+        const getSystemTheme = () => {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches 
+                ? 'dark' 
+                : 'light';
+        };
+
+        const getCurrentMode = () => {
+            return localStorage.getItem('theme-mode') || THEMES.SYSTEM;
+        };
+
+        const setMode = (mode) => {
+            localStorage.setItem('theme-mode', mode);
+            applyTheme();
+        };
+
+        const applyTheme = () => {
+            const mode = getCurrentMode();
+            let finalTheme;
+
+            if (mode === THEMES.SYSTEM) {
+                finalTheme = getSystemTheme();
+                themeToggle.innerHTML = '<i class="fas fa-desktop"></i>';
+            } 
+            else if (mode === THEMES.DARK) {
+                finalTheme = 'dark';
                 themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                localStorage.setItem('theme', 'light');
+            } 
+            else {
+                finalTheme = 'light';
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            body.classList.toggle('dark', finalTheme === 'dark');
+        };
+
+        // 点击循环切换
+        themeToggle.addEventListener('click', () => {
+            const mode = getCurrentMode();
+
+            if (mode === THEMES.SYSTEM) {
+                setMode(THEMES.LIGHT);
+            } 
+            else if (mode === THEMES.LIGHT) {
+                setMode(THEMES.DARK);
+            } 
+            else {
+                setMode(THEMES.SYSTEM);
             }
         });
 
+        // 仅 system 模式跟随系统变化
+        window.matchMedia('(prefers-color-scheme: dark)')
+            .addEventListener('change', () => {
+                if (getCurrentMode() === THEMES.SYSTEM) {
+                    applyTheme();
+                }
+            });
+
+        // 初始化主题
+        applyTheme();
+
+
+        /* ===== 网格点击动画 ===== */
         document.querySelectorAll('.grid-item').forEach(item => {
-            item.addEventListener('click', function() {
+            item.addEventListener('click', function () {
                 this.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     this.style.transform = '';
                 }, 300);
             });
         });
+
+
+        /* ===== Header 交互 ===== */
+        const header = document.querySelector('header');
+
+        header.addEventListener('mouseenter', () => {
+            header.classList.add('active');
+        });
+
+        header.addEventListener('mouseleave', () => {
+            header.classList.remove('active');
+        });
+
+        header.addEventListener('click', (e) => {
+            if (e.target === header || e.target.closest('.friend-link')) return;
+            header.classList.toggle('active');
+        });
+
+    });
     </script>
 </body>
 </html>
