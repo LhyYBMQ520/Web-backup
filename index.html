@@ -403,124 +403,7 @@
             <a href="friend-links.html" class="friend-link" target="_blank">这里是友链入口哦~</a>
         </header>
         
-        <div class="grid-container">
-            <div class="grid-item" onclick="window.open('https://lhyybmq520.github.io', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">L菌の主页</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">私のWeb Page</p>
-                    <div class="item-footer">
-                        <span class="category-tag">Home</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('https://speedtest.lcatnya.top', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">测速站前置页</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">访问我们&不是我们的一些测速站</p>
-                    <div class="item-footer">
-                        <span class="category-tag">Speedtest</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('openlist.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">私の云盘</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">OpenList on Aliyun VPS</p>
-                    <div class="item-footer">
-                        <span class="category-tag">Cloud Drive</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('http3.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">新协议</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">关于http3和http3测试页</p>
-                    <div class="item-footer">
-                        <span class="category-tag">http 3</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('Uiverse Card.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">动态Card</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">Uiverse Card 悬停动画</p>
-                    <div class="item-footer">
-                        <span class="category-tag">Uiverse Card</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="grid-item" onclick="window.open('web designed by AI.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">现代简约网页</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">AI写的现代化（？）网页</p>
-                    <div class="item-footer">
-                        <span class="category-tag">Nice web</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('verification code.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">赤石科技</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">我们修复了填写验证码过于简单的bug（doge）</p>
-                    <div class="item-footer">
-                        <span class="category-tag">新时代の验证码滑块</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('close the AD.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">广告菌可爱捏</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">我们修复了用户关闭广告过于简单的bug（doge）</p>
-                    <div class="item-footer">
-                        <span class="category-tag">新时代の应用广告be like</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-item" onclick="window.open('Hachimi Sound.html', '_blank')">
-                <div class="item-header">
-                    <h3 class="item-title">哈基米之音</h3>
-                </div>
-                <div class="item-content">
-                    <p class="item-desc">点击即可演奏世界上最美妙的music</p>
-                    <div class="item-footer">
-                        <span class="category-tag">这才是真正的音乐.png</span>
-                        <div class="item-link">访问 <i class="fas fa-arrow-right"></i></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="grid-container" id="moduleContainer"></div>
         
     <footer>
         <!-- 功能图标区域 -->
@@ -656,6 +539,51 @@
             if (e.target === header || e.target.closest('.friend-link')) return;
             header.classList.toggle('active');
         });
+
+        /* ===== 从 JSON 读取模块 ===== */
+
+        fetch('jsons/modules.json')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('moduleContainer');
+
+                data.forEach(item => {
+
+                    const card = document.createElement('div');
+                    card.className = 'grid-item';
+                    card.onclick = () => window.open(item.link, '_blank', 'noopener,noreferrer');
+
+                    card.innerHTML = `
+                        <div class="item-header">
+                            <h3 class="item-title">${item.name}</h3>
+                        </div>
+                        <div class="item-content">
+                            <p class="item-desc">${item.desc}</p>
+                            <div class="item-footer">
+                                <span class="category-tag">${item.tag}</span>
+                                <div class="item-link">
+                                    访问 <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    container.appendChild(card);
+                });
+
+                // 生成后再绑定点击动画
+                document.querySelectorAll('.grid-item').forEach(item => {
+                    item.addEventListener('click', function () {
+                        this.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 300);
+                    });
+                });
+            })
+            .catch(err => {
+                console.error('模块加载失败:', err);
+            });
 
     });
     </script>

@@ -1,0 +1,56 @@
+[
+  {
+    "link": "https://lhyybmq520.github.io",
+    "name": "L菌の主页",
+    "desc": "私のWeb Page",
+    "tag": "Home"
+  },
+  {
+    "link": "https://speedtest.lcatnya.top",
+    "name": "测速站前置页",
+    "desc": "访问我们&不是我们的一些测速站",
+    "tag": "Speedtest"
+  },
+  {
+    "link": "openlist.html",
+    "name": "私の云盘",
+    "desc": "OpenList on Aliyun VPS",
+    "tag": "Cloud Drive"
+  },
+  {
+    "link": "http3.html",
+    "name": "新协议",
+    "desc": "关于http3和http3测试页",
+    "tag": "http 3"
+  },
+  {
+    "link": "Uiverse-Card.html",
+    "name": "动态Card",
+    "desc": "Uiverse Card 悬停动画",
+    "tag": "Uiverse Card"
+  },
+  {
+    "link": "web-designed-by-AI.html",
+    "name": "现代简约网页",
+    "desc": "AI写的现代化（？）网页",
+    "tag": "Nice web"
+  },
+  {
+    "link": "verification-code.html",
+    "name": "赤石科技",
+    "desc": "我们修复了填写验证码过于简单的bug（doge）",
+    "tag": "新时代の验证码滑块"
+  },
+  {
+    "link": "close-the-AD.html",
+    "name": "广告菌可爱捏",
+    "desc": "我们修复了用户关闭广告过于简单的bug（doge）",
+    "tag": "新时代の应用广告be like"
+  },
+  {
+    "link": "Hachimi-Sound.html",
+    "name": "哈基米之音",
+    "desc": "点击即可演奏世界上最美妙的music",
+    "tag": "这才是真正的音乐.png"
+  }
+]
