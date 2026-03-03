@@ -327,6 +327,23 @@
         </footer>
     </div>
 
+    <link rel="stylesheet" href="sakana-widget/sakana.min.css" />
+    <!-- ✅ Sakana Widget - 固定在右下角 -->
+    <div id="sakana-widget" style="
+        position: fixed;
+        right: 0px;
+        bottom: 5px;
+        z-index: 9999;
+        pointer-events: auto;
+    "></div>
+    <script>
+        function initSakanaWidget() {
+            new SakanaWidget().mount('#sakana-widget');
+        }
+    </script>
+    <script async onload="initSakanaWidget()"
+        src="sakana-widget/sakana.min.js"></script>
+
     <script>
     document.addEventListener('DOMContentLoaded', () => {
 
