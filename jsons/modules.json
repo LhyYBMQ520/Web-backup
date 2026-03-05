@@ -38,14 +38,14 @@
   {
     "link": "verification-code.html",
     "name": "赤石科技",
-    "desc": "我们修复了填写验证码过于简单的bug（doge）",
-    "tag": "新时代の验证码滑块"
+    "desc": "修复了填写验证码过于简单的bug（doge）",
+    "tag": "只是个验证码滑块"
   },
   {
     "link": "close-the-AD.html",
     "name": "广告菌可爱捏",
-    "desc": "我们修复了用户关闭广告过于简单的bug（doge）",
-    "tag": "新时代の应用广告be like"
+    "desc": "修复了用户关闭广告过于简单的bug（doge）",
+    "tag": "The nice AD"
   },
   {
     "link": "Hachimi-Sound.html",
