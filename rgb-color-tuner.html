@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RGB 无极调色测试页面</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=ZCOOL+KuaiLe&display=swap"
+    rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", "ZCOOL KuaiLe", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+
+/* 明亮模式（默认主题）CSS变量定义 */
+:root {
+  /* 主题色的RGB初始值 - 蓝色系 */
+  --theme-r: 59;
+  --theme-g: 130;
+  --theme-b: 246;
+
+  /* 主色调：使用RGB变量组合 */
+  --primary: rgb(var(--theme-r), var(--theme-g), var(--theme-b));
+  /* 主色调hover状态：RGB值各减50（但不低于0），实现深色hover效果 */
+  --primary-hover: rgb(
+    clamp(0, var(--theme-r) - 50, 255), /* clamp限制值在0-255之间 */
+    clamp(0, var(--theme-g) - 50, 255),
+    clamp(0, var(--theme-b) - 50, 255)
+  );
+
+  /* 明亮模式的基础配色 */
+  --bg: #ffffff;         /* 页面背景色 */
+  --text: #111827;       /* 文本颜色 */
+  --card-bg: #f9fafb;    /* 卡片背景色 */
+  --border: #e5e7eb;     /* 边框颜色 */
+}
+
+/* 暗黑模式CSS变量覆盖 */
+:root[data-theme="dark"] {
+  /* 暗黑模式下hover状态：RGB值各加50（但不超过255），实现浅色hover效果 */
+  --primary-hover: rgb(
+    clamp(0, var(--theme-r) + 50, 255),
+    clamp(0, var(--theme-g) + 50, 255),
+    clamp(0, var(--theme-b) + 50, 255)
+  );
+
+  /* 暗黑模式的基础配色 */
+  --bg: #0f172a;         /* 深色页面背景 */
+  --text: #f1f5f9;       /* 浅色文本 */
+  --card-bg: #1e293b;    /* 深色卡片背景 */
+  --border: #334155;     /* 深色边框 */
+}
+
+/* 页面主体样式 */
+body {
+  background: var(--bg); /* 使用CSS变量作为背景色 */
+  color: var(--text);    /* 使用CSS变量作为文本色 */
+  line-height: 1.6;      /* 行高：提升可读性 */
+  transition: background 0.25s ease, color 0.25s ease; /* 过渡动画：背景和文本色变化时的平滑效果 */
+}
+
+/* 页面头部样式 */
+header {
+  background: var(--primary); /* 主色调作为头部背景 */
+  color: #fff;                /* 白色文本 */
+  padding: 2rem 1rem;         /* 上下2rem，左右1rem内边距 */
+  text-align: center;         /* 文本居中 */
+  transition: background 0.25s ease; /* 背景色过渡动画 */
+}
+
+/* 内容容器样式 */
+.container {
+  max-width: 960px;   /* 最大宽度960px */
+  margin: 0 auto;     /* 水平居中 */
+  padding: 2rem 1rem; /* 上下2rem，左右1rem内边距 */
+}
+
+/* 卡片组件样式 */
+.card {
+  background: var(--card-bg);    /* 卡片背景色 */
+  border: 2px solid var(--border); /* 卡片边框 */
+  border-radius: 30px;           /* 圆角 */
+  padding: 1.5rem;               /* 内边距 */
+  margin-bottom: 1.5rem;         /* 底部外边距 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* 轻微阴影 */
+  transition: background 0.25s ease, border-color 0.25s ease; /* 背景和边框过渡动画 */
+}
+
+/* 卡片标题样式 */
+.card h2 {
+  color: var(--primary);         /* 主色调作为标题色 */
+  margin-bottom: 0.8rem;        /* 底部外边距 */
+  transition: color 0.25s ease; /* 颜色过渡动画 */
+}
+
+/* 按钮通用样式 */
+.btn {
+  display: inline-block;        /* 行内块级元素 */
+  background: var(--primary);   /* 主色调背景 */
+  color: white;                 /* 白色文本 */
+  border: none;                 /* 无边框 */
+  padding: 0.6rem 1.2rem;       /* 内边距 */
+  border-radius: 20px;           /* 圆角 */
+  cursor: pointer;              /* 鼠标指针为手型 */
+  font-size: 1rem;              /* 字体大小 */
+  transition: background 0.25s ease; /* 背景过渡动画 */
+}
+/* 按钮hover状态 */
+.btn:hover {
+  background: var(--primary-hover); /* hover状态颜色 */
+}
+
+/* 右上角圆形设置按钮样式 */
+.setting-btn {
+  position: fixed;              /* 固定定位：不随页面滚动 */
+  top: 20px;                    /* 距离顶部20px */
+  right: 20px;                  /* 距离右侧20px */
+  width: 50px;                  /* 宽度 */
+  height: 50px;                 /* 高度 */
+  border-radius: 50%;           /* 圆形 */
+  background: var(--primary);   /* 主色调背景 */
+  color: #fff;                  /* 白色文本 */
+  border: none;                 /* 无边框 */
+  font-size: 22px;              /* 图标大小 */
+  cursor: pointer;              /* 手型指针 */
+  z-index: 1000;                /* 高z-index：确保在最上层 */
+  display: flex;                /* Flex布局：居中对齐内容 */
+  align-items: center;          /* 垂直居中 */
+  justify-content: center;      /* 水平居中 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 阴影效果 */
+  transition: all 0.2s ease;    /* 所有属性过渡动画 */
+  transform-origin: center center; /* 变换原点：中心（放大效果更自然） */
+}
+
+.setting-btn i {
+  transform-origin: center; /* 让图标自身旋转中心居中 */
+}
+
+/* 设置按钮hover状态 */
+.setting-btn:hover {
+  transform: scale(1.1);       /* 轻微放大效果 */
+}
+
+.setting-btn:hover i {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 调色面板样式 - 默认折叠 */
+.theme-panel {
+  position: fixed;              /* 固定定位 */
+  top: 80px;                    /* 距离顶部80px（在设置按钮下方） */
+  right: 20px;                  /* 距离右侧20px */
+  background: var(--card-bg);   /* 卡片背景色 */
+  border: 1px solid var(--border); /* 边框 */
+  padding: 1rem;                /* 内边距 */
+  border-radius: 12px;          /* 圆角 */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* 阴影 */
+  width: 260px;                 /* 宽度 */
+  z-index: 999;                 /* z-index略低于设置按钮 */
+  transition: all 0.3s ease;    /* 所有属性过渡动画 */
+  transform-origin: top right;  /* 变换原点：右上角（折叠/展开更自然） */
+  transform: scale(0);          /* 默认缩放为0：隐藏 */
+  opacity: 0;                   /* 默认透明度0：隐藏 */
+  pointer-events: none;         /* 默认不响应鼠标事件 */
+}
+/* 调色面板展开状态 */
+.theme-panel.open {
+  transform: scale(1);          /* 缩放为1：显示 */
+  opacity: 1;                   /* 透明度1：显示 */
+  pointer-events: all;          /* 响应鼠标事件 */
+}
+
+/* 调色面板标题 */
+.theme-panel h3 {
+  color: var(--primary);        /* 主色调 */
+  margin-bottom: 0.8rem;        /* 底部外边距 */
+  font-size: 1rem;              /* 字体大小 */
+}
+/* 调色面板标签 */
+.theme-panel label {
+  display: block;               /* 块级元素 */
+  margin-top: 0.6rem;           /* 顶部外边距 */
+  font-size: 0.9rem;            /* 字体大小 */
+}
+/* 调色面板滑块 */
+.theme-panel input[type="range"] {
+  width: 100%;                  /* 宽度100% */
+  margin: 0.3rem 0;             /* 上下外边距 */
+}
+
+/* 亮暗色切换按钮 */
+.mode-switch {
+  margin-top: 1rem;             /* 顶部外边距 */
+  padding: 0.4rem 0.8rem;       /* 内边距 */
+  background: var(--primary);   /* 主色调背景 */
+  color: #fff;                  /* 白色文本 */
+  border: none;                 /* 无边框 */
+  border-radius: 6px;           /* 圆角 */
+  cursor: pointer;              /* 手型指针 */
+  width: 100%;                  /* 宽度100% */
+}
+</style>
+</head>
+
+<body>
+<!-- 页面头部：标题展示 -->
+<header>
+  <h1>RGB 无极调色 <br> 亮暗色模式</h1>
+</header>
+
+<!-- 主要内容容器 -->
+<div class="container">
+  <!-- 演示卡片1：主题色效果展示 -->
+  <div class="card">
+    <h2>主题色演示</h2>
+    <p>所有颜色基于 sRGB(RGB) 计算，支持无极拖动调色。</p>
+    <p>请点击右上角⚙️按钮展开主题面板自行调节</p>
+    <button class="btn" style="margin-top: 1rem;">hover色调展示按钮</button>
+  </div>
+
+  <!-- 演示卡片2：渐变效果展示 -->
+  <div class="card">
+    <h2>渐变背景演示：（从左到右）从主色调到hover色调</h2>
+    <!-- 渐变背景：从主色调到hover色调 -->
+    <div style="margin-top: 1rem; width: 100%; height: 150px; border-radius: 8px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-hover));"></div>
+  </div>
+</div>
+
+<!-- 圆形设置按钮：用于展开/折叠调色面板 -->
+<button class="setting-btn" id="settingBtn">
+  <i class="fas fa-cog"></i> <!-- 实心齿轮图标 -->
+</button>
+
+<!-- 调色面板：默认隐藏，点击设置按钮展开 -->
+<div class="theme-panel" id="themePanel">
+  <h3><i class="fas fa-palette"></i> 全局调色</h3>
+
+  <!-- 红色通道滑块 -->
+  <label>红 R</label>
+  <input type="range" id="r" min="0" max="255" value="59">
+
+  <!-- 绿色通道滑块 -->
+  <label>绿 G</label>
+  <input type="range" id="g" min="0" max="255" value="130">
+
+  <!-- 蓝色通道滑块 -->
+  <label>蓝 B</label>
+  <input type="range" id="b" min="0" max="255" value="246">
+
+  <!-- 亮暗色模式切换按钮 -->
+  <button class="mode-switch" id="modeSwitch">切换到暗黑模式</button>
+</div>
+
+<script>
+// ========== 全局变量定义 ==========
+// 获取根元素（:root）：用于操作CSS变量
+const root = document.documentElement;
+// 获取RGB滑块元素
+const r = document.getElementById('r');
+const g = document.getElementById('g');
+const b = document.getElementById('b');
+// 获取亮暗色切换按钮
+const modeSwitch = document.getElementById('modeSwitch');
+// 获取设置按钮
+const settingBtn = document.getElementById('settingBtn');
+// 获取调色面板
+const themePanel = document.getElementById('themePanel');
+
+// ========== 事件监听 ==========
+// 展开/折叠调色面板：点击设置按钮切换open类
+settingBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // 阻止事件冒泡
+  themePanel.classList.toggle('open');
+  // 更新模式切换按钮文本
+  updateModeBtnText();
+});
+
+// 点击页面其他区域关闭调色面板
+document.addEventListener('click', (e) => {
+  if (!themePanel.contains(e.target) && e.target !== settingBtn) {
+    themePanel.classList.remove('open');
+  }
+});
+
+// 阻止面板内部点击事件冒泡
+themePanel.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+// ========== 核心函数 ==========
+/**
+ * 初始化主题：从本地存储读取保存的颜色和模式，增加数据校验
+ */
+function initTheme() {
+  // 从localStorage读取保存的RGB值（格式："r,g,b"）
+  const savedColor = localStorage.getItem('theme-rgb');
+  // 从localStorage读取保存的模式（light/dark）
+  const savedMode = localStorage.getItem('theme-mode');
+
+  // 校验并设置RGB值
+  if (savedColor) {
+    const rgbArr = savedColor.split(',').map(Number);
+    // 校验是否为合法的RGB值（3个数字，范围0-255）
+    if (rgbArr.length === 3 && rgbArr.every(val => !isNaN(val) && val >= 0 && val <= 255)) {
+      r.value = rgbArr[0];
+      g.value = rgbArr[1];
+      b.value = rgbArr[2];
+    }
+  }
+
+  // 校验并设置主题模式
+  if (savedMode === 'dark' || savedMode === 'light') {
+    if (savedMode === 'dark') {
+      root.dataset.theme = 'dark';
+    } else {
+      delete root.dataset.theme;
+    }
+  }
+
+  // 更新CSS变量
+  updateCSS();
+  // 更新模式按钮文本
+  updateModeBtnText();
+}
+
+/**
+ * 更新CSS变量：将滑块值同步到:root的CSS变量，并保存到本地存储
+ */
+function updateCSS() {
+  // 确保值为数字且在0-255范围内
+  const rVal = Math.max(0, Math.min(255, parseInt(r.value) || 0));
+  const gVal = Math.max(0, Math.min(255, parseInt(g.value) || 0));
+  const bVal = Math.max(0, Math.min(255, parseInt(b.value) || 0));
+  
+  // 设置RGB CSS变量
+  root.style.setProperty('--theme-r', rVal);
+  root.style.setProperty('--theme-g', gVal);
+  root.style.setProperty('--theme-b', bVal);
+  
+  // 更新滑块显示值（防止非法输入）
+  r.value = rVal;
+  g.value = gVal;
+  b.value = bVal;
+  
+  // 保存RGB值到localStorage（持久化）
+  localStorage.setItem('theme-rgb', `${rVal},${gVal},${bVal}`);
+}
+
+/**
+ * 更新模式切换按钮的文本显示
+ */
+function updateModeBtnText() {
+  if (root.dataset.theme === 'dark') {
+    modeSwitch.textContent = '切换到明亮模式';
+  } else {
+    modeSwitch.textContent = '切换到暗黑模式';
+  }
+}
+
+// ========== 事件绑定 ==========
+// RGB滑块事件：拖动时更新CSS变量
+[r, g, b].forEach(el => {
+  el.addEventListener('input', () => {
+    updateCSS();   // 更新CSS变量
+  });
+});
+
+// 亮暗色模式切换事件
+modeSwitch.addEventListener('click', () => {
+  // 如果当前是暗黑模式
+  if (root.dataset.theme === 'dark') {
+    // 移除data-theme属性（恢复明亮模式）
+    delete root.dataset.theme;
+    // 保存模式到本地存储
+    localStorage.setItem('theme-mode', 'light');
+  } else {
+    // 设置data-theme为dark（切换到暗黑模式）
+    root.dataset.theme = 'dark';
+    // 保存模式到本地存储
+    localStorage.setItem('theme-mode', 'dark');
+  }
+  // 更新按钮文本
+  updateModeBtnText();
+});
+
+// ========== 初始化 ==========
+// 页面加载时初始化主题
+initTheme();
+</script>
+</body>
+</html>
