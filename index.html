@@ -410,7 +410,6 @@
     <div class="container">
         <header>
             <h1>L菌の导航站</h1>
-            <p class="subtitle">很多人问我怎么没有博客 <br> 我表示，这就是我的博客喵，我的导航站就是喵！L菌说什么都是对的喵~！</p>
             <p class="subtitle">抚摸我可以显示友链入口哦~❤️</p>
             <p class="subtitle">点击下方方格访问不同的内容模块</p>
             <a href="friend-links.html" class="friend-link" target="_blank">这里是友链入口哦~</a>
@@ -551,28 +550,22 @@
 
 
             /* ===== Header交互效果（显示友链入口） ===== */
-            const header = document.querySelector('header');
+            const header = document.querySelector('header'); // 获取头部元素
 
-            // 鼠标/触摸进入header时，显示友链（PC+手机通用）
+            // 鼠标进入头部时激活（显示友链）
             header.addEventListener('mouseenter', () => {
                 header.classList.add('active');
             });
 
-            // 鼠标离开header时，隐藏友链（PC端）
+            // 鼠标离开头部时取消激活（隐藏友链）
             header.addEventListener('mouseleave', () => {
                 header.classList.remove('active');
             });
 
-            // 手机端触摸header时显示友链（兜底）
-            header.addEventListener('touchstart', () => {
-                header.classList.add('active');
-            });
-
-            // 触摸离开屏幕且不在header内时，隐藏友链（手机端）
-            document.addEventListener('touchend', (e) => {
-                if (!header.contains(e.target)) {
-                    header.classList.remove('active');
-                }
+            // 点击头部时切换激活状态（除了友链链接本身）
+            header.addEventListener('click', (e) => {
+                if (e.target === header || e.target.closest('.friend-link')) return;
+                header.classList.toggle('active');
             });
 
             /* ===== 从JSON文件加载导航模块 ===== */
