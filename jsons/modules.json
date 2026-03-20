@@ -24,12 +24,6 @@
     "tag": "http 3"
   },
   {
-    "link": "Uiverse-Card.html",
-    "name": "动态Card",
-    "desc": "Uiverse Card 悬停动画",
-    "tag": "Uiverse Card"
-  },
-  {
     "link": "web-designed-by-AI.html",
     "name": "现代简约网页",
     "desc": "AI写的现代化（？）网页",
@@ -46,12 +40,6 @@
     "name": "广告菌可爱捏",
     "desc": "修复了用户关闭广告过于简单的bug（doge）",
     "tag": "The nice AD"
-  },
-  {
-    "link": "Hachimi-Sound.html",
-    "name": "哈基米之音",
-    "desc": "点击即可演奏世界上最美妙的music",
-    "tag": "这才是真正的音乐.png"
   },
   {
     "link": "rgb-color-tuner.html",
