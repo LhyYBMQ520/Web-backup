@@ -46,5 +46,11 @@
     "name": "RGB 无极调色",
     "desc": "网页的主题颜色我说了算！",
     "tag": "RGB"
+  },
+  {
+    "link": "test.html",
+    "name": "测试页面",
+    "desc": "前瞻测试页面。",
+    "tag": "Test"
   }
 ]
