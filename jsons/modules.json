@@ -1,8 +1,14 @@
 [
   {
-    "link": "https://lhyybmq520.github.io",
+    "link": "index.html",
     "name": "L菌の主页",
     "desc": "私のWeb Page",
+    "tag": "Home"
+  },
+  {
+    "link": "https://lhyybmq520.github.io",
+    "name": "L菌の主页（旧）",
+    "desc": "私のWeb Page（Old）",
     "tag": "Home"
   },
   {
@@ -50,7 +56,7 @@
   {
     "link": "test.html",
     "name": "测试页面",
-    "desc": "前瞻测试页面。",
+    "desc": "测试新想法的页面。",
     "tag": "Test"
   }
 ]

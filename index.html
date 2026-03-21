@@ -3,476 +3,563 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L菌の导航站</title>
-    <link rel="icon" href="/favicon.ico">
+    <title>Lcat - 个人主页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Poppins", "ZCOOL KuaiLe", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-        }
-
+        /* ==================== 全局样式 ==================== */
         body {
-            color: #333;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            /* 背景渐变色：从浅粉色到浅青绿色的135度渐变 */
+            background: linear-gradient(135deg, #fdf2f8 0%, #f0fdfa 100%);
+            background-attachment: fixed;
+            font-family: "Poppins", "ZCOOL KuaiLe", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            /* 背景色和文字颜色变化时的过渡动画（0.5秒，缓动效果） */
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
+        /* ==================== 暗色模式基础样式 ==================== */
         body.dark {
-            color: #eee;
-            background-color: #121212;
+            /* 暗色模式文字颜色 */
+            color: #d1d5db;
+            /* 暗色模式背景渐变：深紫色到深青绿色 */
+            background: linear-gradient(135deg, #2d1b41 0%, #1a3636 100%);
+            /* 背景固定 */
+            background-attachment: fixed;
         }
 
-        .bg-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: opacity 1s ease-in-out;
-            z-index: -1;
-        }
-
-        .bg-vertical { background-image: url('background/Miao-1.webp'); opacity: 0; }
-        .bg-horizontal { background-image: url('background/Miao-2.webp'); opacity: 0; }
-
-        @media (aspect-ratio < 1) {
-        .bg-vertical { opacity: 1; }
-        .bg-horizontal { opacity: 0; }
-
-        body.dark .bg-vertical { opacity: 0.3; }
-        body.dark .bg-horizontal { opacity: 0; }
-        }
-
-        @media (aspect-ratio >= 1) {
-        .bg-vertical { opacity: 0; }
-        .bg-horizontal { opacity: 1; }
-
-        body.dark .bg-vertical { opacity: 0; }
-        body.dark .bg-horizontal { opacity: 0.3; }
-        }
-
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            color: #F97316;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 999;
-        }
-        body.dark .theme-toggle {
-            background: rgba(0, 0, 0, 0.3);
-            color: #3B82F6;
-            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
-        }
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(8px);
-            border-radius: 30px;
-            transition: all 0.5s ease;
-        }
-        body.dark header {
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            color: #222;
-            text-shadow: 0 2px 5px rgba(255, 255, 255, 0.5);
-            transition: all 0.5s ease;
-            font-weight: 800;
-        }
-        body.dark h1 {
-            color: #fff;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #444;
-            max-width: 600px;
-            margin: 0 auto;
-            transition: all 0.5s ease;
-        }
-        body.dark .subtitle {
-            color: #ddd;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .grid-item {
-            background: rgba(255, 255, 255, 0.18);
+        /* ==================== 毛玻璃卡片样式 ==================== */
+        .card {
+            /* 卡片背景：白色，透明度85% */
+            background: rgba(255, 255, 255, 0.85);
+            /* 毛玻璃效果：模糊10px */
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-            min-height: 275px; /* 保证卡片最小高度，避免内容过少时太矮 */
-            height: auto; /* 高度随内容自适应 */
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            position: relative;
-        }
-        body.dark .grid-item {
-            background: rgba(0, 0, 0, 0.4);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .grid-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-            background: rgba(255, 255, 255, 0.35);
-        }
-        body.dark .grid-item:hover {
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .grid-item:active {
-            transform: scale(0.95);
-        }
-
-        .item-header {
-            padding: 25px 20px 15px;
-            background: rgba(255, 255, 255, 0.22);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.5s ease;
-        }
-        body.dark .item-header {
-            background: rgba(0, 0, 0, 0.45);
-        }
-
-        .item-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #4D1DA3;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            transition: all 0.5s ease;
-        }
-        body.dark .item-title {
-            color: #ffcc00;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .item-content {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .item-desc {
-            font-size: 1.05rem;
-            color: #333;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.5s ease;
-        }
-        body.dark .item-desc {
-            color: #ddd;
-        }
-
-        .item-footer {
-            margin-top: auto;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.3);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 30px;
-            transition: all 0.5s ease;
-        }
-        body.dark .item-footer {
-            background: rgba(0, 0, 0, 0.45);
-        }
-
-        .category-tag {
-            color: #333;
-            padding: 8px 15px;
-            font-weight: 500;
-            transition: all 0.5s ease;
-        }
-        body.dark .category-tag {
-            color: #ddd;
-        }
-
-        .item-link {
-            color: #4D1DA3;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            font-size: 1.1rem;
-            pointer-events: none;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            transition: all 0.5s ease;
-        }
-        body.dark .item-link {
-            color: #ffcc00;
-        }
-
-        .item-link i {
-            margin-left: 3px;
-            transition: transform 0.5s;
-        }
-        .grid-item:hover .item-link i {
-            transform: translateX(5px);
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            color: #444;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        body.dark footer {
-            color: #ddd;
+            /* 圆角12px */
+            border-radius: 12px;
+            /* 阴影效果：0偏移 4px模糊 20px扩散，黑色透明度5% */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            /* 边框：白色，透明度20% */
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* 卡片样式变化的过渡动画 */
+            transition: background-color 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease;
         }
         
-        body.dark footer a {
-            color: #ffcc00;
+        /* 联系板块卡片hover效果 */
+        #contact .card:hover {
+            /* hover时背景色变化（强制覆盖） */
+            background: rgba(229, 229, 229, 0.9) !important;
+            /* hover时阴影加深（强制覆盖） */
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1) !important;
         }
 
-        .friend-link {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(77, 29, 163, 0.3);
-            color: #4D1DA3;
-            padding: 8px 16px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.3rem;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(6px);
-            pointer-events: none;
+        /* 暗色模式下的卡片样式 */
+        body.dark .card {
+            /* 暗色模式卡片背景：黑色，透明度60% */
+            background: rgba(0, 0, 0, 0.6);
+            /* 暗色模式阴影：更明显 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            /* 暗色模式边框：白色，透明度10% */
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 暗色模式下联系板块卡片hover效果 */
+        body.dark #contact .card:hover {
+            background: rgba(50, 50, 50, 0.7) !important;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25) !important;
         }
 
-        body.dark .friend-link {
-            background: rgba(255, 204, 0, 0.2);
-            color: #ffcc00;
+        /* ==================== 小标签样式 ==================== */
+        .tag {
+            /* 行内块级元素，可设置宽高和内外边距 */
+            display: inline-block;
+            /* 内边距：上下2px，左右8px */
+            padding: 2px 8px;
+            /* 字体大小12px */
+            font-size: 12px;
+            /* 圆角4px */
+            border-radius: 4px;
+            /* 背景：白色，透明度70% */
+            background: rgba(255, 255, 255, 0.7);
+            /* 文字颜色：灰色 */
+            color: #6b7280;
+            /* 右边距4px */
+            margin-right: 4px;
+            /* 过渡动画 */
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        
+        /* 暗色模式下的标签样式 */
+        body.dark .tag {
+            background: rgba(0, 0, 0, 0.5);
+            color: #d1d5db;
         }
 
-        .friend-link:hover {
-            background: rgba(77, 29, 163, 0.5);
-            transform: translateY(-50%) scale(1.05);
+        /* ==================== 全局通用样式 ==================== */
+        html {
+            /* 平滑滚动：点击锚点链接时平滑滚动到对应位置 */
+            scroll-behavior: smooth;
         }
 
-        body.dark .friend-link:hover {
-            background: rgba(255, 204, 0, 0.4);
+        /* ==================== 暗色模式文字颜色适配 ==================== */
+        /* 覆盖Tailwind默认的灰色文字颜色，适配暗色模式 */
+        body.dark .text-gray-800 { color: #f3f4f6 !important; }
+        body.dark .text-gray-600 { color: #d1d5db !important; }
+        body.dark .text-gray-500 { color: #9ca3af !important; }
+        body.dark .text-gray-400 { color: #9ca3af !important; }
+        /* 粉色hover效果适配 */
+        body.dark .hover\:text-pink-500:hover { color: #f472b6 !important; }
+        body.dark .text-pink-400 { color: #f472b6 !important; }
+        body.dark .text-pink-500 { color: #ec4899 !important; }
+        /* 半透明白色背景适配 */
+        body.dark .bg-white\/70 { background-color: rgba(0, 0, 0, 0.5) !important; }
+        body.dark .bg-white\/60 { background-color: rgba(0, 0, 0, 0.4) !important; }
+        body.dark .text-gray-700 { color: #f3f4f6 !important; }
+        
+        /* ==================== 自定义暗色模式按钮样式 ==================== */
+        .theme-btn-dark {
+            background: rgba(0, 0, 0, 0.3) !important;
+            color: #3B82F6 !important;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        /* ==================== 板块标题图标样式 ==================== */
+        .section-icon {
+            /* 图标右边距6px */
+            margin-right: 6px;
+            /* 图标颜色：粉色 */
+            color: #ec4899;
+        }
+        
+        /* 暗色模式下板块图标颜色 */
+        body.dark .section-icon {
+            color: #f472b6 !important;
         }
 
-        header.active h1,
-        header.active .subtitle {
-            transform: translateX(-200px);
-            transition: transform 0.5s ease;
+        /* 回到顶部按钮 + HTTP3/Github链接 统一配色 */
+        #toTop,
+        .http3-text, 
+        .github-link {
+            color: #9333ea !important; /* 紫色 */
+        }
+        
+        /* hover时颜色变化 */
+        .http3-text:hover, 
+        .github-link:hover {
+            color: #7e22ce !important; /* 深紫色 */
         }
 
-        header.active .friend-link {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
+        /* 暗色模式下的配色 */
+        body.dark #toTop,
+        body.dark .http3-text, 
+        body.dark .github-link {
+            color: #ffcc00 !important; /* 黄色 */
+        }
+        
+        body.dark .http3-text:hover, 
+        body.dark .github-link:hover {
+            color: #fbbf24 !important; /* 深黄色 */
         }
 
+        /* 回到顶部按钮基础样式 */
         #toTop {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(8px);
-            color: #4D1DA3;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: fixed;
-            bottom: 70px;
-            right: 20px;
-            z-index: 998;
+            background: rgba(255, 255, 255, 0.3) !important;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
-
+        
+        /* 暗色模式下回到顶部按钮样式 */
         body.dark #toTop {
-            background: rgba(0, 0, 0, 0.4);
-            color: #ffcc00;
+            background: rgba(0, 0, 0, 0.4) !important;
             box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
         }
 
-        #toTop:hover {
-            transform: scale(1.2);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        /* 页脚其他链接样式适配 */
+        .footer-icons a:not(.http3-text) {
+            color: #6b7280 !important; /* 灰色 */
+        }
+        
+        .footer-icons a:not(.http3-text):hover {
+            color: #ec4899 !important; /* 粉色 */
+        }
+        
+        /* 暗色模式下页脚链接样式 */
+        body.dark .footer-icons a:not(.http3-text) {
+            color: #d1d5db !important; /* 浅灰色 */
+        }
+        
+        body.dark .footer-icons a:not(.http3-text):hover {
+            color: #f472b6 !important; /* 浅粉色 */
         }
 
-        body.dark #toTop:hover {
-            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.15);
+        /* ========== 新增：暗黑模式下按钮hover样式 ========== */
+        /* 换一句按钮 暗黑模式 hover 效果 */
+        body.dark #changeSentenceBtn:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: #f3f4f6 !important;
         }
 
-        #toTop:active {
-            transform: scale(0.95);
+        /* L菌の导航站按钮 暗黑模式 hover 效果 */
+        body.dark a[href="navigation.html"]:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: #f3f4f6 !important;
         }
 
-        @media (max-width: 768px) {
-            .grid-container {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            h1 {
-                font-size: 2.2rem;
-            }
-            .item-title {
-                font-size: 1.6rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .grid-container {
-                grid-template-columns: 1fr;
-            }
-            h1 {
-                font-size: 1.8rem;
-            }
-            .subtitle {
-                font-size: 1rem;
-            }
-            .item-title {
-                font-size: 1.5rem;
-            }
+        /* 优化原有按钮基础样式，确保过渡效果统一 */
+        #changeSentenceBtn,
+        a[href="navigation.html"] {
+            transition: all 0.3s ease !important;
         }
     </style>
 </head>
-<body>
-    <div class="theme-toggle" id="themeToggle">
+
+<body class="min-h-screen p-4 md:p-8 text-gray-800">
+    <!-- 主题切换按钮：固定在右上角，圆形按钮，带月亮图标 -->
+    <div id="themeToggle" class="fixed top-5 right-5 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md text-orange-500 text-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg z-50">
         <i class="fas fa-moon"></i>
     </div>
 
-    <div id="toTop">
+    <!-- 回到顶部按钮：默认隐藏，固定在右下角，圆形按钮，带向上箭头 -->
+    <div id="toTop" class="fixed bottom-16 right-5 w-14 h-14 rounded-full bg-white/30 backdrop-blur-md text-purple-800 text-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg z-40 hidden">
         <i class="fas fa-arrow-up"></i>
     </div>
 
-    <div class="bg-layer bg-vertical"></div>
-    <div class="bg-layer bg-horizontal"></div>
-
-    <div class="container">
-        <header>
-            <h1>L菌の导航站</h1>
-            <p class="subtitle">很多人问我怎么没有博客 <br> 我表示，这就是我的博客喵，我的导航站就是喵！L菌说什么都是对的喵~！</p>
-            <p class="subtitle">抚摸我可以显示友链入口哦~❤️</p>
-            <p class="subtitle">点击下方方格访问不同的内容模块</p>
-            <a href="friend-links.html" class="friend-link" target="_blank">这里是友链入口哦~</a>
+    <!-- 主容器：最大宽度5xl，水平居中 -->
+    <div class="max-w-5xl mx-auto">
+        <!-- 顶部导航栏：移动端垂直排列，桌面端水平排列 -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <!-- 左侧：头像 + 用户名 -->
+            <div class="flex items-center gap-3">
+                <img src="background/avatar.webp" alt="头像" class="w-11 h-11 rounded-full object-cover">
+                <h1 class="text-2xl font-bold">Lcat</h1>
+            </div>
+            <!-- 右侧：导航链接 -->
+            <nav class="flex flex-wrap gap-4 text-sm font-medium text-gray-600">
+                <a href="#about" class="hover:text-pink-500 transition-colors">关于我</a>
+                <a href="#projects" class="hover:text-pink-500 transition-colors">项目</a>
+                <a href="#blog" class="hover:text-pink-500 transition-colors">博客</a>
+                <a href="friend-links.html" target="_blank" rel="noopener noreferrer" class="hover:text-pink-500 transition-colors">友链</a>
+                <a href="#contact" class="hover:text-pink-500 transition-colors">联系</a>
+            </nav>
         </header>
-        
-        <div class="grid-container" id="moduleContainer"></div>
-        
-    <footer>
-        <div class="footer-icons">
-            <a href="https://ipw.cn/ipv6webcheck/?site=https://www.lcatnya.top" title="本站支持IPv6访问" target="_blank">
-                <img style="display: inline-block; vertical-align: middle;" alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s1.svg"></a>
-            <a href="https://ipw.cn/ssl/?site=https://www.lcatnya.top" title="本站支持SSL安全访问" target="_blank">
-                <img style="display: inline-block; vertical-align: middle;" alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s1.svg"></a>
-            <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank">本站已支持HTTP/3</a>
+
+        <!-- 今日一句 + 时间卡片：移动端单列，大屏端3列（今日一句占2列，时间占1列） -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+            <!-- 今日一句卡片 -->
+            <div class="card p-5 lg:col-span-2 flex flex-col justify-between">
+                <div class="flex items-start gap-3">
+                    <i class="fa-regular fa-comment text-pink-400 mt-1"></i>
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">今日一句</p>
+                        <!-- 句子内容展示区 -->
+                        <p class="text-base font-medium" id="sentenceContent">加载中...</p>
+                        <!-- 句子来源展示区 -->
+                        <p class="text-xs text-gray-400 mt-2" id="sentenceSource">—— 加载中</p>
+                    </div>
+                </div>
+                <!-- 换一句按钮 -->
+                <button id="changeSentenceBtn" class="self-end mt-3 md:mt-0 px-3 py-1 text-xs bg-white/70 hover:bg-gray-200 text-gray-600 rounded-full shadow-sm transition-colors">换一句</button>
+            </div>
+
+            <!-- 时间卡片 -->
+            <div class="card p-5 flex items-center justify-center">
+                <div class="text-center w-full">
+                    <p class="text-base text-gray-500 mb-1">本地时间</p>
+                    <!-- 当前时间展示 -->
+                    <p class="text-3xl md:text-4xl font-bold mb-2" id="currentTime">00:00:00</p>
+                    <!-- 当前日期展示 -->
+                    <p class="text-sm text-gray-500" id="currentDate">0000年 00月 00日</p>
+                </div>
+            </div>
         </div>
 
-        <div class="footer-copyright">
-            Copyright © LC（Lcat）| All Rights Reserved.
-            <br>© <span id="copyright-year-range"></span> By LC（Lcat）❤️
-            <br>本站所有内容均已开源 <a href="https://github.com/LhyYBMQ520/Web-backup">Github Page</a>
-        </div>
-    </footer>
+        <!-- 个人介绍区：移动端单列，大屏端3列（介绍占2列，快速了解占1列） -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+            <!-- 个人介绍主体 -->
+            <div class="lg:col-span-2">
+                <div class="mb-3 inline-block px-3 py-1 bg-white/60 rounded-full text-xs text-gray-600 shadow-sm">
+                    <i class="fa-solid fa-paw text-pink-400 mr-1"></i> LC 个人档案
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">Lcat（L菌）是一只猫猫哦~</h2>
+                <p class="text-gray-600 text-base leading-relaxed mb-6">
+                    114514岁老年喵（雾），来自喵星。喜欢睡大觉（S属性大爆发）、玩各种的Game！爱好计算机，想做各种自己感兴趣的事。
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <!-- 导航站链接按钮 -->
+                    <a href="navigation.html" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white/70 text-gray-700 text-sm rounded-2xl hover:bg-gray-200 transition-colors inline-block">L菌の导航站</a>
+                </div>
+            </div>
 
+            <!-- 快速了解我卡片 -->
+            <div class="card p-5">
+                <h3 class="text-xl font-bold mb-4">快速了解我</h3>
+                <div class="space-y-3 mb-4 text-sm">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-pink-500"></i>
+                        <span>来自：喵星</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-purple-500"></i>
+                        <span>标签：猫猫，Sleep！Game！</span>
+                    </div>
+                </div>
+                <!-- 兴趣标签 -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="tag">#摸鱼日常</span>
+                    <span class="tag">#游戏玩家</span>
+                    <span class="tag">#瞎折腾</span>
+                    <span class="tag">#保持热爱</span>
+                    <span class="tag">#快乐至上</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 关于我板块 -->
+        <section id="about" class="mb-10">
+            <h3 class="text-lg font-bold mb-4">关于我</h3>
+            <!-- 三个卡片：移动端单列，桌面端3列 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="card p-4 text-sm">
+                    <h4 class="font-semibold mb-2">我在意的事</h4>
+                    <p class="text-gray-600 text-xs">并没有在意的事 (❁´◡`❁)，只想过好每一天，做做自己感兴趣的事。</p>
+                </div>
+                <div class="card p-4 text-sm">
+                    <h4 class="font-semibold mb-2">我的兴趣</h4>
+                    <p class="text-gray-600 text-xs">编程、记录、睡觉、Game，还有可爱的角色，设计和配色。</p>
+                </div>
+                <div class="card p-4 text-sm">
+                    <h4 class="font-semibold mb-2">我在寻找</h4>
+                    <p class="text-gray-600 text-xs">希望是能让我开心的事物和人吧。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- GitHub项目板块 -->
+        <section id="projects" class="mb-10">
+            <!-- 板块标题 + 查看更多链接 -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold flex items-center">
+                    <i class="fa-brands fa-github section-icon"></i>
+                    GitHub 项目
+                </h3>
+                <a href="https://github.com/LhyYBMQ520?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-sm text-pink-500 hover:underline">查看更多</a>
+            </div>
+            <!-- 项目卡片：移动端单列，桌面端3列 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="card p-4">
+                    <h4 class="text-sm font-semibold mb-2">Torrent-List（已进入删库倒计时）</h4>
+                    <p class="text-xs text-gray-600 mb-3">一个磁力种子存储站。（后端部分已重构，未测试，前端部分已无动力继续创作）</p>
+                    <a href="https://github.com/HanaLuan/Torrent-List" target="_blank" rel="noopener noreferrer" title="查看Torrent-List项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
+                </div>
+
+                <div class="card p-4">
+                    <h4 class="text-sm font-semibold mb-2">Web backup</h4>
+                    <p class="text-xs text-gray-600 mb-3">本套网页的开源仓库。</p>
+                    <a href="https://github.com/LhyYBMQ520/Web-backup" target="_blank" rel="noopener noreferrer" title="查看Web backup项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
+                </div>
+
+                <div class="card p-4">
+                    <h4 class="text-sm font-semibold mb-2">Photo in voice</h4>
+                    <p class="text-xs text-gray-600 mb-3">致敬旅行者金唱片，将灰度图片编码为FLAC音频，解码时播放声音并实时还原图像。</p>
+                    <a href="https://github.com/LhyYBMQ520/Photo-in-voice" target="_blank" rel="noopener noreferrer" title="查看Photo in voice项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
+                </div>
+
+                <div class="card p-4">
+                    <h4 class="text-sm font-semibold mb-2">ffmpeg batch</h4>
+                    <p class="text-xs text-gray-600 mb-3">一个简易的ffmpeg批处理脚本，包含一些常用的命令。</p>
+                    <a href="https://github.com/LhyYBMQ520/ffmpeg-batch" target="_blank" rel="noopener noreferrer" title="查看ffmpeg batch项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 博客更新板块 -->
+        <section id="blog" class="mb-10">
+            <!-- 板块标题 + 查看全部链接 -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold flex items-center">
+                    <i class="fa-solid fa-pen-to-square section-icon"></i>
+                    博客更新（博客暂未开工建设喵~）
+                </h3>
+                <div class="flex gap-3 text-sm">
+                    <a href="#" class="text-pink-500 hover:underline">查看全部</a>
+                </div>
+            </div>
+            <!-- 博客卡片：移动端单列，桌面端2列 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card p-4">
+                    <div class="flex gap-2 mb-2">
+                        <span class="tag">tag</span>
+                        <span class="tag">tag</span>
+                        <span class="tag">tag</span>
+                        <span class="tag">tag</span>
+                    </div>
+                    <h4 class="text-sm font-semibold mb-2">标题</h4>
+                    <p class="text-xs text-gray-600 mb-3">副标题</p>
+                    <button class="text-xs text-pink-500 hover:underline">阅读</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 联系我板块 -->
+        <section id="contact" class="mb-10">
+            <h3 class="text-lg font-bold mb-4 flex items-center">
+                <i class="fa-solid fa-paper-plane section-icon"></i>
+                联系我
+            </h3>
+            <!-- 联系卡片：移动端单列，桌面端3列（都是可点击的链接） -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <a href="https://wx.mail.qq.com" target="_blank" rel="noopener noreferrer" class="card p-4 block">
+                    <h4 class="text-sm font-semibold mb-2">喵喵邮箱</h4>
+                    <p class="text-xs text-gray-600 mb-2">lhy20070708@qq.com</p>
+                </a>
+                <a href="https://github.com/LhyYBMQ520" target="_blank" rel="noopener noreferrer" class="card p-4 block">
+                    <h4 class="text-sm font-semibold mb-2">GitHub</h4>
+                    <p class="text-xs text-gray-600 mb-2">https://github.com/LhyYBMQ520</p>
+                </a>
+                <a href="https://space.bilibili.com/1211287493" target="_blank" rel="noopener noreferrer" class="card p-4 block">
+                    <h4 class="text-sm font-semibold mb-2">bilibili</h4>
+                    <p class="text-xs text-gray-600 mb-2">https://space.bilibili.com/1211287493</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- 页脚 -->
+        <footer class="text-center py-4">
+            <!-- 页脚图标/链接区 -->
+            <div class="footer-icons mb-2 text-base">
+                <!-- IPv6支持图标 -->
+                <a href="https://ipw.cn/ipv6webcheck/?site=https://www.lcatnya.top" title="本站支持IPv6访问" target="_blank" rel="noopener noreferrer">
+                    <img style="display: inline-block; vertical-align: middle;" alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s1.svg">
+                </a>
+                <!-- SSL支持图标 -->
+                <a href="https://ipw.cn/ssl/?site=https://www.lcatnya.top" title="本站支持SSL安全访问" target="_blank" rel="noopener noreferrer" class="mx-1">
+                    <img style="display: inline-block; vertical-align: middle;" alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s1.svg">
+                </a>
+                <!-- HTTP3支持链接 -->
+                <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank" rel="noopener noreferrer" class="http3-text transition-colors font-bold hover:underline">本站已支持HTTP/3</a>
+            </div>
+
+            <!-- 版权信息区 -->
+            <div class="footer-copyright text-sm text-gray-500">
+                Copyright © LC（Lcat）| All Rights Reserved.
+                <br>© <span id="copyright-year-range"></span> By LC（Lcat）❤️
+                <br>本站所有内容均已开源 <a href="https://github.com/LhyYBMQ520/Web-backup" target="_blank" rel="noopener noreferrer" class="github-link transition-colors font-bold hover:underline">Github Page</a>
+            </div>
+        </footer>
     </div>
 
-    <link rel="stylesheet" href="sakana-widget/sakana.min.css" />
-    <div id="sakana-widget" style="
-        position: fixed;
-        left: -20px;
-        bottom: 5px;
-        z-index: 9999;
-        pointer-events: auto;
-    "></div>
     <script>
-        function initSakanaWidget() {
-            new SakanaWidget().mount('#sakana-widget');
-        }
-    </script>
-    <script async onload="initSakanaWidget()"
-        src="sakana-widget/sakana.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            /* ===== 版权年份动态生成 ===== */
+        // ==================== 时间更新功能 ====================
+        function updateTime() {
+            // 获取当前时间对象
             const now = new Date();
-            const currentYear = now.getFullYear(); // 当前年份
-            const currentMonth = String(now.getMonth() + 1).padStart(2, '0'); // 当前月份（补零）
-            const startYear = 2025; // 起始年份
+            // 获取小时，不足两位补0
+            const h = String(now.getHours()).padStart(2, '0');
+            // 获取分钟，不足两位补0
+            const m = String(now.getMinutes()).padStart(2, '0');
+            // 获取秒数，不足两位补0
+            const s = String(now.getSeconds()).padStart(2, '0');
+            // 更新页面上的时间显示
+            document.getElementById('currentTime').textContent = `${h}:${m}:${s}`;
+            
+            // 获取年份
+            const y = now.getFullYear();
+            // 获取月份（注意：月份从0开始，所以要+1），不足两位补0
+            const mo = String(now.getMonth() + 1).padStart(2, '0');
+            // 获取日期，不足两位补0
+            const d = String(now.getDate()).padStart(2, '0');
+            // 更新页面上的日期显示
+            document.getElementById('currentDate').textContent = `${y}年 ${mo}月 ${d}日`;
+        }
+        // 页面加载时立即执行一次时间更新
+        updateTime();
+        // 设置定时器，每100毫秒更新一次时间（实现秒表效果）
+        setInterval(updateTime, 100);
 
-            // 生成显示文本：如果当前年等于起始年，只显示起始年；否则显示范围
-            const displayText = currentYear === startYear 
-                ? `${startYear}` 
-                : `${startYear} - ${currentYear}/${currentMonth}`;
+        // ==================== 版权年份动态生成 ====================
+        // 获取当前日期对象
+        const now = new Date();
+        // 获取当前年份
+        const currentYear = now.getFullYear();
+        // 获取当前月份，不足两位补0
+        const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+        // 设置起始年份
+        const startYear = 2025;
 
-            // 将生成的文本插入到页面中
-            document.getElementById('copyright-year-range').textContent = displayText;
+        // 生成版权年份显示文本：如果当前年份等于起始年份，只显示起始年份；否则显示 "起始年份 - 当前年份/月份"
+        const displayText = currentYear === startYear 
+            ? `${startYear}` 
+            : `${startYear} - ${currentYear}/${currentMonth}`;
 
+        // 更新版权年份显示
+        document.getElementById('copyright-year-range').textContent = displayText;
 
-            /* ===== 三态主题系统（系统/亮色/暗色） ===== */
-            const themeToggle = document.getElementById('themeToggle'); // 获取主题切换按钮
-            const body = document.body; // 获取body元素
+        // ==================== 今日一句功能 ====================
+        // 存储所有句子的数组
+        let allSentences = [];
+        // 默认句子（加载失败时显示）
+        const defaultSentence = {
+            content: "加载失败",
+            source: "加载失败"
+        };
+
+        // 异步加载句子数据（从JSON文件）
+        async function loadSentences() {
+            try {
+                // 发起GET请求获取JSON文件
+                const response = await fetch('jsons/sentences.json');
+                // 检查响应状态，如果不是200-299则抛出错误
+                if (!response.ok) {
+                    throw new Error(`请求失败：${response.status}`);
+                }
+                // 解析JSON数据
+                const data = await response.json();
+                // 检查数据格式是否正确（是否有sentences数组且长度>0）
+                if (Array.isArray(data.sentences) && data.sentences.length > 0) {
+                    // 将数据存入allSentences数组
+                    allSentences = data.sentences;
+                } else {
+                    // 数据格式错误，抛出错误
+                    throw new Error("JSON文件格式错误或无句子数据");
+                }
+            } catch (error) {
+                // 捕获错误并打印到控制台
+                console.error("加载句子失败：", error);
+                // 使用默认句子
+                allSentences = [defaultSentence];
+            }
+            // 显示随机句子
+            showRandomSentence();
+        }
+
+        // 显示随机句子
+        function showRandomSentence() {
+            // 生成随机索引（0到数组长度-1）
+            const randomIndex = Math.floor(Math.random() * allSentences.length);
+            // 获取随机选中的句子
+            const selectedSentence = allSentences[randomIndex];
+            
+            // 更新页面上的句子内容
+            document.getElementById('sentenceContent').textContent = selectedSentence.content;
+            // 更新页面上的句子来源
+            document.getElementById('sentenceSource').textContent = `—— ${selectedSentence.source}`;
+        }
+
+        // ==================== 页面加载完成后执行的主逻辑 ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 获取DOM元素
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            const toTop = document.getElementById('toTop');
+            const changeSentenceBtn = document.getElementById('changeSentenceBtn');
+
+            // 加载句子数据
+            loadSentences();
+            // 为"换一句"按钮添加点击事件，点击时显示随机句子
+            changeSentenceBtn.addEventListener('click', showRandomSentence);
 
             // 定义主题常量
             const THEMES = {
@@ -481,172 +568,102 @@
                 DARK: 'dark'       // 暗色模式
             };
 
-            // 获取系统主题偏好
+            // 获取系统主题
             const getSystemTheme = () => {
-                // 判断系统是否偏好暗色模式
+                // 检测系统是否偏好暗色模式
                 return window.matchMedia('(prefers-color-scheme: dark)').matches 
                     ? 'dark' 
                     : 'light';
             };
 
-            // 获取当前保存的主题模式（从本地存储读取）
+            // 获取当前主题模式（从localStorage读取，没有则返回SYSTEM）
             const getCurrentMode = () => {
                 return localStorage.getItem('theme-mode') || THEMES.SYSTEM;
             };
 
-            // 设置主题模式并保存到本地存储
+            // 设置主题模式（存入localStorage并应用）
             const setMode = (mode) => {
-                localStorage.setItem('theme-mode', mode); // 保存到本地存储
-                applyTheme(); // 应用主题
+                localStorage.setItem('theme-mode', mode);
+                applyTheme();
             };
 
             // 应用主题样式
             const applyTheme = () => {
-                const mode = getCurrentMode(); // 获取当前模式
-                let finalTheme; // 最终要应用的主题
+                // 获取当前模式
+                const mode = getCurrentMode();
+                // 最终应用的主题
+                let finalTheme;
 
-                // 根据不同模式确定最终主题
+                // 根据不同模式设置最终主题
                 if (mode === THEMES.SYSTEM) {
-                    finalTheme = getSystemTheme(); // 跟随系统
-                    themeToggle.innerHTML = '<i class="fas fa-desktop"></i>'; // 显示桌面图标
-                } 
-                else if (mode === THEMES.DARK) {
-                    finalTheme = 'dark'; // 暗色模式
-                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>'; // 显示月亮图标
-                } 
-                else {
-                    finalTheme = 'light'; // 亮色模式
-                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>'; // 显示太阳图标
+                    // 跟随系统模式
+                    finalTheme = getSystemTheme();
+                    // 切换按钮图标为桌面图标
+                    themeToggle.innerHTML = '<i class="fas fa-desktop"></i>';
+                } else if (mode === THEMES.DARK) {
+                    // 暗色模式
+                    finalTheme = 'dark';
+                    // 切换按钮图标为月亮图标
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                } else {
+                    // 亮色模式
+                    finalTheme = 'light';
+                    // 切换按钮图标为太阳图标
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
                 }
 
-                // 切换body的dark类来应用深色模式样式
+                // 根据最终主题切换body的dark类
                 body.classList.toggle('dark', finalTheme === 'dark');
+                // 切换主题按钮的暗色样式
+                themeToggle.classList.toggle('theme-btn-dark', finalTheme === 'dark');
+                // 切换回到顶部按钮的暗色样式
+                toTop.classList.toggle('totop-btn-dark', finalTheme === 'dark');
             };
 
-            // 点击主题按钮循环切换模式：系统 → 亮色 → 暗色 → 系统
+            // ==================== 主题切换按钮点击事件 ====================
             themeToggle.addEventListener('click', () => {
+                // 获取当前模式
                 const mode = getCurrentMode();
 
+                // 循环切换模式：SYSTEM → LIGHT → DARK → SYSTEM
                 if (mode === THEMES.SYSTEM) {
-                    setMode(THEMES.LIGHT); // 切换到亮色
-                } 
-                else if (mode === THEMES.LIGHT) {
-                    setMode(THEMES.DARK); // 切换到暗色
-                } 
-                else {
-                    setMode(THEMES.SYSTEM); // 切换到系统
+                    setMode(THEMES.LIGHT);
+                } else if (mode === THEMES.LIGHT) {
+                    setMode(THEMES.DARK);
+                } else {
+                    setMode(THEMES.SYSTEM);
                 }
             });
 
-            // 监听系统主题变化（仅在系统模式下生效）
+            // ==================== 监听系统主题变化 ====================
             window.matchMedia('(prefers-color-scheme: dark)')
                 .addEventListener('change', () => {
+                    // 只有当当前模式是SYSTEM时，才响应系统主题变化
                     if (getCurrentMode() === THEMES.SYSTEM) {
-                        applyTheme(); // 重新应用主题
+                        applyTheme();
                     }
                 });
 
-            // 页面加载时初始化主题
-            applyTheme();
-
-
-            /* ===== Header交互效果（显示友链入口） ===== */
-            const header = document.querySelector('header'); // 获取头部元素
-
-            // 鼠标进入头部时激活（显示友链）
-            header.addEventListener('mouseenter', () => {
-                header.classList.add('active');
-            });
-
-            // 鼠标离开头部时取消激活（隐藏友链）
-            header.addEventListener('mouseleave', () => {
-                header.classList.remove('active');
-            });
-
-            // 点击头部时切换激活状态（除了友链链接本身）
-            header.addEventListener('click', (e) => {
-                if (e.target === header || e.target.closest('.friend-link')) return;
-                header.classList.toggle('active');
-            });
-
-            /* ===== 从JSON文件加载导航模块 ===== */
-            // 从指定JSON文件获取导航数据
-            fetch('jsons/modules.json')
-                .then(res => res.json()) // 解析JSON数据
-                .then(data => {
-                    const container = document.getElementById('moduleContainer'); // 获取卡片容器
-
-                    // 遍历数据生成每个导航卡片
-                    data.forEach(item => {
-
-                        // 创建卡片元素
-                        const card = document.createElement('div');
-                        card.className = 'grid-item'; // 添加样式类
-                        // 点击卡片打开链接（新窗口）
-                        card.onclick = () => window.open(item.link, '_blank', 'noopener,noreferrer');
-
-                        // 卡片内部HTML结构
-                        card.innerHTML = `
-                            <div class="item-header">
-                                <h3 class="item-title">${item.name}</h3> <!-- 卡片标题 -->
-                            </div>
-                            <div class="item-content">
-                                <p class="item-desc">${item.desc}</p> <!-- 卡片描述 -->
-                                <div class="item-footer">
-                                    <span class="category-tag">${item.tag}</span> <!-- 分类标签 -->
-                                    <div class="item-link">
-                                        访问 <i class="fas fa-arrow-right"></i> <!-- 访问文字+箭头 -->
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-
-                        // 将卡片添加到容器中
-                        container.appendChild(card);
-                    });
-
-                    // 为生成的卡片绑定点击动画
-                    document.querySelectorAll('.grid-item').forEach(item => {
-                        item.addEventListener('click', function () {
-                            this.style.transform = 'scale(0.95)'; // 点击时缩小
-                            setTimeout(() => {
-                                this.style.transform = ''; // 300ms后恢复
-                            }, 300);
-                        });
-                    });
-                })
-                .catch(err => {
-                    // 加载失败时在控制台输出错误
-                    console.error('模块加载失败:', err);
-                });
-
-            /* ===== 返回顶部功能 ===== */
-            const toTop = document.querySelector("#toTop");    // 获取返回顶部按钮  
-            toTop.style.display = "none";// 初始状态隐藏按钮  
-
-            // 监听页面滚动事件
-            window.addEventListener("scroll", scrollHandler);
-            function scrollHandler(e) {        
-                // 简化scrollTop兼容写法（使用document.documentElement.scrollTop即可兼容现代浏览器）
+            // ==================== 回到顶部功能 ====================
+            // 监听滚动事件
+            window.addEventListener("scroll", () => {
+                // 获取滚动距离
                 const distanceY = document.documentElement.scrollTop;
-                // 滚动超过100px时显示按钮，否则隐藏
-                if (distanceY > 100) { 
-                    toTop.style.display = "flex";
-                } else {
-                    toTop.style.display = "none";
-                }
-            }
+                // 滚动距离>100px时显示回到顶部按钮，否则隐藏
+                toTop.classList.toggle('hidden', distanceY <= 100);
+            });
 
-            // 点击返回顶部按钮的处理函数（改用原生scrollTo实现平滑滚动）
-            toTop.addEventListener("click", clickHandler);
-            function clickHandler(e) {
-                // 原生API实现平滑滚动，无需定时器
+            // 回到顶部按钮点击事件
+            toTop.addEventListener("click", () => {
+                // 平滑滚动到顶部
                 window.scrollTo({
                     top: 0,
-                    behavior: 'smooth' // 平滑滚动效果，浏览器原生支持
+                    behavior: 'smooth'
                 });
-            }
+            });
 
+            // 初始应用主题
+            applyTheme();
         });
     </script>
 </body>

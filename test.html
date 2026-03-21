@@ -3,221 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lcat - 个人主页</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Lcat - 测试页面</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+
     <style>
-        /* 全局背景与字体 */
         body {
-            background: linear-gradient(135deg, #fdf2f8 0%, #f0fdfa 100%);
-            background-attachment: fixed;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: "Poppins", "ZCOOL KuaiLe", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            /* 添加页面居中样式 */
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        /* 毛玻璃卡片效果 */
-        .card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        /* 小标签样式 */
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            font-size: 12px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.7);
-            color: #6b7280;
-            margin-right: 4px;
-        }
-        /* 平滑滚动 */
-        html {
-            scroll-behavior: smooth;
+
+        /* 定义文本样式 */
+        .empty-message {
+            font-size: 72px; /* 大字大小 */
+            font-weight: 600; /* 字体加粗 */
+            color: #333; /* 文字颜色 */
+            text-align: center; /* 文本居中（兼容不同屏幕） */
+            font-family: "ZCOOL KuaiLe", sans-serif; /* 使用更有特色的字体 */
         }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 text-gray-800">
-    <div class="max-w-5xl mx-auto">
-        <!-- 顶部导航栏 -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <div class="flex items-center gap-3">
-                <img src="https://lhyybmq520.github.io/assets/avatar-CG3XBQ0Z.webp" alt="头像" class="w-10 h-10 rounded-full object-cover">
-                <h1 class="text-xl font-bold">Lcat</h1>
-            </div>
-            <nav class="flex flex-wrap gap-4 text-sm font-medium text-gray-600">
-                <a href="#about" class="hover:text-pink-500 transition-colors">关于我</a>
-                <a href="#projects" class="hover:text-pink-500 transition-colors">项目</a>
-                <a href="#blog" class="hover:text-pink-500 transition-colors">博客</a>
-                <a href="#friends" class="hover:text-pink-500 transition-colors">友链</a>
-                <a href="#contact" class="hover:text-pink-500 transition-colors">联系</a>
-            </nav>
-        </header>
-
-        <!-- 今日一句 + 时间卡片 -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-            <!-- 今日一句 -->
-            <div class="card p-5 lg:col-span-2 flex flex-col justify-between">
-                <div class="flex items-start gap-3">
-                    <i class="fa-regular fa-comment text-pink-400 mt-1"></i>
-                    <div>
-                        <p class="text-xs text-gray-500 mb-1">今日一句</p>
-                        <p class="text-base font-medium">内容</p>
-                        <p class="text-xs text-gray-400 mt-2">—— 来源</p>
-                    </div>
-                </div>
-                <button class="self-end mt-3 md:mt-0 px-3 py-1 text-xs bg-white/70 hover:bg-white text-gray-600 rounded-full shadow-sm transition-colors">换一句</button>
-            </div>
-
-            <!-- 时间卡片 -->
-            <div class="card p-5 flex items-center justify-center">
-                <div class="text-center w-full">
-                    <p class="text-xs text-gray-500 mb-1">本地时间</p>
-                    <p class="text-3xl md:text-4xl font-bold mb-2" id="currentTime">00:00:00</p>
-                    <p class="text-sm text-gray-500" id="currentDate">0000年 00月 00日</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 个人介绍区 -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-            <div class="lg:col-span-2">
-                <div class="mb-3 inline-block px-3 py-1 bg-white/60 rounded-full text-xs text-gray-600 shadow-sm">
-                    <i class="fa-solid fa-paw text-pink-400 mr-1"></i> LC 个人档案
-                </div>
-                <h2 class="text-3xl md:text-4xl font-bold mb-4 leading-tight">Lcat（L菌）是一只猫猫哦~</h2>
-                <p class="text-gray-600 text-base leading-relaxed mb-6">
-                    114514岁老年人（雾），在读，来自喵星。喜欢睡大觉（S属性大爆发）、玩各种的Game！爱好计算机，想做各种自己感兴趣的事。
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    <button class="px-4 py-2 bg-white/70 text-gray-700 text-sm rounded-lg hover:bg-white transition-colors">OpenList / 下载站</button>
-                    <button class="px-4 py-2 bg-white/70 text-gray-700 text-sm rounded-lg hover:bg-white transition-colors">LC博客</button>
-                    <button class="px-4 py-2 bg-white/70 text-gray-700 text-sm rounded-lg hover:bg-white transition-colors">友人帐</button>
-                </div>
-            </div>
-
-            <!-- 右侧快速了解我 -->
-            <div class="card p-5">
-                <h3 class="text-xl font-bold mb-4">快速了解我</h3>
-                <div class="space-y-3 mb-4 text-sm">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-pink-500"></i>
-                        <span>来自：喵星</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-info text-purple-500"></i>
-                        <span>标签：猫猫，Sleep！Game！</span>
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="tag">#摸鱼日常</span>
-                    <span class="tag">#游戏玩家</span>
-                    <span class="tag">#瞎折腾</span>
-                    <span class="tag">#保持热爱</span>
-                    <span class="tag">#人间凑数</span>
-                    <span class="tag">#快乐至上</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 关于我 -->
-        <section id="about" class="mb-10">
-            <h3 class="text-lg font-bold mb-4">关于我</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="card p-4 text-sm">
-                    <h4 class="font-semibold mb-2">我在意的事</h4>
-                    <p class="text-gray-600 text-xs">并没有在意的事 (･ｪ･)ﾉ，只想过好每一天，做做自己感兴趣的事。</p>
-                </div>
-                <div class="card p-4 text-sm">
-                    <h4 class="font-semibold mb-2">我的兴趣</h4>
-                    <p class="text-gray-600 text-xs">编程、记录、睡觉、Game，还有可爱的设计和配色。</p>
-                </div>
-                <div class="card p-4 text-sm">
-                    <h4 class="font-semibold mb-2">我在寻找</h4>
-                    <p class="text-gray-600 text-xs">希望是能让我开心的事物和人吧。</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- GitHub 项目 -->
-        <section id="projects" class="mb-10">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold">GitHub 项目</h3>
-                <a href="#" class="text-xs text-pink-500 hover:underline">查看更多</a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">名字</h4>
-                    <p class="text-xs text-gray-600 mb-3">描述</p>
-                    <button class="text-xs text-pink-500 hover:underline">查看项目</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 博客更新 -->
-        <section id="blog" class="mb-10">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold">博客更新</h3>
-                <div class="flex gap-3 text-xs">
-                    <a href="#" class="text-pink-500 hover:underline">查看全部</a>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                <div class="card p-4">
-                    <div class="flex gap-2 mb-2">
-                        <span class="tag">tag</span>
-                        <span class="tag">tag</span>
-                        <span class="tag">tag</span>
-                        <span class="tag">tag</span>
-                    </div>
-                    <h4 class="text-sm font-semibold mb-2">标题</h4>
-                    <p class="text-xs text-gray-600 mb-3">副标题</p>
-                    <button class="text-xs text-pink-500 hover:underline">阅读</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 联系我 -->
-        <section id="contact" class="mb-10">
-            <h3 class="text-lg font-bold mb-4">联系我</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">邮箱</h4>
-                    <p class="text-xs text-gray-600 mb-2">lhy20070708@qq.com</p>
-                    <button class="text-xs text-pink-500 hover:underline">发送邮件</button>
-                </div>
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">GitHub</h4>
-                    <p class="text-xs text-gray-600 mb-2">github.com/LhyYBMQ520</p>
-                    <button class="text-xs text-pink-500 hover:underline">打开主页</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 页脚 -->
-        <footer class="text-center text-xs text-gray-500 py-4">
-            <p>© 2026 Lcat❤️ All rights reserved.</p>
-        </footer>
-    </div>
-
-    <script>
-        function updateTime() {
-            const now = new Date();
-            // 格式化时间：HH:MM:SS
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('currentTime').textContent = `${h}:${m}:${s}`;
-            
-            // 格式化日期：YYYY年 MM月 DD日
-            const y = now.getFullYear();
-            const mo = String(now.getMonth() + 1).padStart(2, '0');
-            const d = String(now.getDate()).padStart(2, '0');
-            document.getElementById('currentDate').textContent = `${y}年 ${mo}月 ${d}日`;
-        }
-        updateTime();
-        setInterval(updateTime, 1000);
-    </script>
+<body>
+    <!-- 添加居中显示的文本元素 -->
+    <div class="empty-message">这里没有内容哦~</div>
 </body>
 </html>
