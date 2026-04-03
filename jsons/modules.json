@@ -54,6 +54,12 @@
     "tag": "RGB"
   },
   {
+    "link": "nice-clock.html",
+    "name": "丝滑小车时钟",
+    "desc": "一个有着流畅动画的小车时钟页面。",
+    "tag": "Clock"
+  },
+  {
     "link": "test.html",
     "name": "测试页面",
     "desc": "测试新想法的页面。",
