@@ -143,25 +143,21 @@
 
         /* 回到顶部按钮 + HTTP3/Github链接 统一配色 */
         #toTop,
-        .http3-text, 
         .github-link {
             color: #9333ea !important; /* 紫色 */
         }
         
         /* hover时颜色变化 */
-        .http3-text:hover, 
         .github-link:hover {
             color: #7e22ce !important; /* 深紫色 */
         }
 
         /* 暗色模式下的配色 */
         body.dark #toTop,
-        body.dark .http3-text, 
         body.dark .github-link {
             color: #ffcc00 !important; /* 黄色 */
         }
         
-        body.dark .http3-text:hover, 
         body.dark .github-link:hover {
             color: #fbbf24 !important; /* 深黄色 */
         }
@@ -176,24 +172,6 @@
         body.dark #toTop {
             background: rgba(0, 0, 0, 0.4) !important;
             box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
-        }
-
-        /* 页脚其他链接样式适配 */
-        .footer-icons a:not(.http3-text) {
-            color: #6b7280 !important; /* 灰色 */
-        }
-        
-        .footer-icons a:not(.http3-text):hover {
-            color: #ec4899 !important; /* 粉色 */
-        }
-        
-        /* 暗色模式下页脚链接样式 */
-        body.dark .footer-icons a:not(.http3-text) {
-            color: #d1d5db !important; /* 浅灰色 */
-        }
-        
-        body.dark .footer-icons a:not(.http3-text):hover {
-            color: #f472b6 !important; /* 浅粉色 */
         }
 
         /* ========== 新增：暗黑模式下按钮hover样式 ========== */
@@ -451,16 +429,18 @@
         <footer class="text-center py-4">
             <!-- 页脚图标/链接区 -->
             <div class="footer-icons mb-2 text-base">
-                <!-- IPv6支持图标 -->
-                <a href="https://ipw.cn/ipv6webcheck/?site=https://www.lcatnya.top" title="本站支持IPv6访问" target="_blank" rel="noopener noreferrer">
-                    <img style="display: inline-block; vertical-align: middle;" alt="本站支持IPv6访问" src="https://static.ipw.cn/icon/ipv6-s1.svg">
+                <!-- IPv6支持按钮 -->
+                <a href="https://www.itdog.cn/ping_ipv6/www.lcatnya.top" title="本站支持IPv6访问" target="_blank" rel="noopener noreferrer" class="mx-1">
+                    <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站支持IPv6访问" src="https://img.shields.io/badge/本站支持-IPv6访问-brightgreen?style=for-the-badge">
                 </a>
                 <!-- SSL支持图标 -->
-                <a href="https://ipw.cn/ssl/?site=https://www.lcatnya.top" title="本站支持SSL安全访问" target="_blank" rel="noopener noreferrer" class="mx-1">
-                    <img style="display: inline-block; vertical-align: middle;" alt="本站支持SSL安全访问" src="https://static.ipw.cn/icon/ssl-s1.svg">
+                <a href="https://myssl.com/www.lcatnya.top" title="本站支持SSL安全访问" target="_blank" rel="noopener noreferrer" class="mx-1">
+                    <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站支持SSL安全访问" src="https://img.shields.io/badge/本站支持-SSL安全访问-green?style=for-the-badge">
                 </a>
-                <!-- HTTP3支持链接 -->
-                <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank" rel="noopener noreferrer" class="http3-text transition-colors font-bold hover:underline">本站已支持HTTP/3</a>
+                <!-- HTTP3支持按钮 -->
+                <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank" rel="noopener noreferrer" class="mx-1">
+                    <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站已支持HTTP/3" src="https://img.shields.io/badge/HTTP/3-已支持-yellow?style=for-the-badge">
+                </a>
             </div>
 
             <!-- 版权信息区 -->
