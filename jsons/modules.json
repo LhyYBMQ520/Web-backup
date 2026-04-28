@@ -18,12 +18,6 @@
     "tag": "Speedtest"
   },
   {
-    "link": "openlist.html",
-    "name": "私の云盘",
-    "desc": "OpenList on Aliyun VPS",
-    "tag": "Cloud Drive"
-  },
-  {
     "link": "http3.html",
     "name": "新协议",
     "desc": "关于http3和http3测试页",
