@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Web backup",
+    "desc": "本套网页的开源仓库。",
+    "url": "https://github.com/LhyYBMQ520/Web-backup"
+  },
+  {
+    "name": "IP-check-api",
+    "desc": "本欢迎页使用的轻量 IP 归属地查询后端，通过api调用",
+    "url": "https://github.com/LhyYBMQ520/IP-check-api"
+  },
+  {
+    "name": "Listen music together",
+    "desc": "一起听歌网页全栈项目仓库",
+    "url": "https://github.com/LhyYBMQ520/Listen-music-together"
+  },
+  {
+    "name": "LhyYBMQ520.github.io",
+    "desc": "我的旧个人主页",
+    "url": "https://github.com/LhyYBMQ520/LhyYBMQ520.github.io"
+  },
+  {
+    "name": "Photo in voice",
+    "desc": "致敬旅行者金唱片，将灰度图片编码为FLAC音频，解码时播放声音并实时还原图像。",
+    "url": "https://github.com/LhyYBMQ520/Photo-in-voice"
+  },
+  {
+    "name": "ffmpeg batch",
+    "desc": "一个简易的ffmpeg批处理脚本，包含一些常用的命令。",
+    "url": "https://github.com/LhyYBMQ520/ffmpeg-batch"
+  },
+  {
+    "name": "SSE-Monitor",
+    "desc": "基于 SSE 的轻量级 Linux 服务器实时监控面板",
+    "url": "https://github.com/LhyYBMQ520/SSE-Monitor"
+  },
+  {
+    "name": "Simple-web-chat",
+    "desc": "一个简单的网页版即时聊天，正在更新ing。。。",
+    "url": "https://github.com/LhyYBMQ520/Simple-web-chat"
+  },
+  {
+    "name": "A-small-toy",
+    "desc": "芝士一个有多种编程语言版本的小玩具",
+    "url": "https://github.com/LhyYBMQ520/A-small-toy"
+  }
+]

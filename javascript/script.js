@@ -94,6 +94,81 @@ function showRandomSentence() {
     document.getElementById('sentenceSource').textContent = `—— ${selectedSentence.source}`;
 }
 
+// ==================== GitHub 项目动态加载 ====================
+// 从 JSON 文件加载项目列表并渲染到页面
+async function loadProjects() {
+    const grid = document.getElementById('projectsGrid');
+    if (!grid) return;
+
+    try {
+        const response = await fetch('jsons/projects.json');
+        if (!response.ok) {
+            throw new Error(`请求失败：${response.status}`);
+        }
+        const projects = await response.json();
+
+        if (!Array.isArray(projects) || projects.length === 0) {
+            throw new Error('项目数据为空或格式错误');
+        }
+
+        // 清空占位内容，渲染项目卡片
+        grid.innerHTML = '';
+        projects.forEach(project => {
+            const card = document.createElement('div');
+            card.className = 'card p-4';
+            card.innerHTML = `
+                <h4 class="text-sm font-semibold mb-2">${escapeHtml(project.name)}</h4>
+                <p class="text-xs text-gray-600 mb-3">${escapeHtml(project.desc)}</p>
+                <a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" title="查看${escapeHtml(project.name)}项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
+            `;
+            grid.appendChild(card);
+        });
+    } catch (error) {
+        console.error('加载项目列表失败：', error);
+        grid.innerHTML = '<p class="text-sm text-gray-400 col-span-full text-center">项目加载失败，请稍后刷新重试</p>';
+    }
+}
+
+// 简单的 HTML 转义，防止 XSS
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ==================== 欢迎文案功能（IP归属地查询） ====================
+// 加载 API 配置并从后端获取欢迎信息
+async function loadWelcome() {
+    const welcomeMsgEl = document.getElementById('welcomeMsg');
+    const visitorIpEl = document.getElementById('visitorIp');
+
+    try {
+        // 第一步：从配置文件读取 API 地址
+        const configResp = await fetch('jsons/api-config.json');
+        if (!configResp.ok) {
+            throw new Error(`配置文件加载失败：${configResp.status}`);
+        }
+        const config = await configResp.json();
+        const apiBase = config.welcomeApi;
+
+        // 第二步：调用欢迎接口
+        const apiResp = await fetch(`${apiBase}/api/welcome`);
+        if (!apiResp.ok) {
+            throw new Error(`API 请求失败：${apiResp.status}`);
+        }
+        const data = await apiResp.json();
+
+        // 更新页面显示
+        welcomeMsgEl.textContent = data.welcomeMsg;
+        visitorIpEl.textContent = data.ip;
+    } catch (error) {
+        console.error('加载欢迎信息失败：', error);
+        // 兜底文案
+        welcomeMsgEl.textContent = '欢迎访问本站';
+        visitorIpEl.textContent = '-';
+    }
+}
+
 // ==================== 页面加载完成后执行的主逻辑 ====================
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
@@ -104,6 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 加载句子数据
     loadSentences();
+    // 加载欢迎文案
+    loadWelcome();
+    // 加载项目列表
+    loadProjects();
     // 为"换一句"按钮添加点击事件，点击时显示随机句子
     changeSentenceBtn.addEventListener('click', showRandomSentence);
 

@@ -63,6 +63,12 @@
             </nav>
         </header>
 
+        <!-- 欢迎文案横幅：根据访客IP显示个性化欢迎信息 -->
+        <div id="welcomeBanner" class="card p-4 mb-6 text-center transition-opacity duration-500">
+            <p class="text-base font-medium" id="welcomeMsg">正在识别你的位置…</p>
+            <p class="text-xs text-gray-400 mt-1">你的 IP：<span id="visitorIp">-</span></p>
+        </div>
+
         <!-- 今日一句 + 时间卡片：移动端单列，大屏端3列（今日一句占2列，时间占1列） -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
             <!-- 今日一句卡片 -->
@@ -164,57 +170,9 @@
                 </h3>
                 <a href="https://github.com/LhyYBMQ520?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-sm text-pink-500 hover:underline">查看更多</a>
             </div>
-            <!-- 项目卡片：移动端单列，桌面端3列 -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">Web backup</h4>
-                    <p class="text-xs text-gray-600 mb-3">本套网页的开源仓库。</p>
-                    <a href="https://github.com/LhyYBMQ520/Web-backup" target="_blank" rel="noopener noreferrer" title="查看Web backup项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">Listen music together</h4>
-                    <p class="text-xs text-gray-600 mb-3">（个人主项目）一起听歌网页全栈项目仓库</p>
-                    <a href="https://github.com/LhyYBMQ520/Listen-music-together" target="_blank" rel="noopener noreferrer" title="查看Listen music together项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">LhyYBMQ520.github.io</h4>
-                    <p class="text-xs text-gray-600 mb-3">我的旧个人主页</p>
-                    <a href="https://github.com/LhyYBMQ520/LhyYBMQ520.github.io" target="_blank" rel="noopener noreferrer" title="查看我的旧个人主页项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">Photo in voice</h4>
-                    <p class="text-xs text-gray-600 mb-3">致敬旅行者金唱片，将灰度图片编码为FLAC音频，解码时播放声音并实时还原图像。</p>
-                    <a href="https://github.com/LhyYBMQ520/Photo-in-voice" target="_blank" rel="noopener noreferrer" title="查看Photo in voice项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">ffmpeg batch</h4>
-                    <p class="text-xs text-gray-600 mb-3">一个简易的ffmpeg批处理脚本，包含一些常用的命令。</p>
-                    <a href="https://github.com/LhyYBMQ520/ffmpeg-batch" target="_blank" rel="noopener noreferrer" title="查看ffmpeg batch项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-                
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">SSE-Monitor</h4>
-                    <p class="text-xs text-gray-600 mb-3">基于 SSE 的轻量级 Linux 服务器实时监控面板</p>
-                    <a href="https://github.com/LhyYBMQ520/SSE-Monitor" target="_blank" rel="noopener noreferrer" title="查看SSE-Monitor项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">Simple-web-chat</h4>
-                    <p class="text-xs text-gray-600 mb-3">一个简单的网页版即时聊天，正在更新ing。。。</p>
-                    <a href="https://github.com/LhyYBMQ520/Simple-web-chat" target="_blank" rel="noopener noreferrer" title="查看Simple-web-chat项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
-                <div class="card p-4">
-                    <h4 class="text-sm font-semibold mb-2">A-small-toy</h4>
-                    <p class="text-xs text-gray-600 mb-3">芝士一个有多种编程语言版本的小玩具</p>
-                    <a href="https://github.com/LhyYBMQ520/A-small-toy" target="_blank" rel="noopener noreferrer" title="查看A-small-toy项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
-                </div>
-
+            <!-- 项目卡片：移动端单列，桌面端3列（数据从 jsons/projects.json 动态加载） -->
+            <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 项目卡片由 JavaScript 动态渲染 -->
             </div>
         </section>
 
@@ -254,7 +212,7 @@
             </h3>
             <!-- 联系卡片：移动端单列，桌面端3列（都是可点击的链接） -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <a href="https://wx.mail.qq.com" target="_blank" rel="noopener noreferrer" class="card p-4 block">
+                <a href="mailto:lhy20070708@qq.com" class="card p-4 block">
                     <h4 class="text-sm font-semibold mb-2">喵喵邮箱</h4>
                     <p class="text-xs text-gray-600 mb-2">lhy20070708@qq.com</p>
                 </a>
@@ -274,15 +232,15 @@
             <!-- 页脚图标/链接区 -->
             <div class="footer-icons mb-2 text-base">
                 <!-- IPv6支持按钮 -->
-                <a href="https://www.itdog.cn/ping_ipv6/www.lcatnya.top" title="本站支持IPv6访问" target="_blank" rel="noopener noreferrer" class="mx-1">
+                <a href="https://www.itdog.cn/ping_ipv6/www.lcatnya.top" title="本站支持IPv6访问" target="_blank" rel="noopener noreferrer" class="inline-block m-1">
                     <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站支持IPv6访问" src="https://img.shields.io/badge/本站支持-IPv6访问-brightgreen?style=for-the-badge">
                 </a>
                 <!-- SSL支持图标 -->
-                <a href="https://myssl.com/www.lcatnya.top" title="本站支持SSL安全访问" target="_blank" rel="noopener noreferrer" class="mx-1">
+                <a href="https://myssl.com/www.lcatnya.top" title="本站支持SSL安全访问" target="_blank" rel="noopener noreferrer" class="inline-block m-1">
                     <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站支持SSL安全访问" src="https://img.shields.io/badge/本站支持-SSL安全访问-green?style=for-the-badge">
                 </a>
                 <!-- HTTP3支持按钮 -->
-                <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank" rel="noopener noreferrer" class="mx-1">
+                <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank" rel="noopener noreferrer" class="inline-block m-1">
                     <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站已支持HTTP/3" src="https://img.shields.io/badge/HTTP/3-已支持-yellow?style=for-the-badge">
                 </a>
             </div>
