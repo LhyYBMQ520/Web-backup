@@ -215,3 +215,81 @@ body.dark a[href="navigation.html"]:hover {
 a[href="navigation.html"] {
     transition: all 0.3s ease !important;
 }
+
+/* ==================== 欢迎横幅遮罩层 ==================== */
+#welcomeOverlay {
+    background: rgba(255, 255, 255, 0.92);
+}
+
+body.dark #welcomeOverlay {
+    background: rgba(20, 15, 35, 0.92) !important;
+}
+
+body.dark .welcome-overlay-text {
+    color: #d1d5db !important;
+}
+
+body.dark #openDisclaimerBtn {
+    color: #f472b6 !important;
+}
+
+/* ==================== 免责声明弹窗暗色模式 ==================== */
+/* 弹窗卡片本身沿用 .card 规则，暗色模式下自动变为黑色半透明 */
+
+/* 弹窗标题 */
+.disclaimer-title {
+    color: #1f2937;
+}
+body.dark .disclaimer-title {
+    color: #f3f4f6 !important;
+}
+
+/* 弹窗正文 */
+.disclaimer-text {
+    color: #374151;
+}
+body.dark .disclaimer-text {
+    color: #d1d5db !important;
+}
+
+/* 弹窗小标题 */
+.disclaimer-heading {
+    color: #1f2937;
+}
+body.dark .disclaimer-heading {
+    color: #f3f4f6 !important;
+}
+
+/* 弹窗分隔线 */
+.disclaimer-border {
+    border-color: #e5e7eb;
+}
+body.dark .disclaimer-border {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 弹窗"不同意"按钮 */
+.disclaimer-disagree-btn {
+    border-color: #d1d5db;
+    color: #6b7280;
+}
+.disclaimer-disagree-btn:hover {
+    border-color: #f87171;
+    color: #ef4444;
+}
+body.dark .disclaimer-disagree-btn {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #9ca3af;
+}
+body.dark .disclaimer-disagree-btn:hover {
+    border-color: #f87171;
+    color: #f87171;
+}
+
+/* 弹窗滚动提示 */
+body.dark #scrollHint {
+    color: #9ca3af !important;
+}
+body.dark #scrollHint.text-green-500 {
+    color: #4ade80 !important;
+}

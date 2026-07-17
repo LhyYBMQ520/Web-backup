@@ -137,6 +137,15 @@ function escapeHtml(str) {
 }
 
 // ==================== 欢迎文案功能（IP归属地查询） ====================
+
+// 免责声明 localStorage 键名
+const DISCLAIMER_KEY = 'welcome-disclaimer-accepted';
+
+// 检查用户是否已持久化同意免责声明
+function hasAcceptedDisclaimer() {
+    return localStorage.getItem(DISCLAIMER_KEY) === 'true';
+}
+
 // 加载 API 配置并从后端获取欢迎信息
 async function loadWelcome() {
     const welcomeMsgEl = document.getElementById('welcomeMsg');
@@ -169,6 +178,124 @@ async function loadWelcome() {
     }
 }
 
+// 初始化欢迎功能：根据免责声明同意状态决定是否激活 API
+function initWelcome() {
+    if (hasAcceptedDisclaimer()) {
+        // 已持久化同意，直接激活
+        document.getElementById('welcomeOverlay').classList.add('hidden');
+        loadWelcome();
+    }
+    // 未同意时保持遮罩层显示，不激活 API
+}
+
+// 设置免责声明弹窗交互逻辑
+function setupDisclaimer() {
+    const overlay = document.getElementById('welcomeOverlay');
+    const modal = document.getElementById('disclaimerModal');
+    const modalCard = modal.querySelector('.card');
+    const openBtn = document.getElementById('openDisclaimerBtn');
+    const disagreeBtn = document.getElementById('disagreeBtn');
+    const disagreeBtn2 = document.getElementById('disagreeBtn2');
+    const agreeOnceBtn = document.getElementById('agreeOnceBtn');
+    const agreePersistBtn = document.getElementById('agreePersistBtn');
+    const scrollContainer = document.getElementById('disclaimerContent');
+    const scrollHint = document.getElementById('scrollHint');
+
+    let hasScrolledToBottom = false;
+
+    // 打开弹窗
+    function openModal() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0');
+            modalCard.classList.remove('scale-95');
+        });
+        // 重置滚动状态
+        scrollContainer.scrollTop = 0;
+        hasScrolledToBottom = false;
+        updateButtonState();
+        scrollHint.textContent = '↓ 请完整阅读以上声明后进行操作 ↓';
+        scrollHint.classList.remove('text-green-500');
+    }
+
+    // 关闭弹窗
+    function closeModal() {
+        modal.classList.add('opacity-0');
+        modalCard.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    // 更新按钮可用状态
+    function updateButtonState() {
+        if (hasScrolledToBottom) {
+            agreeOnceBtn.disabled = false;
+            agreeOnceBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreeOnceBtn.classList.add('bg-pink-100', 'text-pink-600', 'hover:bg-pink-200', 'cursor-pointer');
+
+            agreePersistBtn.disabled = false;
+            agreePersistBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreePersistBtn.classList.add('bg-pink-500', 'text-white', 'hover:bg-pink-600', 'cursor-pointer');
+        } else {
+            agreeOnceBtn.disabled = true;
+            agreeOnceBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreeOnceBtn.classList.remove('bg-pink-100', 'text-pink-600', 'hover:bg-pink-200', 'cursor-pointer');
+
+            agreePersistBtn.disabled = true;
+            agreePersistBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreePersistBtn.classList.remove('bg-pink-500', 'text-white', 'hover:bg-pink-600', 'cursor-pointer');
+        }
+    }
+
+    // 同意后的激活流程
+    function activateWelcome() {
+        overlay.classList.add('hidden');
+        closeModal();
+        loadWelcome();
+    }
+
+    // --- 事件绑定 ---
+
+    openBtn.addEventListener('click', openModal);
+
+    disagreeBtn.addEventListener('click', closeModal);
+    disagreeBtn2.addEventListener('click', closeModal);
+
+    // 点击遮罩层关闭（视为不同意）
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // 滚动检测：到底后启用按钮
+    scrollContainer.addEventListener('scroll', () => {
+        const threshold = 5;
+        const atBottom = scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - threshold;
+
+        if (atBottom && !hasScrolledToBottom) {
+            hasScrolledToBottom = true;
+            scrollHint.textContent = '✓ 你已阅读完毕，可以选择操作了';
+            scrollHint.classList.add('text-green-500');
+            updateButtonState();
+        }
+    });
+
+    // 我知道了 —— 仅本次会话生效
+    agreeOnceBtn.addEventListener('click', () => {
+        if (!hasScrolledToBottom) return;
+        activateWelcome();
+    });
+
+    // 不再显示 —— 持久化到 localStorage，下次自动激活
+    agreePersistBtn.addEventListener('click', () => {
+        if (!hasScrolledToBottom) return;
+        localStorage.setItem(DISCLAIMER_KEY, 'true');
+        activateWelcome();
+    });
+}
+
 // ==================== 页面加载完成后执行的主逻辑 ====================
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
@@ -179,8 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 加载句子数据
     loadSentences();
-    // 加载欢迎文案
-    loadWelcome();
+    // 设置免责声明弹窗
+    setupDisclaimer();
+    // 初始化欢迎功能（检查是否已同意免责声明）
+    initWelcome();
     // 加载项目列表
     loadProjects();
     // 为"换一句"按钮添加点击事件，点击时显示随机句子
