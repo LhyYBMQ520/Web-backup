@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     const root = document.documentElement;
     const toTop = document.getElementById('toTop');
+    const scrollProgressCircle = document.getElementById('scrollProgressCircle');
     const changeSentenceBtn = document.getElementById('changeSentenceBtn');
 
     // 加载句子数据
@@ -395,13 +396,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     // ==================== 回到顶部功能 ====================
-    // 监听滚动事件
-    window.addEventListener("scroll", () => {
-        // 获取滚动距离
-        const distanceY = document.documentElement.scrollTop;
-        // 滚动距离>100px时显示回到顶部按钮，否则隐藏
+    // 根据当前滚动距离更新按钮显隐和环形进度
+    const updateScrollProgress = () => {
+        const distanceY = window.scrollY || document.documentElement.scrollTop;
+        const scrollableHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollableHeight > 0
+            ? Math.min(100, Math.max(0, (distanceY / scrollableHeight) * 100))
+            : 0;
+
         toTop.classList.toggle('hidden', distanceY <= 100);
-    });
+        scrollProgressCircle.style.strokeDashoffset = String(100 - progress);
+    };
+
+    window.addEventListener('scroll', updateScrollProgress, { passive: true });
+    window.addEventListener('resize', updateScrollProgress);
+    updateScrollProgress();
 
     // 回到顶部按钮点击事件
     toTop.addEventListener("click", () => {

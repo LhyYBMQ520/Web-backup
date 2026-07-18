@@ -41,10 +41,14 @@
         <i class="fas fa-moon"></i>
     </div>
 
-    <!-- 回到顶部按钮：默认隐藏，固定在右下角，圆形按钮，带向上箭头 -->
-    <div id="toTop" class="fixed bottom-16 right-5 z-40 hidden h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-white/30 text-purple-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-md transition-all duration-300 hover:scale-110 hover:shadow-lg dark:bg-black/40 dark:text-[#ffcc00] dark:shadow-[0_4px_10px_rgba(255,255,255,0.1)] flex">
-        <i class="fas fa-arrow-up text-[20px]"></i>
-    </div>
+    <!-- 回到顶部按钮：外圈同步显示页面滚动进度 -->
+    <button id="toTop" type="button" aria-label="回到页面顶部" class="fixed bottom-16 right-5 z-40 hidden h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-white/30 shadow-[0_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-md transition-all duration-300 hover:scale-110 hover:shadow-lg dark:bg-black/40 dark:shadow-[0_4px_10px_rgba(255,255,255,0.1)] flex">
+        <svg class="pointer-events-none absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 56 56" aria-hidden="true">
+            <circle cx="28" cy="28" r="25" pathLength="100" fill="none" stroke="currentColor" stroke-width="3" class="text-purple-200 dark:text-white/15"></circle>
+            <circle id="scrollProgressCircle" cx="28" cy="28" r="25" pathLength="100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" class="text-purple-600 transition-[stroke-dashoffset] duration-150 ease-out dark:text-[#ffcc00]"></circle>
+        </svg>
+        <i class="fas fa-arrow-up text-[20px] text-purple-600 dark:text-[#ffcc00]"></i>
+    </button>
 
     <!-- 主容器：最大宽度5xl，水平居中 -->
     <div class="max-w-5xl mx-auto">
