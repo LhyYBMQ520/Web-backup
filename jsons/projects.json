@@ -43,5 +43,10 @@
     "name": "A-small-toy",
     "desc": "芝士一个有多种编程语言版本的小玩具",
     "url": "https://github.com/LhyYBMQ520/A-small-toy"
+  },
+  {
+    "name": "MC-Ping-Tools",
+    "desc": "Minecraft Java 版 SLP 协议 RTT 延迟测试工具",
+    "url": "https://github.com/LhyYBMQ520/MC-Ping-Tools"
   }
 ]
