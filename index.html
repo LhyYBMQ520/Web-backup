@@ -1,11 +1,31 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lcat - 个人主页</title>
     <link rel="icon" href="/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'selector',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        site: [
+                            'var(--en-font, "Poppins")',
+                            'var(--zh-font, "ZCOOL KuaiLe")',
+                            '-apple-system',
+                            'BlinkMacSystemFont',
+                            '"Segoe UI"',
+                            'Roboto',
+                            'sans-serif'
+                        ]
+                    }
+                }
+            }
+        };
+    </script>
 
     <link rel="stylesheet" type="text/css" href="fontawesome-free-7.2.0-web/css/all.min.css">
 
@@ -13,17 +33,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Saira+Stencil:ital,wght@0,100..900;1,100..900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="min-h-screen p-4 md:p-8 text-gray-800">
+<body class="min-h-screen bg-gradient-to-br from-pink-50 to-teal-50 bg-fixed p-4 font-site text-gray-800 transition-all duration-500 ease-out dark:from-[#2d1b41] dark:to-[#1a3636] dark:text-gray-300 md:p-8">
     <!-- 主题切换按钮：固定在右上角，圆形按钮，带月亮图标 -->
-    <div id="themeToggle" class="fixed top-5 right-5 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md text-orange-500 text-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg z-50">
+    <div id="themeToggle" class="fixed top-5 right-5 z-50 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white/20 text-xl text-orange-500 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:shadow-lg dark:bg-black/30 dark:text-blue-500 dark:shadow-[0_4px_10px_rgba(255,255,255,0.1)]">
         <i class="fas fa-moon"></i>
     </div>
 
     <!-- 回到顶部按钮：默认隐藏，固定在右下角，圆形按钮，带向上箭头 -->
-    <div id="toTop" class="fixed bottom-16 right-5 w-14 h-14 rounded-full bg-white/30 backdrop-blur-md text-purple-800 flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-lg z-40 hidden">
+    <div id="toTop" class="fixed bottom-16 right-5 z-40 hidden h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-white/30 text-purple-600 shadow-[0_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-md transition-all duration-300 hover:scale-110 hover:shadow-lg dark:bg-black/40 dark:text-[#ffcc00] dark:shadow-[0_4px_10px_rgba(255,255,255,0.1)] flex">
         <i class="fas fa-arrow-up text-[20px]"></i>
     </div>
 
@@ -37,7 +56,7 @@
                 <h1 class="text-2xl font-bold">Lcat</h1>
             </div>
             <!-- 右侧：导航链接 -->
-            <nav class="flex flex-wrap gap-4 text-sm font-medium text-gray-600 items-center">
+            <nav class="flex flex-wrap gap-4 text-sm font-medium text-gray-600 dark:text-gray-300 items-center">
                 <a href="#about" class="hover:text-pink-500 transition-colors">关于我</a>
                 <a href="#projects" class="hover:text-pink-500 transition-colors">项目</a>
                 <a href="#blog" class="hover:text-pink-500 transition-colors">博客</a>
@@ -64,43 +83,43 @@
         </header>
 
         <!-- 欢迎文案横幅：根据访客IP显示个性化欢迎信息 -->
-        <div id="welcomeBanner" class="card p-4 mb-6 text-center transition-opacity duration-500 relative overflow-hidden">
+        <div id="welcomeBanner" class="relative mb-6 overflow-hidden rounded-xl border border-white/20 bg-white/[0.85] p-4 text-center shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
             <!-- 免责声明遮罩层（未同意协议时显示） -->
-            <div id="welcomeOverlay" class="absolute inset-0 bg-white/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10 px-4">
-                <p class="text-sm text-gray-600 mb-2 welcome-overlay-text">如需使用此功能，你需要先阅读</p>
-                <button id="openDisclaimerBtn" class="text-pink-500 hover:text-pink-600 font-medium underline transition-colors text-sm">「IP及IP属地展示功能免责声明」</button>
+            <div id="welcomeOverlay" class="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-white/[0.92] px-4 backdrop-blur-sm dark:bg-[rgba(20,15,35,0.92)]">
+                <p class="mb-2 text-sm text-gray-600 dark:text-gray-300">如需使用此功能，你需要先阅读</p>
+                <button id="openDisclaimerBtn" class="text-sm font-medium text-pink-500 underline transition-colors hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300">「IP及IP属地展示功能免责声明」</button>
             </div>
             <!-- 实际欢迎内容 -->
             <p class="text-base font-medium" id="welcomeMsg">欢迎访问本站</p>
-            <p class="text-xs text-gray-400 mt-1">你的 IP：<span id="visitorIp">-</span></p>
+            <p class="mt-1 text-xs text-gray-400 dark:text-gray-400">你的 IP：<span id="visitorIp">-</span></p>
         </div>
 
         <!-- 今日一句 + 时间卡片：移动端单列，大屏端3列（今日一句占2列，时间占1列） -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
             <!-- 今日一句卡片 -->
-            <div class="card p-5 lg:col-span-2 flex flex-col justify-between">
+            <div class="flex flex-col justify-between rounded-xl border border-white/20 bg-white/[0.85] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] lg:col-span-2">
                 <div class="flex items-start gap-3">
                     <i class="fa-regular fa-comment text-pink-400 mt-1"></i>
                     <div>
-                        <p class="text-sm text-gray-500 mb-1">今日一句</p>
+                        <p class="mb-1 text-sm text-gray-500 dark:text-gray-400">今日一句</p>
                         <!-- 句子内容展示区 -->
                         <p class="text-base font-medium" id="sentenceContent">加载中...</p>
                         <!-- 句子来源展示区 -->
-                        <p class="text-xs text-gray-400 mt-2" id="sentenceSource">—— 加载中</p>
+                        <p class="mt-2 text-xs text-gray-400 dark:text-gray-400" id="sentenceSource">—— 加载中</p>
                     </div>
                 </div>
                 <!-- 换一句按钮 -->
-                <button id="changeSentenceBtn" class="self-end mt-3 md:mt-0 px-3 py-1 text-xs bg-white/70 hover:bg-gray-200 text-gray-600 rounded-full shadow-sm transition-colors">换一句</button>
+                <button id="changeSentenceBtn" class="mt-3 self-end rounded-full bg-white/70 px-3 py-1 text-xs text-gray-600 shadow-sm transition-all duration-300 hover:bg-gray-200 dark:bg-black/50 dark:text-gray-300 dark:hover:bg-white/20 dark:hover:text-gray-100 md:mt-0">换一句</button>
             </div>
 
             <!-- 时间卡片 -->
-            <div class="card p-5 flex items-center justify-center">
+            <div class="flex items-center justify-center rounded-xl border border-white/20 bg-white/[0.85] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
                 <div class="text-center w-full">
-                    <p class="text-base text-gray-500 mb-1">本地时间</p>
+                    <p class="mb-1 text-base text-gray-500 dark:text-gray-400">本地时间</p>
                     <!-- 当前时间展示 -->
                     <p class="text-3xl md:text-4xl font-bold mb-2" id="currentTime">00:00:00</p>
                     <!-- 当前日期展示 -->
-                    <p class="text-sm text-gray-500" id="currentDate">0000年 00月 00日</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400" id="currentDate">0000年 00月 00日</p>
                 </div>
             </div>
         </div>
@@ -109,21 +128,21 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
             <!-- 个人介绍主体 -->
             <div class="lg:col-span-2">
-                <div class="mb-3 inline-block px-3 py-1 bg-white/60 rounded-full text-xs text-gray-600 shadow-sm">
+                <div class="mb-3 inline-block rounded-full bg-white/60 px-3 py-1 text-xs text-gray-600 shadow-sm dark:bg-black/40 dark:text-gray-300">
                     <i class="fa-solid fa-paw text-pink-400 mr-1"></i> LC 个人档案
                 </div>
                 <h2 class="text-3xl md:text-4xl font-semibold mb-4 leading-tight">Lcat（L菌）是一只猫猫哦~</h2>
-                <p class="text-gray-600 text-base leading-relaxed mb-6">
+                <p class="mb-6 text-base leading-relaxed text-gray-600 dark:text-gray-300">
                     114514岁老年喵（雾），来自喵星。喜欢睡大觉（S属性大爆发）、玩各种的Game！爱好计算机，想做各种自己感兴趣的事。
                 </p>
                 <div class="flex flex-wrap gap-2">
                     <!-- 导航站链接按钮 -->
-                    <a href="navigation.html" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-white/70 text-gray-700 text-sm rounded-2xl hover:bg-gray-200 transition-colors inline-flex items-center gap-1.5">L菌の导航站 <i class="fa-solid fa-arrow-up-right-from-square text-[12px]"></i></a>
+                    <a href="navigation.html" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 rounded-2xl bg-white/70 px-4 py-2 text-sm text-gray-700 transition-all duration-300 hover:bg-gray-200 dark:bg-black/50 dark:text-gray-100 dark:hover:bg-white/20 dark:hover:text-gray-100">L菌の导航站 <i class="fa-solid fa-arrow-up-right-from-square text-[12px]"></i></a>
                 </div>
             </div>
 
             <!-- 快速了解我卡片 -->
-            <div class="card p-5">
+            <div class="rounded-xl border border-white/20 bg-white/[0.85] p-5 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
                 <h3 class="text-xl font-bold mb-4">快速了解我</h3>
                 <div class="space-y-3 mb-4 text-sm">
                     <div class="flex items-center gap-2">
@@ -137,11 +156,11 @@
                 </div>
                 <!-- 兴趣标签 -->
                 <div class="flex flex-wrap gap-2 mb-4">
-                    <span class="tag">#摸鱼日常</span>
-                    <span class="tag">#游戏玩家</span>
-                    <span class="tag">#瞎折腾</span>
-                    <span class="tag">#保持热爱</span>
-                    <span class="tag">#快乐至上</span>
+                    <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">#摸鱼日常</span>
+                    <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">#游戏玩家</span>
+                    <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">#瞎折腾</span>
+                    <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">#保持热爱</span>
+                    <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">#快乐至上</span>
                 </div>
             </div>
         </div>
@@ -151,17 +170,17 @@
             <h3 class="text-lg font-bold mb-4">关于我</h3>
             <!-- 三个卡片：移动端单列，桌面端3列 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="card p-4 text-sm">
+                <div class="rounded-xl border border-white/20 bg-white/[0.85] p-4 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
                     <h4 class="font-semibold mb-2">我在意的事</h4>
-                    <p class="text-gray-600 text-xs">并没有在意的事 (❁´◡`❁)，只想过好每一天，做做自己感兴趣的事。</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">并没有在意的事 (❁´◡`❁)，只想过好每一天，做做自己感兴趣的事。</p>
                 </div>
-                <div class="card p-4 text-sm">
+                <div class="rounded-xl border border-white/20 bg-white/[0.85] p-4 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
                     <h4 class="font-semibold mb-2">我的兴趣</h4>
-                    <p class="text-gray-600 text-xs">编程、记录、睡觉、Game，还有可爱的角色，设计和配色。</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">编程、记录、睡觉、Game，还有可爱的角色，设计和配色。</p>
                 </div>
-                <div class="card p-4 text-sm">
+                <div class="rounded-xl border border-white/20 bg-white/[0.85] p-4 text-sm shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
                     <h4 class="font-semibold mb-2">我在寻找</h4>
-                    <p class="text-gray-600 text-xs">希望是能让我开心的事物和人吧。</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">希望是能让我开心的事物和人吧。</p>
                 </div>
             </div>
         </section>
@@ -171,7 +190,7 @@
             <!-- 板块标题 + 查看更多链接 -->
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold flex items-center">
-                    <i class="fa-brands fa-github section-icon"></i>
+                    <i class="fa-brands fa-github mr-1.5 text-pink-500 dark:text-pink-400"></i>
                     GitHub 项目
                 </h3>
                 <a href="https://github.com/LhyYBMQ520?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-sm text-pink-500 hover:underline">查看更多</a>
@@ -187,7 +206,7 @@
             <!-- 板块标题 + 查看全部链接 -->
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold flex items-center">
-                    <i class="fa-solid fa-pen-to-square section-icon"></i>
+                    <i class="fa-solid fa-pen-to-square mr-1.5 text-pink-500 dark:text-pink-400"></i>
                     博客更新（博客暂未开工建设，其实是没有文章可写喵~）
                 </h3>
                 <div class="flex gap-3 text-sm">
@@ -196,15 +215,15 @@
             </div>
             <!-- 博客卡片：移动端单列，桌面端2列 -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="card p-4">
+                <div class="rounded-xl border border-white/20 bg-white/[0.85] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]">
                     <div class="flex gap-2 mb-2">
-                        <span class="tag">tag</span>
-                        <span class="tag">tag</span>
-                        <span class="tag">tag</span>
-                        <span class="tag">tag</span>
+                        <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">tag</span>
+                        <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">tag</span>
+                        <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">tag</span>
+                        <span class="mr-1 inline-block rounded bg-white/70 px-2 py-0.5 text-xs text-gray-500 transition-colors duration-500 dark:bg-black/50 dark:text-gray-300">tag</span>
                     </div>
                     <h4 class="text-sm font-semibold mb-2">标题</h4>
-                    <p class="text-xs text-gray-600 mb-3">副标题</p>
+                    <p class="mb-3 text-xs text-gray-600 dark:text-gray-300">副标题</p>
                     <button class="text-xs text-pink-500 hover:underline">阅读</button>
                 </div>
             </div>
@@ -213,22 +232,22 @@
         <!-- 联系我板块 -->
         <section id="contact" class="mb-10">
             <h3 class="text-lg font-bold mb-4 flex items-center">
-                <i class="fa-solid fa-paper-plane section-icon"></i>
+                <i class="fa-solid fa-paper-plane mr-1.5 text-pink-500 dark:text-pink-400"></i>
                 联系我
             </h3>
             <!-- 联系卡片：移动端单列，桌面端3列（都是可点击的链接） -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <a href="mailto:lhy20070708@qq.com" class="card p-4 block">
+                <a href="mailto:lhy20070708@qq.com" class="block rounded-xl border border-white/20 bg-white/[0.85] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 hover:bg-neutral-200/90 hover:shadow-[0_6px_25px_rgba(0,0,0,0.1)] dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] dark:hover:bg-neutral-800/70 dark:hover:shadow-[0_6px_25px_rgba(0,0,0,0.25)]">
                     <h4 class="text-sm font-semibold mb-2">喵喵邮箱</h4>
-                    <p class="text-xs text-gray-600 mb-2">lhy20070708@qq.com</p>
+                    <p class="mb-2 text-xs text-gray-600 dark:text-gray-300">lhy20070708@qq.com</p>
                 </a>
-                <a href="https://github.com/LhyYBMQ520" target="_blank" rel="noopener noreferrer" class="card p-4 block">
+                <a href="https://github.com/LhyYBMQ520" target="_blank" rel="noopener noreferrer" class="block rounded-xl border border-white/20 bg-white/[0.85] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 hover:bg-neutral-200/90 hover:shadow-[0_6px_25px_rgba(0,0,0,0.1)] dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] dark:hover:bg-neutral-800/70 dark:hover:shadow-[0_6px_25px_rgba(0,0,0,0.25)]">
                     <h4 class="text-sm font-semibold mb-2">GitHub</h4>
-                    <p class="text-xs text-gray-600 mb-2">https://github.com/LhyYBMQ520</p>
+                    <p class="mb-2 text-xs text-gray-600 dark:text-gray-300">https://github.com/LhyYBMQ520</p>
                 </a>
-                <a href="https://space.bilibili.com/1211287493" target="_blank" rel="noopener noreferrer" class="card p-4 block">
+                <a href="https://space.bilibili.com/1211287493" target="_blank" rel="noopener noreferrer" class="block rounded-xl border border-white/20 bg-white/[0.85] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 hover:bg-neutral-200/90 hover:shadow-[0_6px_25px_rgba(0,0,0,0.1)] dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] dark:hover:bg-neutral-800/70 dark:hover:shadow-[0_6px_25px_rgba(0,0,0,0.25)]">
                     <h4 class="text-sm font-semibold mb-2">bilibili</h4>
-                    <p class="text-xs text-gray-600 mb-2">https://space.bilibili.com/1211287493</p>
+                    <p class="mb-2 text-xs text-gray-600 dark:text-gray-300">https://space.bilibili.com/1211287493</p>
                 </a>
             </div>
         </section>
@@ -239,23 +258,23 @@
             <div class="footer-icons mb-2 text-base">
                 <!-- IPv6支持按钮 -->
                 <a href="https://www.itdog.cn/ping_ipv6/www.lcatnya.top" title="本站支持IPv6访问" target="_blank" rel="noopener noreferrer" class="inline-block m-1">
-                    <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站支持IPv6访问" src="https://img.shields.io/badge/本站支持-IPv6访问-brightgreen?style=for-the-badge">
+                    <img class="inline-block rounded-lg align-middle" alt="本站支持IPv6访问" src="https://img.shields.io/badge/本站支持-IPv6访问-brightgreen?style=for-the-badge">
                 </a>
                 <!-- SSL支持图标 -->
                 <a href="https://myssl.com/www.lcatnya.top" title="本站支持SSL安全访问" target="_blank" rel="noopener noreferrer" class="inline-block m-1">
-                    <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站支持SSL安全访问" src="https://img.shields.io/badge/本站支持-SSL安全访问-green?style=for-the-badge">
+                    <img class="inline-block rounded-lg align-middle" alt="本站支持SSL安全访问" src="https://img.shields.io/badge/本站支持-SSL安全访问-green?style=for-the-badge">
                 </a>
                 <!-- HTTP3支持按钮 -->
                 <a href="https://http3check.net/?host=https://www.lcatnya.top" title="本站已支持HTTP/3" target="_blank" rel="noopener noreferrer" class="inline-block m-1">
-                    <img style="display: inline-block; vertical-align: middle; border-radius: 8px;" alt="本站已支持HTTP/3" src="https://img.shields.io/badge/HTTP/3-已支持-yellow?style=for-the-badge">
+                    <img class="inline-block rounded-lg align-middle" alt="本站已支持HTTP/3" src="https://img.shields.io/badge/HTTP/3-已支持-yellow?style=for-the-badge">
                 </a>
             </div>
 
             <!-- 版权信息区 -->
-            <div class="footer-copyright text-sm text-gray-500">
+            <div class="footer-copyright text-sm text-gray-500 dark:text-gray-400">
                 Copyright © LC（Lcat）| All Rights Reserved.
                 <br>© <span id="copyright-year-range"></span> By LC（Lcat）❤️
-                <br>本站所有内容均已开源 <a href="https://github.com/LhyYBMQ520/Web-backup" target="_blank" rel="noopener noreferrer" class="github-link transition-colors font-bold hover:underline">Github Page</a>
+                <br>本站所有内容均已开源 <a href="https://github.com/LhyYBMQ520/Web-backup" target="_blank" rel="noopener noreferrer" class="font-bold text-purple-600 transition-colors hover:text-purple-700 hover:underline dark:text-[#ffcc00] dark:hover:text-amber-400">Github Page</a>
                 <br><a href="https://icp.gov.moe/?keyword=20267811" target="_blank">萌ICP备20267811号</a>
             </div>
         </footer>
@@ -263,58 +282,58 @@
 
     <!-- 免责声明弹窗 -->
     <div id="disclaimerModal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="card rounded-2xl w-11/12 max-w-2xl max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-all duration-300">
+        <div data-modal-card class="flex max-h-[85vh] w-11/12 max-w-2xl scale-95 transform flex-col rounded-2xl border border-white/20 bg-white/[0.85] shadow-2xl backdrop-blur-[10px] transition-all duration-300 dark:border-white/10 dark:bg-black/60">
             <!-- 标题栏 -->
-            <div class="flex justify-between items-center p-5 border-b disclaimer-border">
-                <h3 class="text-lg font-bold disclaimer-title">IP及IP属地展示功能免责声明</h3>
-                <button id="disagreeBtn" class="text-gray-400 hover:text-red-500 transition-colors" title="不同意并关闭">
+            <div class="flex items-center justify-between border-b border-gray-200 p-5 dark:border-white/10">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">IP及IP属地展示功能免责声明</h3>
+                <button id="disagreeBtn" class="text-gray-400 transition-colors hover:text-red-500 dark:text-gray-400" title="不同意并关闭">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
             <!-- 可滚动的协议正文 -->
-            <div id="disclaimerContent" class="disclaimer-text flex-1 overflow-y-auto p-5 text-sm leading-relaxed space-y-3">
+            <div id="disclaimerContent" class="flex-1 space-y-3 overflow-y-auto p-5 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                 <p class="text-xs text-gray-400 mb-3">（将持续更新）</p>
 
                 <p>为规范本个人主页此展示功能的运行，明确相关权责边界，充分提示技术风险与使用注意事项，保护用户合法权益，特制定本免责声明。本声明完整覆盖该功能涉及的技术原理、使用限制、风险提示与责任划分。如需使用本功能，需要完整充分阅读、理解并同意本声明全部条款。</p>
 
-                <h4 class="font-bold text-base disclaimer-heading pt-2">一、功能概述与信息获取规则</h4>
+                <h4 class="pt-2 text-base font-bold text-gray-800 dark:text-gray-100">一、功能概述与信息获取规则</h4>
                 <p><strong>1. 功能说明</strong><br>本页面在用户访问时，将通过后端服务调用 ip2region 数据库，对用户访问IP进行归属地解析，并在页面展示"欢迎，来自XX的用户，即将进入网页"及"你的 IP：XXX"等相关提示，该功能仅用于页面交互展示，不具备其他业务用途。</p>
                 <p><strong>2. 获取方式</strong><br>本系统仅通过HTTP/HTTPS网络通信协议，被动获取用户本次访问所携带的公网IP地址。该行为属于网络访问的标准技术流程，不涉及主动端口扫描、设备探测或其他非必要数据采集行为。</p>
                 <p><strong>3. 使用范围</strong><br>IP地址及解析后的属地信息仅用于本次页面的即时展示，用于优化页面访问体验，不用于任何商业用途、用户画像构建、行为追踪或跨站点数据关联，亦不会向其他无关主体提供。</p>
 
-                <h4 class="font-bold text-base disclaimer-heading pt-2">二、属地识别准确性免责</h4>
+                <h4 class="pt-2 text-base font-bold text-gray-800 dark:text-gray-100">二、属地识别准确性免责</h4>
                 <p>1. IP归属地识别技术基于 ip2region 数据库实现，识别结果仅能反映IP地址对应的大致行政区域，不具备精确地理位置定位能力，无法对应具体街道、建筑或自然人实际位置。</p>
                 <p>2. 受运营商网络调度、骨干网路由调整、CDN节点转发、代理服务、移动网络漫游、IPv4/IPv6地址转换等多重客观因素影响，属地识别结果可能存在偏差、延迟更新或匹配错误。本网站不对IP归属地识别结果的准确性、实时性、完整性作出任何明示或默示的保证。</p>
                 <p>3. 页面展示的属地信息仅为数据库匹配输出结果，不代表用户实际所处地理位置。任何单位或个人均不得将该展示结果作为事实认定、司法证据或判断用户真实位置的依据。</p>
 
-                <h4 class="font-bold text-base disclaimer-heading pt-2">三、数据安全与隐私保护</h4>
+                <h4 class="pt-2 text-base font-bold text-gray-800 dark:text-gray-100">三、数据安全与隐私保护</h4>
                 <p>1. 本网站对IP地址及属地信息采用"即时调用、即时释放"的处理规则，仅在本次页面加载过程中临时用于属地解析，不将IP地址、属地信息写入数据库、日志文件或任何持久化存储介质，页面关闭后相关临时数据随即释放销毁。</p>
                 <p>2. IP属地解析服务由自建开源后端项目实现，可自行检查源码。</p>
                 <p>3. 本网站不会将IP地址信息与用户姓名、手机号码、电子邮箱等可识别个人身份的信息进行关联匹配，不通过IP信息构建用户个人身份画像。</p>
 
-                <h4 class="font-bold text-base disclaimer-heading pt-2">四、功能运行与责任限制</h4>
+                <h4 class="pt-2 text-base font-bold text-gray-800 dark:text-gray-100">四、功能运行与责任限制</h4>
                 <p>1. 因网络故障、第三方接口异常、数据库数据错误、系统维护升级或不可抗力等因素，导致属地展示功能失效、显示异常、信息错误的，本网站不承担由此产生的任何直接或间接责任。</p>
                 <p>2. 本功能为个人主页的辅助体验模块，本网站有权根据实际运营情况随时对该功能进行修改、暂停或下线，无需另行通知用户，亦不承担任何补偿或赔偿责任。</p>
                 <p>3. 任何主体不得利用本功能进行反向工程、接口滥用、批量查询或实施网络攻击行为，由此造成的一切法律后果与经济损失，由行为人自行承担。</p>
 
-                <h4 class="font-bold text-base disclaimer-heading pt-2">五、用户权利与注意事项</h4>
+                <h4 class="pt-2 text-base font-bold text-gray-800 dark:text-gray-100">五、用户权利与注意事项</h4>
                 <p>1. 如用户不希望接收IP属地展示，可点击不同意按钮，您的本次访问将始终不激活本功能。</p>
                 <p>2. 用户如对本功能的信息处理规则存在异议，有权随时停止访问本网站。因本网站未对IP信息进行持久化存储，故不提供单独的信息删除服务。</p>
 
-                <h4 class="font-bold text-base disclaimer-heading pt-2">六、附则</h4>
+                <h4 class="pt-2 text-base font-bold text-gray-800 dark:text-gray-100">六、附则</h4>
                 <p>1. 本声明的解释权归本个人主页运营者所有。</p>
                 <p>2. 本声明内容如与现行法律法规的强制性规定相冲突，以法律法规规定为准。</p>
                 <p>3. 本声明自发布之日起永久生效。</p>
 
                 <!-- 滚动到底部提示 -->
-                <p id="scrollHint" class="text-center text-xs text-gray-400 pt-4 pb-2">↓ 请完整阅读以上声明后进行操作 ↓</p>
+                <p id="scrollHint" class="pb-2 pt-4 text-center text-xs text-gray-400 dark:text-gray-400">↓ 请完整阅读以上声明后进行操作 ↓</p>
             </div>
             <!-- 底部操作按钮 -->
-            <div class="flex justify-between items-center p-4 border-t disclaimer-border">
-                <button id="disagreeBtn2" class="disclaimer-disagree-btn px-4 py-2 text-sm rounded-lg border transition-colors">不同意</button>
+            <div class="flex items-center justify-between border-t border-gray-200 p-4 dark:border-white/10">
+                <button id="disagreeBtn2" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-500 transition-colors hover:border-red-400 hover:text-red-500 dark:border-white/20 dark:text-gray-400 dark:hover:border-red-400 dark:hover:text-red-400">不同意</button>
                 <div class="flex gap-3">
-                    <button id="agreeOnceBtn" class="px-4 py-2 text-sm rounded-lg bg-gray-300 text-gray-500 cursor-not-allowed transition-all duration-300" disabled>我知道了</button>
-                    <button id="agreePersistBtn" class="px-5 py-2 text-sm rounded-lg bg-gray-300 text-gray-500 cursor-not-allowed transition-all duration-300" disabled>不再显示</button>
+                    <button id="agreeOnceBtn" class="cursor-not-allowed rounded-lg bg-gray-300 px-4 py-2 text-sm text-gray-500 transition-all duration-300 dark:text-gray-400" disabled>我知道了</button>
+                    <button id="agreePersistBtn" class="cursor-not-allowed rounded-lg bg-gray-300 px-5 py-2 text-sm text-gray-500 transition-all duration-300 dark:text-gray-400" disabled>不再显示</button>
                 </div>
             </div>
         </div>
@@ -322,10 +341,10 @@
 
     <!-- 设置弹窗 -->
     <div id="settingsModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-        <div class="card rounded-2xl w-11/12 max-w-3xl shadow-2xl transform scale-95 transition-all duration-300 p-6">
+        <div class="w-11/12 max-w-3xl scale-95 transform rounded-2xl border border-white/20 bg-white/[0.85] p-6 shadow-2xl backdrop-blur-[10px] transition-all duration-300 dark:border-white/10 dark:bg-black/60">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="text-xl font-bold text-gray-800">设置</h3>
-                <button id="closeSettingsBtn" class="text-gray-500 hover:text-pink-500 transition-colors">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">设置</h3>
+                <button id="closeSettingsBtn" class="text-gray-500 transition-colors hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
@@ -333,17 +352,17 @@
             <!-- 设置弹窗：上下结构布局 -->
             <div class="flex flex-col min-h-[300px]">
                 <!-- 上方：导航栏 -->
-                <div class="flex mb-4 overflow-x-auto no-scrollbar">
-                    <button class="settings-tab active whitespace-nowrap px-4 py-2 text-sm font-medium text-pink-500 border-b-2 border-pink-500 transition-colors" data-target="setting-basic">基础设置</button>
-                    <button class="settings-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent transition-colors" data-target="setting-appearance">字体设置</button>
-                    <button class="settings-tab whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-800 border-b-2 border-transparent transition-colors" data-target="setting-advanced">高级设置</button>
+                <div class="mb-4 flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    <button class="settings-tab active whitespace-nowrap border-b-2 border-pink-500 px-4 py-2 text-sm font-medium text-pink-500 transition-colors dark:text-pink-400" data-target="setting-basic">基础设置</button>
+                    <button class="settings-tab whitespace-nowrap border-b-2 border-transparent px-4 py-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100" data-target="setting-appearance">字体设置</button>
+                    <button class="settings-tab whitespace-nowrap border-b-2 border-transparent px-4 py-2 text-sm font-medium text-gray-500 transition-colors hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100" data-target="setting-advanced">高级设置</button>
                 </div>
                 
                 <!-- 下方：对应的内容区 (加了一点高度使得内容不拥挤) -->
                 <div class="flex-1 relative">
                     <!-- 基础设置模块 -->
                     <div id="setting-basic" class="settings-pane block h-full">
-                        <div class="text-gray-600 space-y-4 flex flex-col items-center justify-center border-2 border-dashed border-gray-400/50 rounded-xl p-6 min-h-[220px]">
+                        <div class="flex min-h-[220px] flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-gray-400/50 p-6 text-gray-600 dark:text-gray-300">
                             <i class="fa-solid fa-wrench text-3xl text-gray-300 mb-2"></i>
                             <p class="text-sm">基础设置内容待添加...</p>
                         </div>
@@ -354,59 +373,59 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                             <!-- 左栏：英文字体 -->
                             <div class="flex flex-col space-y-3">
-                                <h4 class="font-bold text-gray-800 text-sm mb-1">英文/数字字体选择</h4>
+                                <h4 class="mb-1 text-sm font-bold text-gray-800 dark:text-gray-100">英文/数字字体选择</h4>
                                 
-                                <div class="flex items-center justify-between p-2 rounded-lg border-2 border-gray-300 hover:border-pink-300 transition-colors">
+                                <div class="flex items-center justify-between rounded-lg border-2 border-gray-300 p-2 transition-colors hover:border-pink-300 dark:border-white/20 dark:hover:border-pink-300">
                                     <label class="flex items-center gap-3 flex-1 cursor-pointer">
                                         <input type="radio" name="en-font" value='"Poppins"' class="text-pink-500 focus:ring-pink-500 w-4 h-4">
-                                        <span class="text-sm font-bold" style="font-family: 'Poppins', sans-serif;">Poppins（Default）</span>
+                                        <span class="font-['Poppins',sans-serif] text-sm font-bold">Poppins（Default）</span>
                                     </label>
-                                    <a href="https://fonts.google.com/specimen/Poppins" target="_blank" title="预览" class="text-gray-400 hover:text-pink-500 p-1"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="https://fonts.google.com/specimen/Poppins" target="_blank" title="预览" class="p-1 text-gray-400 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 </div>
                                 
-                                <div class="flex items-center justify-between p-2 rounded-lg border-2 border-gray-300 hover:border-pink-300 transition-colors">
+                                <div class="flex items-center justify-between rounded-lg border-2 border-gray-300 p-2 transition-colors hover:border-pink-300 dark:border-white/20 dark:hover:border-pink-300">
                                     <label class="flex items-center gap-3 flex-1 cursor-pointer">
                                         <input type="radio" name="en-font" value='"Comic Neue"' class="text-pink-500 focus:ring-pink-500 w-4 h-4">
-                                        <span class="text-sm font-bold" style="font-family: 'Comic Neue', sans-serif;">Comic Neue</span>
+                                        <span class="font-['Comic_Neue',sans-serif] text-sm font-bold">Comic Neue</span>
                                     </label>
-                                    <a href="https://fonts.google.com/specimen/Comic+Neue" target="_blank" title="预览" class="text-gray-400 hover:text-pink-500 p-1"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="https://fonts.google.com/specimen/Comic+Neue" target="_blank" title="预览" class="p-1 text-gray-400 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 </div>
                                 
-                                <div class="flex items-center justify-between p-2 rounded-lg border-2 border-gray-300 hover:border-pink-300 transition-colors">
+                                <div class="flex items-center justify-between rounded-lg border-2 border-gray-300 p-2 transition-colors hover:border-pink-300 dark:border-white/20 dark:hover:border-pink-300">
                                     <label class="flex items-center gap-3 flex-1 cursor-pointer">
                                         <input type="radio" name="en-font" value='"Saira Stencil"' class="text-pink-500 focus:ring-pink-500 w-4 h-4">
-                                        <span class="text-sm font-bold" style="font-family: 'Saira Stencil', sans-serif;">Saira Stencil</span>
+                                        <span class="font-['Saira_Stencil',sans-serif] text-sm font-bold">Saira Stencil</span>
                                     </label>
-                                    <a href="https://fonts.google.com/specimen/Saira+Stencil" target="_blank" title="预览" class="text-gray-400 hover:text-pink-500 p-1"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="https://fonts.google.com/specimen/Saira+Stencil" target="_blank" title="预览" class="p-1 text-gray-400 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 </div>
                             </div>
                             
                             <!-- 右栏：中文字体 -->
                             <div class="flex flex-col space-y-3">
-                                <h4 class="font-bold text-gray-800 text-sm mb-1">中文字体选择</h4>
+                                <h4 class="mb-1 text-sm font-bold text-gray-800 dark:text-gray-100">中文字体选择</h4>
                                 
-                                <div class="flex items-center justify-between p-2 rounded-lg border-2 border-gray-300 hover:border-pink-300 transition-colors">
+                                <div class="flex items-center justify-between rounded-lg border-2 border-gray-300 p-2 transition-colors hover:border-pink-300 dark:border-white/20 dark:hover:border-pink-300">
                                     <label class="flex items-center gap-3 flex-1 cursor-pointer">
                                         <input type="radio" name="zh-font" value='"ZCOOL KuaiLe"' class="text-pink-500 focus:ring-pink-500 w-4 h-4">
-                                        <span class="text-sm font-bold" style="font-family: 'ZCOOL KuaiLe', sans-serif;">站酷快乐体（默认）</span>
+                                        <span class="font-['ZCOOL_KuaiLe',sans-serif] text-sm font-bold">站酷快乐体（默认）</span>
                                     </label>
-                                    <a href="https://fonts.google.com/specimen/ZCOOL+KuaiLe" target="_blank" title="预览" class="text-gray-400 hover:text-pink-500 p-1"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="https://fonts.google.com/specimen/ZCOOL+KuaiLe" target="_blank" title="预览" class="p-1 text-gray-400 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 </div>
 
-                                <div class="flex items-center justify-between p-2 rounded-lg border-2 border-gray-300 hover:border-pink-300 transition-colors">
+                                <div class="flex items-center justify-between rounded-lg border-2 border-gray-300 p-2 transition-colors hover:border-pink-300 dark:border-white/20 dark:hover:border-pink-300">
                                     <label class="flex items-center gap-3 flex-1 cursor-pointer">
                                         <input type="radio" name="zh-font" value='"Noto Sans SC"' class="text-pink-500 focus:ring-pink-500 w-4 h-4">
-                                        <span class="text-sm font-bold" style="font-family: 'Noto Sans SC', sans-serif;">思源黑体</span>
+                                        <span class="font-['Noto_Sans_SC',sans-serif] text-sm font-bold">思源黑体</span>
                                     </label>
-                                    <a href="https://fonts.google.com/specimen/Noto+Sans+SC" target="_blank" title="预览" class="text-gray-400 hover:text-pink-500 p-1"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="https://fonts.google.com/specimen/Noto+Sans+SC" target="_blank" title="预览" class="p-1 text-gray-400 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 </div>
 
-                                <div class="flex items-center justify-between p-2 rounded-lg border-2 border-gray-300 hover:border-pink-300 transition-colors">
+                                <div class="flex items-center justify-between rounded-lg border-2 border-gray-300 p-2 transition-colors hover:border-pink-300 dark:border-white/20 dark:hover:border-pink-300">
                                     <label class="flex items-center gap-3 flex-1 cursor-pointer">
                                         <input type="radio" name="zh-font" value='"Ma Shan Zheng"' class="text-pink-500 focus:ring-pink-500 w-4 h-4">
-                                        <span class="text-sm font-bold" style="font-family: 'Ma Shan Zheng', sans-serif;">马善政毛笔</span>
+                                        <span class="font-['Ma_Shan_Zheng',sans-serif] text-sm font-bold">马善政毛笔</span>
                                     </label>
-                                    <a href="https://fonts.google.com/specimen/Ma+Shan+Zheng" target="_blank" title="预览" class="text-gray-400 hover:text-pink-500 p-1"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                    <a href="https://fonts.google.com/specimen/Ma+Shan+Zheng" target="_blank" title="预览" class="p-1 text-gray-400 hover:text-pink-500 dark:text-gray-400 dark:hover:text-pink-400"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 </div>
                             </div>
                         </div>
@@ -414,7 +433,7 @@
                     
                     <!-- 高级设置模块 -->
                     <div id="setting-advanced" class="settings-pane hidden h-full">
-                        <div class="text-gray-600 space-y-4 flex flex-col items-center justify-center border-2 border-dashed border-gray-400/50 rounded-xl p-6 min-h-[220px]">
+                        <div class="flex min-h-[220px] flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-gray-400/50 p-6 text-gray-600 dark:text-gray-300">
                             <i class="fa-solid fa-microchip text-3xl text-gray-300 mb-2"></i>
                             <p class="text-sm">高级设置内容待添加...</p>
                         </div>

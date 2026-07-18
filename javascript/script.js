@@ -115,10 +115,10 @@ async function loadProjects() {
         grid.innerHTML = '';
         projects.forEach(project => {
             const card = document.createElement('div');
-            card.className = 'card p-4';
+            card.className = 'rounded-xl border border-white/20 bg-white/[0.85] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-[10px] transition-all duration-500 dark:border-white/10 dark:bg-black/60 dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)]';
             card.innerHTML = `
                 <h4 class="text-sm font-semibold mb-2">${escapeHtml(project.name)}</h4>
-                <p class="text-xs text-gray-600 mb-3">${escapeHtml(project.desc)}</p>
+                <p class="mb-3 text-xs text-gray-600 dark:text-gray-300">${escapeHtml(project.desc)}</p>
                 <a href="${escapeHtml(project.url)}" target="_blank" rel="noopener noreferrer" title="查看${escapeHtml(project.name)}项目" class="text-xs text-pink-500 hover:underline">查看项目</a>
             `;
             grid.appendChild(card);
@@ -192,7 +192,7 @@ function initWelcome() {
 function setupDisclaimer() {
     const overlay = document.getElementById('welcomeOverlay');
     const modal = document.getElementById('disclaimerModal');
-    const modalCard = modal.querySelector('.card');
+    const modalCard = modal.querySelector('[data-modal-card]');
     const openBtn = document.getElementById('openDisclaimerBtn');
     const disagreeBtn = document.getElementById('disagreeBtn');
     const disagreeBtn2 = document.getElementById('disagreeBtn2');
@@ -216,7 +216,7 @@ function setupDisclaimer() {
         hasScrolledToBottom = false;
         updateButtonState();
         scrollHint.textContent = '↓ 请完整阅读以上声明后进行操作 ↓';
-        scrollHint.classList.remove('text-green-500');
+        scrollHint.classList.remove('text-green-500', 'dark:text-green-400');
     }
 
     // 关闭弹窗
@@ -233,19 +233,19 @@ function setupDisclaimer() {
     function updateButtonState() {
         if (hasScrolledToBottom) {
             agreeOnceBtn.disabled = false;
-            agreeOnceBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreeOnceBtn.classList.remove('bg-gray-300', 'text-gray-500', 'dark:text-gray-400', 'cursor-not-allowed');
             agreeOnceBtn.classList.add('bg-pink-100', 'text-pink-600', 'hover:bg-pink-200', 'cursor-pointer');
 
             agreePersistBtn.disabled = false;
-            agreePersistBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreePersistBtn.classList.remove('bg-gray-300', 'text-gray-500', 'dark:text-gray-400', 'cursor-not-allowed');
             agreePersistBtn.classList.add('bg-pink-500', 'text-white', 'hover:bg-pink-600', 'cursor-pointer');
         } else {
             agreeOnceBtn.disabled = true;
-            agreeOnceBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreeOnceBtn.classList.add('bg-gray-300', 'text-gray-500', 'dark:text-gray-400', 'cursor-not-allowed');
             agreeOnceBtn.classList.remove('bg-pink-100', 'text-pink-600', 'hover:bg-pink-200', 'cursor-pointer');
 
             agreePersistBtn.disabled = true;
-            agreePersistBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+            agreePersistBtn.classList.add('bg-gray-300', 'text-gray-500', 'dark:text-gray-400', 'cursor-not-allowed');
             agreePersistBtn.classList.remove('bg-pink-500', 'text-white', 'hover:bg-pink-600', 'cursor-pointer');
         }
     }
@@ -277,7 +277,7 @@ function setupDisclaimer() {
         if (atBottom && !hasScrolledToBottom) {
             hasScrolledToBottom = true;
             scrollHint.textContent = '✓ 你已阅读完毕，可以选择操作了';
-            scrollHint.classList.add('text-green-500');
+            scrollHint.classList.add('text-green-500', 'dark:text-green-400');
             updateButtonState();
         }
     });
@@ -300,7 +300,7 @@ function setupDisclaimer() {
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
     const themeToggle = document.getElementById('themeToggle');
-    const body = document.body;
+    const root = document.documentElement;
     const toTop = document.getElementById('toTop');
     const changeSentenceBtn = document.getElementById('changeSentenceBtn');
 
@@ -366,12 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
             themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
         }
 
-        // 根据最终主题切换body的dark类
-        body.classList.toggle('dark', finalTheme === 'dark');
-        // 切换主题按钮的暗色样式
-        themeToggle.classList.toggle('theme-btn-dark', finalTheme === 'dark');
-        // 切换回到顶部按钮的暗色样式
-        toTop.classList.toggle('totop-btn-dark', finalTheme === 'dark');
+        // Tailwind 的 dark 变体由根元素上的 dark 类统一控制
+        root.classList.toggle('dark', finalTheme === 'dark');
     };
 
     // ==================== 主题切换按钮点击事件 ====================
@@ -532,8 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tab.addEventListener('click', () => {
             // 重置所有tab样式
             tabs.forEach(t => {
-                t.classList.remove('text-pink-500', 'border-pink-500', 'active');
-                t.classList.add('text-gray-500', 'border-transparent');
+                t.classList.remove('text-pink-500', 'dark:text-pink-400', 'border-pink-500', 'active');
+                t.classList.add('text-gray-500', 'dark:text-gray-400', 'border-transparent');
             });
 
             // 隐藏所有面板
@@ -543,8 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // 激活当前tab
-            tab.classList.remove('text-gray-500', 'border-transparent');
-            tab.classList.add('text-pink-500', 'border-pink-500', 'active');
+            tab.classList.remove('text-gray-500', 'dark:text-gray-400', 'border-transparent');
+            tab.classList.add('text-pink-500', 'dark:text-pink-400', 'border-pink-500', 'active');
 
             // 显示目标面板
             const targetId = tab.getAttribute('data-target');
