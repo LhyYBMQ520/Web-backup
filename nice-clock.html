@@ -6,9 +6,20 @@
     <link rel="stylesheet" type="text/css" href="fontawesome-free-7.2.0-web/css/all.min.css">
     <title>极致丝滑-小车时钟</title>
     <style>
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            overscroll-behavior: none;
+        }
+
         body {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             margin: 0;
-            height: 100vh;
             overflow: hidden;
             display: flex;
             justify-content: center;
@@ -43,45 +54,48 @@
 
         #clock-container {
             display: flex;
-            gap: 25px;
+            gap: clamp(4px, 1.8vw, 25px);
             align-items: center;
-            position: relative;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 10;
             pointer-events: none;
         }
 
         .time-group {
             display: flex;
-            gap: 25px;
+            gap: clamp(4px, 1.8vw, 25px);
             align-items: center;
         }
 
         .digit-placeholder {
-            width: 100px;
-            height: 180px;
+            width: clamp(32px, 10vw, 100px);
+            height: clamp(58px, 18vw, 180px);
             position: relative;
         }
 
         .separator {
-            font-size: 80px;
-            line-height: 180px;
+            font-size: clamp(26px, 8vw, 80px);
+            line-height: clamp(58px, 18vw, 180px);
             font-weight: bold;
             color: rgba(255, 255, 255, 0.7);
             text-shadow: 0 0 15px rgba(255,255,255,0.3);
             animation: soft-blink 2s infinite ease-in-out;
             position: relative;
-            top: -10px;
+            top: clamp(-10px, -1.2vw, -4px);
         }
 
         .separator-small {
-            font-size: 80px;
-            line-height: 180px;
+            font-size: clamp(26px, 8vw, 80px);
+            line-height: clamp(58px, 18vw, 180px);
             font-weight: bold;
             color: rgba(255, 255, 255, 0.7);
             text-shadow: 0 0 15px rgba(255,255,255,0.3);
             animation: soft-blink 2s infinite ease-in-out;
             position: relative;
-            top: -10px;
+            top: clamp(-10px, -1.2vw, -4px);
         }
 
         @keyframes soft-blink {
@@ -93,9 +107,9 @@
 
         /* 小车样式 */
         .car {
-            position: absolute;
-            width: 40px;
-            height: 20px;
+            position: fixed;
+            width: clamp(18px, 5.6vw, 40px);
+            height: clamp(9px, 2.8vw, 20px);
             background: linear-gradient(to top, #e74c3c, #c0392b);
             border-radius: 10px 4px 4px 10px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.4);
@@ -121,11 +135,11 @@
         .car::after {
             content: '';
             display: block;
-            width: 12px;
-            height: 14px;
+            width: 30%;
+            height: 70%;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 4px 2px 2px 4px;
-            margin-left: 8px;
+            margin-left: 20%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-sizing: border-box;
         }
@@ -143,13 +157,15 @@
         .taillights { left: 2px; }
 
         .light {
-            width: 4px; height: 4px;
+            width: clamp(2px, 0.6vw, 4px);
+            height: clamp(2px, 0.6vw, 4px);
             background: #f1c40f;
             border-radius: 50%;
             box-shadow: 0 0 8px 2px #f1c40f;
         }
         .tail-light {
-            width: 3px; height: 6px;
+            width: clamp(2px, 0.45vw, 3px);
+            height: clamp(4px, 0.8vw, 6px);
             background: #e74c3c;
             border-radius: 2px;
             box-shadow: 0 0 6px 1px #c0392b;
@@ -288,6 +304,74 @@
             border-bottom-color: white;
         }
 
+        #footer .contact-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            color: white;
+            background: rgba(255, 255, 255, 0.12);
+            text-decoration: none;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        #footer .contact-link:hover {
+            border-bottom-color: rgba(255, 255, 255, 0.7);
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        @media (max-width: 600px) {
+            #bg-switcher {
+                right: 12px;
+                bottom: calc(20px + env(safe-area-inset-bottom));
+                left: 12px;
+                gap: 6px;
+            }
+
+            .switch-btn {
+                flex: 1;
+                width: 0;
+                min-width: 0;
+                padding: 8px 5px;
+                font-size: 12px;
+                gap: 4px;
+            }
+
+            #fullscreen-btn {
+                top: max(12px, env(safe-area-inset-top));
+                right: 12px;
+                width: 42px;
+                height: 42px;
+                font-size: 20px;
+            }
+
+            #footer {
+                right: 12px;
+                bottom: calc(62px + env(safe-area-inset-bottom));
+                left: 12px;
+                justify-content: center;
+                flex-wrap: wrap;
+                line-height: 1.35;
+                text-align: center;
+            }
+
+            #footer .contact-line {
+                flex-basis: 100%;
+            }
+        }
+
+        @media (max-height: 520px) and (orientation: landscape) {
+            #bg-switcher {
+                bottom: calc(20px + env(safe-area-inset-bottom));
+            }
+
+            #footer {
+                bottom: calc(52px + env(safe-area-inset-bottom));
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -325,6 +409,7 @@
     <div id="footer">
         <a href="http://gandashi.site/clockcar/index.html" target="_blank">Source page</a>
         <span>本页面为L菌优化版本（侵删！）</span>
+        <span class="contact-line">联系我：<a class="contact-link" href="mailto:lhy20070708@qq.com">Email</a></span>
     </div>
 
 <script>
@@ -365,7 +450,7 @@
 
     const carFleet = [];
 
-    // 车身尺寸定义，用于计算中心点修正
+    // 默认车身尺寸，用于元素尚未完成布局时的回退值
     const CAR_WIDTH = 40;
     const CAR_HEIGHT = 20;
 
@@ -396,10 +481,9 @@
                     targetSig: null
                 };
 
-                // 初始化定位
-                setCarStaticPosition(car, startPos.x, startPos.y, startPos.angle);
-
                 document.body.appendChild(car);
+                // 初始化定位（先插入 DOM，才能读取移动端自适应后的尺寸）
+                setCarStaticPosition(car, startPos.x, startPos.y, startPos.angle);
                 carFleet[d][s] = car;
             }
         }
@@ -411,8 +495,10 @@
     function setCarStaticPosition(car, centerX, centerY, angle) {
         car.style.offsetPath = 'none';
         // 左上角坐标 = 中心坐标 - 半宽/半高
-        const left = centerX - CAR_WIDTH / 2;
-        const top = centerY - CAR_HEIGHT / 2;
+        const width = car.offsetWidth || CAR_WIDTH;
+        const height = car.offsetHeight || CAR_HEIGHT;
+        const left = centerX - width / 2;
+        const top = centerY - height / 2;
         car.style.transform = `translate(${left}px, ${top}px) rotate(${angle}deg)`;
     }
 
@@ -532,8 +618,8 @@
                 const isActive = activeSegments[s] === 1;
 
                 if (isActive) {
-                    const targetX = rect.left + SEGMENT_POSITIONS[s].x;
-                    const targetY = rect.top + SEGMENT_POSITIONS[s].y;
+                    const targetX = rect.left + SEGMENT_POSITIONS[s].x * rect.width / 100;
+                    const targetY = rect.top + SEGMENT_POSITIONS[s].y * rect.height / 180;
                     const targetAngle = SEGMENT_POSITIONS[s].angle;
 
                     driveTo(car, targetX, targetY, targetAngle, false);

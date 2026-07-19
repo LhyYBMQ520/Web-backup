@@ -27,17 +27,12 @@
         }
 
         .empty-message {
-            font-size: 64px;
+            font-size: clamp(2.5rem, 8vw, 4rem);
             font-weight: 600;
             color: #4a5568;
             text-align: center;
             font-family: "ZCOOL KuaiLe", sans-serif;
-            background: white;
-            padding: 60px 80px;
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             animation: breathe 3s ease-in-out infinite;
-            transition: all 0.3s ease;
         }
 
         @keyframes breathe {
@@ -51,15 +46,9 @@
             }
         }
 
-        @media (max-width: 768px) {
-            .empty-message {
-                font-size: 42px;
-                padding: 40px 30px;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="empty-message">暂时这里没有内容哦~</div>
+    <p class="empty-message">这里暂时没有内容哦~</p>
 </body>
 </html>
