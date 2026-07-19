@@ -94,8 +94,10 @@
                 <button id="openDisclaimerBtn" class="text-sm font-medium text-pink-500 underline transition-colors hover:text-pink-600 dark:text-pink-400 dark:hover:text-pink-300">「IP及IP属地展示功能免责声明」</button>
             </div>
             <!-- 实际欢迎内容 -->
-            <p class="text-base font-medium" id="welcomeMsg">欢迎访问本站</p>
-            <p class="mt-1 text-xs text-gray-400 dark:text-gray-400">你的 IP：<span id="visitorIp">-</span></p>
+            <div id="welcomeContent" role="status" aria-live="polite" aria-atomic="true" aria-busy="false">
+                <p class="text-base font-medium" id="welcomeMsg">欢迎访问本站</p>
+                <p class="mt-1 text-xs text-gray-400 dark:text-gray-400">你的 IP：<span id="visitorIp">-</span></p>
+            </div>
         </div>
 
         <!-- 今日一句 + 时间卡片：移动端单列，大屏端3列（今日一句占2列，时间占1列） -->

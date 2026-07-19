@@ -148,8 +148,15 @@ function hasAcceptedDisclaimer() {
 
 // 加载 API 配置并从后端获取欢迎信息
 async function loadWelcome() {
+    const welcomeContentEl = document.getElementById('welcomeContent');
     const welcomeMsgEl = document.getElementById('welcomeMsg');
     const visitorIpEl = document.getElementById('visitorIp');
+
+    // 请求完成前显示明确的加载状态，避免短暂显示兜底文案
+    welcomeContentEl.setAttribute('aria-busy', 'true');
+    welcomeContentEl.classList.add('animate-pulse');
+    welcomeMsgEl.textContent = '欢迎信息加载中...';
+    visitorIpEl.textContent = '获取中...';
 
     try {
         // 第一步：从配置文件读取 API 地址
@@ -175,6 +182,9 @@ async function loadWelcome() {
         // 兜底文案
         welcomeMsgEl.textContent = '欢迎访问本站';
         visitorIpEl.textContent = '-';
+    } finally {
+        welcomeContentEl.setAttribute('aria-busy', 'false');
+        welcomeContentEl.classList.remove('animate-pulse');
     }
 }
 
