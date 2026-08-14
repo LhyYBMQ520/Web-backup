@@ -1,2 +1,5 @@
 备用.html
 jsons/api-config.json
+node_modules/
+.pnpm-store/
+pnpm-debug.log*

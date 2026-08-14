@@ -6,75 +6,13 @@
   <title>企业官网</title>
   <!-- 引入Vue CDN -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
-  <!-- 引入TailwindCSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/tailwind.css">
   <!-- 引入Font Awesome图标 -->
   <link rel="stylesheet" type="text/css" href="fontawesome-free-7.2.0-web/css/all.min.css">
   
-  <!-- Tailwind配置 -->
-  <script>
-    tailwind.config = {
-      darkMode: 'class', // 启用class模式的暗黑模式
-      theme: {
-        extend: {
-          colors: {
-            // 明亮模式主色
-            light: {
-              primary: '#165DFF', // 主蓝色
-              secondary: '#FFFFFF', // 白色
-            },
-            // 暗黑模式主色
-            dark: {
-              primary: '#9333EA', // 主紫色
-              secondary: '#121212', // 黑色
-            },
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
-  
-  <!-- 自定义样式 -->
-  <style type="text/tailwindcss">
-    @layer utilities {
-      /* 毛玻璃效果 */
-      .backdrop-blur-custom {
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-      }
-      /* 过渡动画 */
-      .transition-all-300 {
-        transition: all 0.3s ease;
-      }
-    }
-    
-    /* 基础样式重置 */
-    body {
-      min-height: 100vh;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      scroll-behavior: smooth; /* 全局平滑滚动 */
-    }
-    
-    /* 滚动条美化 */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      @apply bg-light-primary/20 dark:bg-dark-primary/20 rounded-full;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      @apply bg-light-primary/30 dark:bg-dark-primary/30;
-    }
-  </style>
 </head>
 
-<body class="bg-light-secondary text-gray-800 dark:bg-dark-secondary dark:text-gray-200">
+<body class="page-ai bg-light-secondary text-gray-800 dark:bg-dark-secondary dark:text-gray-200">
   <div id="app">
     <!-- 导航栏 -->
     <header class="fixed top-0 left-0 w-full z-50 transition-all duration-300" :class="{'py-4': !isScrolled, 'py-2 bg-white/80 dark:bg-dark-secondary/80 shadow-md': isScrolled}">

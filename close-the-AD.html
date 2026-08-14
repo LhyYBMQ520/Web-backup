@@ -4,44 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我让你关闭广告了啊！</title>
-  <!-- 引入Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- 配置Tailwind -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#4361EE',
-            accent: '#FF3366',
-            neutral: '#F8F9FA'
-          },
-          fontFamily: {
-            inter: ['Inter', 'system-ui', 'sans-serif'],
-          },
-        },
-      }
-    }
-  </script>
-  
-  <!-- 自定义工具类 -->
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .ad-shadow {
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-      }
-      .float-animation {
-        animation: float 3s ease-in-out infinite;
-      }
-      .pulse-animation {
-        animation: pulse 0.5s ease-in-out infinite alternate;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/tailwind.css">
   
   <style>
     @keyframes float {
@@ -144,7 +107,7 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen font-inter flex items-center justify-center p-4 overflow-x-hidden">
+<body class="page-ad bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen font-inter flex items-center justify-center p-4 overflow-x-hidden">
   <!-- 背景装饰 -->
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
     <div class="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
