@@ -213,6 +213,95 @@
             transform: translateX(5px);
         }
 
+        /* ===== 友链检测功能样式 ===== */
+        .ping-toolbar {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        #pingAllBtn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: #fff;
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
+        }
+        body.dark #pingAllBtn {
+            background: linear-gradient(135deg, #E69AA8, #f472b6);
+            box-shadow: 0 4px 12px rgba(244, 114, 182, 0.25);
+        }
+        #pingAllBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.3);
+        }
+        #pingAllBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #pingSummary {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .friend-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.06);
+            color: #777;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        body.dark .friend-status {
+            background: rgba(255, 255, 255, 0.1);
+            color: #bbb;
+        }
+
+        .friend-status.checking {
+            color: #1E40AF;
+            background: rgba(59, 130, 246, 0.12);
+            cursor: default;
+        }
+        body.dark .friend-status.checking {
+            color: #93c5fd;
+        }
+
+        .friend-status.online {
+            color: #16a34a;
+            background: rgba(34, 197, 94, 0.15);
+        }
+        body.dark .friend-status.online {
+            color: #4ade80;
+        }
+
+        .friend-status.offline {
+            color: #dc2626;
+            background: rgba(239, 68, 68, 0.15);
+        }
+        body.dark .friend-status.offline {
+            color: #f87171;
+        }
+
         footer {
             margin-top: 60px;
             text-align: center;
@@ -341,6 +430,13 @@
         <header>
             <h1>友人帐</h1>
             <p class="subtitle">下面是一些可爱的网站~</p>
+            <div class="ping-toolbar">
+                <button id="pingAllBtn" type="button">
+                    <i class="fas fa-wifi"></i>
+                    <span id="pingAllText">检测全部友链</span>
+                </button>
+                <span id="pingSummary"></span>
+            </div>
         </header>
         
         <!-- 友链列表容器（JS动态生成内容） -->
@@ -524,6 +620,7 @@
                 // 创建卡片元素
                 const card = document.createElement('div');
                 card.className = 'friend-link-card'; // 添加样式类
+                card.dataset.url = item.url; // 记录友链地址，供连通性检测使用
                 // 卡片点击事件：在新标签页打开友链（noopener/noreferrer提升安全性）
                 card.onclick = () => window.open(item.url, '_blank', 'noopener,noreferrer');
 
@@ -539,6 +636,7 @@
                             ${item.url} <!-- 网站网址 -->
                         </div>
                     </div>
+                    <div class="friend-status" title="点击单独重新检测">未检测</div> <!-- 连通性状态 -->
                     <div class="friend-arrow"> <!-- 箭头图标 -->
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -553,6 +651,125 @@
             console.error('友链加载失败:', err);
         });
 
+    </script>
+
+    <script>
+    /* ===== 友链连通性检测（ping）功能 ===== */
+    // 说明：浏览器无法执行真正的 ICMP ping，这里通过向目标发送 HTTP 请求
+    // （no-cors 模式可绕过跨域限制）判断目标站点能否连上，以此近似"ping"。
+
+    // 规范化链接：缺少协议时补全 https://
+    function normalizeUrl(url) {
+        return /^https?:\/\//i.test(url) ? url : 'https://' + url;
+    }
+
+    // 单次请求（带超时），成功返回 true
+    async function fetchOnce(url, method, timeout) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        try {
+            await fetch(url, {
+                method: method,
+                mode: 'no-cors',      // 绕过 CORS，只关心"能否连上"
+                cache: 'no-store',    // 跳过缓存，检测真实状态
+                signal: controller.signal
+            });
+            return true;
+        } catch (e) {
+            return false;
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    // 检测单个链接：优先 HEAD（轻量），失败则降级为 GET；返回是否在线
+    async function pingUrl(rawUrl, timeout = 8000) {
+        const url = normalizeUrl(rawUrl);
+        if (await fetchOnce(url, 'HEAD', timeout)) return true;
+        return await fetchOnce(url, 'GET', timeout);
+    }
+
+    // 检测单张卡片并更新状态徽章，返回 null 表示跳过
+    async function pingCard(card) {
+        const url = card.dataset.url;
+        const badge = card.querySelector('.friend-status');
+        if (!url || !badge) return null;
+
+        badge.classList.remove('online', 'offline');
+        badge.classList.add('checking');
+        badge.textContent = '检测中…';
+
+        const online = await pingUrl(url);
+
+        badge.classList.remove('checking');
+        if (online) {
+            badge.classList.add('online');
+            badge.textContent = '在线';
+        } else {
+            badge.classList.add('offline');
+            badge.textContent = '掉线';
+        }
+        return online;
+    }
+
+    // 并行检测全部友链
+    async function pingAll() {
+        const cards = Array.from(document.querySelectorAll('.friend-link-card'));
+        const summary = document.getElementById('pingSummary');
+        const btn = document.getElementById('pingAllBtn');
+        const btnText = document.getElementById('pingAllText');
+        const btnIcon = btn ? btn.querySelector('i') : null;
+
+        if (!cards.length) {
+            if (summary) summary.textContent = '暂无友链可检测';
+            return;
+        }
+
+        if (btn) btn.disabled = true;
+        if (btnText) btnText.textContent = '检测中…';
+        if (btnIcon) btnIcon.className = 'fas fa-circle-notch fa-spin';
+
+        let onlineCount = 0;
+        let checked = 0;
+
+        await Promise.all(cards.map(async (card) => {
+            const result = await pingCard(card);
+            if (result !== null) {
+                checked++;
+                if (result) onlineCount++;
+            }
+            if (summary) {
+                summary.textContent = `正在检测… ${onlineCount}/${checked} 在线`;
+            }
+        }));
+
+        const offline = checked - onlineCount;
+        if (summary) {
+            summary.textContent = `检测完成：${onlineCount} 在线 · ${offline} 掉线 / 共 ${checked} 个`;
+        }
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.textContent = '重新检测全部';
+        if (btnIcon) btnIcon.className = 'fas fa-wifi';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('pingAllBtn');
+        if (btn) btn.addEventListener('click', pingAll);
+
+        // 事件委托：点击某张卡片的徽章可单独重新检测该友链
+        // 注意：必须用捕获阶段(true)，才能在事件冒泡到卡片触发跳转前拦截
+        const container = document.getElementById('friendContainer');
+        if (container) {
+            container.addEventListener('click', (e) => {
+                const badge = e.target.closest('.friend-status');
+                if (!badge) return;
+                e.stopPropagation(); // 阻止后续冒泡，避免触发卡片的跳转事件
+                e.preventDefault();
+                const card = badge.closest('.friend-link-card');
+                if (card) pingCard(card);
+            }, true);
+        }
+    });
     </script>
 </body>
 </html>
