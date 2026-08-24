@@ -48,5 +48,10 @@
     "name": "MC-Ping-Tools",
     "desc": "Minecraft Java 版 SLP 协议 RTT 延迟测试工具",
     "url": "https://github.com/LhyYBMQ520/MC-Ping-Tools"
+  },
+  {
+    "name": "Image-processing",
+    "desc": "基于 Python + Pillow + FastAPI 的一站式在线图像处理工具库",
+    "url": "https://github.com/LhyYBMQ520/Image-processing"
   }
 ]
