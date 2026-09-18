@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>雨夜便利店 · 微缩街角</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23102a63'/%3E%3Crect x='5' y='10' width='22' height='7' rx='2' fill='%238fd0ff'/%3E%3Crect x='7' y='18' width='18' height='9' rx='1' fill='%23ffd98a'/%3E%3C/svg%3E">
+<style>
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:#070a12;}
+  canvas{display:block;touch-action:none;}
+</style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>window.THREE||document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>');</script>
+<script>
+
+/* ===== inlined addon: OrbitControls.js ===== */
+( function () {
+
+	// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
+	//
+	//    Orbit - left mouse / touch: one-finger move
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - right mouse, or left mouse + ctrl/meta/shiftKey, or arrow keys / touch: two-finger move
+
+	const _changeEvent = {
+		type: 'change'
+	};
+	const _startEvent = {
+		type: 'start'
+	};
+	const _endEvent = {
+		type: 'end'
+	};
+
+	class OrbitControls extends THREE.EventDispatcher {
+
+		constructor( object, domElement ) {
+
+			super();
+			if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
+			if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
+			this.object = object;
+			this.domElement = domElement; // Set to false to disable this control
+
+			this.enabled = true; // "target" sets the location of focus, where the object orbits around
+
+			this.target = new THREE.Vector3(); // How far you can dolly in and out ( PerspectiveCamera only )
+
+			this.minDistance = 0;
+			this.maxDistance = Infinity; // How far you can zoom in and out ( OrthographicCamera only )
+
+			this.minZoom = 0;
+			this.maxZoom = Infinity; // How far you can orbit vertically, upper and lower limits.
+			// Range is 0 to Math.PI radians.
+
+			this.minPolarAngle = 0; // radians
+
+			this.maxPolarAngle = Math.PI; // radians
+			// How far you can orbit horizontally, upper and lower limits.
+			// If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
+
+			this.minAzimuthAngle = - Infinity; // radians
+
+			this.maxAzimuthAngle = Infinity; // radians
+			// Set to true to enable damping (inertia)
+			// If damping is enabled, you must call controls.update() in your animation loop
+
+			this.enableDamping = false;
+			this.dampingFactor = 0.05; // This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
+			// Set to false to disable zooming
+
+			this.enableZoom = true;
+			this.zoomSpeed = 1.0; // Set to false to disable rotating
+
+			this.enableRotate = true;
+			this.rotateSpeed = 1.0; // Set to false to disable panning
+
+			this.enablePan = true;
+			this.panSpeed = 1.0;
+			this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
+
+			this.keyPanSpeed = 7.0; // pixels moved per arrow key push
+			// Set to true to automatically rotate around the target
+			// If auto-rotate is enabled, you must call controls.update() in your animation loop
+
+			this.autoRotate = false;
+			this.autoRotateSpeed = 2.0; // 30 seconds per orbit when fps is 60
+			// The four arrow keys
+
+			this.keys = {
+				LEFT: 'ArrowLeft',
+				UP: 'ArrowUp',
+				RIGHT: 'ArrowRight',
+				BOTTOM: 'ArrowDown'
+			}; // Mouse buttons
+
+			this.mouseButtons = {
+				LEFT: THREE.MOUSE.ROTATE,
+				MIDDLE: THREE.MOUSE.DOLLY,
+				RIGHT: THREE.MOUSE.PAN
+			}; // Touch fingers
+
+			this.touches = {
+				ONE: THREE.TOUCH.ROTATE,
+				TWO: THREE.TOUCH.DOLLY_PAN
+			}; // for reset
+
+			this.target0 = this.target.clone();
+			this.position0 = this.object.position.clone();
+			this.zoom0 = this.object.zoom; // the target DOM element for key events
+
+			this._domElementKeyEvents = null; //
+			// public methods
+			//
+
+			this.getPolarAngle = function () {
+
+				return spherical.phi;
+
+			};
+
+			this.getAzimuthalAngle = function () {
+
+				return spherical.theta;
+
+			};
+
+			this.listenToKeyEvents = function ( domElement ) {
+
+				domElement.addEventListener( 'keydown', onKeyDown );
+				this._domElementKeyEvents = domElement;
+
+			};
+
+			this.saveState = function () {
+
+				scope.target0.copy( scope.target );
+				scope.position0.copy( scope.object.position );
+				scope.zoom0 = scope.object.zoom;
+
+			};
+
+			this.reset = function () {
+
+				scope.target.copy( scope.target0 );
+				scope.object.position.copy( scope.position0 );
+				scope.object.zoom = scope.zoom0;
+				scope.object.updateProjectionMatrix();
+				scope.dispatchEvent( _changeEvent );
+				scope.update();
+				state = STATE.NONE;
+
+			}; // this method is exposed, but perhaps it would be better if we can make it private...
+
+
+			this.update = function () {
+
+				const offset = new THREE.Vector3(); // so camera.up is the orbit axis
+
+				const quat = new THREE.Quaternion().setFromUnitVectors( object.up, new THREE.Vector3( 0, 1, 0 ) );
+				const quatInverse = quat.clone().invert();
+				const lastPosition = new THREE.Vector3();
+				const lastQuaternion = new THREE.Quaternion();
+				const twoPI = 2 * Math.PI;
+				return function update() {
+
+					const position = scope.object.position;
+					offset.copy( position ).sub( scope.target ); // rotate offset to "y-axis-is-up" space
+
+					offset.applyQuaternion( quat ); // angle from z-axis around y-axis
+
+					spherical.setFromVector3( offset );
+
+					if ( scope.autoRotate && state === STATE.NONE ) {
+
+						rotateLeft( getAutoRotationAngle() );
+
+					}
+
+					if ( scope.enableDamping ) {
+
+						spherical.theta += sphericalDelta.theta * scope.dampingFactor;
+						spherical.phi += sphericalDelta.phi * scope.dampingFactor;
+
+					} else {
+
+						spherical.theta += sphericalDelta.theta;
+						spherical.phi += sphericalDelta.phi;
+
+					} // restrict theta to be between desired limits
+
+
+					let min = scope.minAzimuthAngle;
+					let max = scope.maxAzimuthAngle;
+
+					if ( isFinite( min ) && isFinite( max ) ) {
+
+						if ( min < - Math.PI ) min += twoPI; else if ( min > Math.PI ) min -= twoPI;
+						if ( max < - Math.PI ) max += twoPI; else if ( max > Math.PI ) max -= twoPI;
+
+						if ( min <= max ) {
+
+							spherical.theta = Math.max( min, Math.min( max, spherical.theta ) );
+
+						} else {
+
+							spherical.theta = spherical.theta > ( min + max ) / 2 ? Math.max( min, spherical.theta ) : Math.min( max, spherical.theta );
+
+						}
+
+					} // restrict phi to be between desired limits
+
+
+					spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
+					spherical.makeSafe();
+					spherical.radius *= scale; // restrict radius to be between desired limits
+
+					spherical.radius = Math.max( scope.minDistance, Math.min( scope.maxDistance, spherical.radius ) ); // move target to panned location
+
+					if ( scope.enableDamping === true ) {
+
+						scope.target.addScaledVector( panOffset, scope.dampingFactor );
+
+					} else {
+
+						scope.target.add( panOffset );
+
+					}
+
+					offset.setFromSpherical( spherical ); // rotate offset back to "camera-up-vector-is-up" space
+
+					offset.applyQuaternion( quatInverse );
+					position.copy( scope.target ).add( offset );
+					scope.object.lookAt( scope.target );
+
+					if ( scope.enableDamping === true ) {
+
+						sphericalDelta.theta *= 1 - scope.dampingFactor;
+						sphericalDelta.phi *= 1 - scope.dampingFactor;
+						panOffset.multiplyScalar( 1 - scope.dampingFactor );
+
+					} else {
+
+						sphericalDelta.set( 0, 0, 0 );
+						panOffset.set( 0, 0, 0 );
+
+					}
+
+					scale = 1; // update condition is:
+					// min(camera displacement, camera rotation in radians)^2 > EPS
+					// using small-angle approximation cos(x/2) = 1 - x^2 / 8
+
+					if ( zoomChanged || lastPosition.distanceToSquared( scope.object.position ) > EPS || 8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
+
+						scope.dispatchEvent( _changeEvent );
+						lastPosition.copy( scope.object.position );
+						lastQuaternion.copy( scope.object.quaternion );
+						zoomChanged = false;
+						return true;
+
+					}
+
+					return false;
+
+				};
+
+			}();
+
+			this.dispose = function () {
+
+				scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
+				scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
+				scope.domElement.removeEventListener( 'wheel', onMouseWheel );
+				scope.domElement.removeEventListener( 'touchstart', onTouchStart );
+				scope.domElement.removeEventListener( 'touchend', onTouchEnd );
+				scope.domElement.removeEventListener( 'touchmove', onTouchMove );
+				scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+				scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+
+				if ( scope._domElementKeyEvents !== null ) {
+
+					scope._domElementKeyEvents.removeEventListener( 'keydown', onKeyDown );
+
+				} //scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
+
+			}; //
+			// internals
+			//
+
+
+			const scope = this;
+			const STATE = {
+				NONE: - 1,
+				ROTATE: 0,
+				DOLLY: 1,
+				PAN: 2,
+				TOUCH_ROTATE: 3,
+				TOUCH_PAN: 4,
+				TOUCH_DOLLY_PAN: 5,
+				TOUCH_DOLLY_ROTATE: 6
+			};
+			let state = STATE.NONE;
+			const EPS = 0.000001; // current position in spherical coordinates
+
+			const spherical = new THREE.Spherical();
+			const sphericalDelta = new THREE.Spherical();
+			let scale = 1;
+			const panOffset = new THREE.Vector3();
+			let zoomChanged = false;
+			const rotateStart = new THREE.Vector2();
+			const rotateEnd = new THREE.Vector2();
+			const rotateDelta = new THREE.Vector2();
+			const panStart = new THREE.Vector2();
+			const panEnd = new THREE.Vector2();
+			const panDelta = new THREE.Vector2();
+			const dollyStart = new THREE.Vector2();
+			const dollyEnd = new THREE.Vector2();
+			const dollyDelta = new THREE.Vector2();
+
+			function getAutoRotationAngle() {
+
+				return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
+
+			}
+
+			function getZoomScale() {
+
+				return Math.pow( 0.95, scope.zoomSpeed );
+
+			}
+
+			function rotateLeft( angle ) {
+
+				sphericalDelta.theta -= angle;
+
+			}
+
+			function rotateUp( angle ) {
+
+				sphericalDelta.phi -= angle;
+
+			}
+
+			const panLeft = function () {
+
+				const v = new THREE.Vector3();
+				return function panLeft( distance, objectMatrix ) {
+
+					v.setFromMatrixColumn( objectMatrix, 0 ); // get X column of objectMatrix
+
+					v.multiplyScalar( - distance );
+					panOffset.add( v );
+
+				};
+
+			}();
+
+			const panUp = function () {
+
+				const v = new THREE.Vector3();
+				return function panUp( distance, objectMatrix ) {
+
+					if ( scope.screenSpacePanning === true ) {
+
+						v.setFromMatrixColumn( objectMatrix, 1 );
+
+					} else {
+
+						v.setFromMatrixColumn( objectMatrix, 0 );
+						v.crossVectors( scope.object.up, v );
+
+					}
+
+					v.multiplyScalar( distance );
+					panOffset.add( v );
+
+				};
+
+			}(); // deltaX and deltaY are in pixels; right and down are positive
+
+
+			const pan = function () {
+
+				const offset = new THREE.Vector3();
+				return function pan( deltaX, deltaY ) {
+
+					const element = scope.domElement;
+
+					if ( scope.object.isPerspectiveCamera ) {
+
+						// perspective
+						const position = scope.object.position;
+						offset.copy( position ).sub( scope.target );
+						let targetDistance = offset.length(); // half of the fov is center to top of screen
+
+						targetDistance *= Math.tan( scope.object.fov / 2 * Math.PI / 180.0 ); // we use only clientHeight here so aspect ratio does not distort speed
+
+						panLeft( 2 * deltaX * targetDistance / element.clientHeight, scope.object.matrix );
+						panUp( 2 * deltaY * targetDistance / element.clientHeight, scope.object.matrix );
+
+					} else if ( scope.object.isOrthographicCamera ) {
+
+						// orthographic
+						panLeft( deltaX * ( scope.object.right - scope.object.left ) / scope.object.zoom / element.clientWidth, scope.object.matrix );
+						panUp( deltaY * ( scope.object.top - scope.object.bottom ) / scope.object.zoom / element.clientHeight, scope.object.matrix );
+
+					} else {
+
+						// camera neither orthographic nor perspective
+						console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - pan disabled.' );
+						scope.enablePan = false;
+
+					}
+
+				};
+
+			}();
+
+			function dollyOut( dollyScale ) {
+
+				if ( scope.object.isPerspectiveCamera ) {
+
+					scale /= dollyScale;
+
+				} else if ( scope.object.isOrthographicCamera ) {
+
+					scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom * dollyScale ) );
+					scope.object.updateProjectionMatrix();
+					zoomChanged = true;
+
+				} else {
+
+					console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
+					scope.enableZoom = false;
+
+				}
+
+			}
+
+			function dollyIn( dollyScale ) {
+
+				if ( scope.object.isPerspectiveCamera ) {
+
+					scale *= dollyScale;
+
+				} else if ( scope.object.isOrthographicCamera ) {
+
+					scope.object.zoom = Math.max( scope.minZoom, Math.min( scope.maxZoom, scope.object.zoom / dollyScale ) );
+					scope.object.updateProjectionMatrix();
+					zoomChanged = true;
+
+				} else {
+
+					console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
+					scope.enableZoom = false;
+
+				}
+
+			} //
+			// event callbacks - update the object state
+			//
+
+
+			function handleMouseDownRotate( event ) {
+
+				rotateStart.set( event.clientX, event.clientY );
+
+			}
+
+			function handleMouseDownDolly( event ) {
+
+				dollyStart.set( event.clientX, event.clientY );
+
+			}
+
+			function handleMouseDownPan( event ) {
+
+				panStart.set( event.clientX, event.clientY );
+
+			}
+
+			function handleMouseMoveRotate( event ) {
+
+				rotateEnd.set( event.clientX, event.clientY );
+				rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
+				const element = scope.domElement;
+				rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
+
+				rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+				rotateStart.copy( rotateEnd );
+				scope.update();
+
+			}
+
+			function handleMouseMoveDolly( event ) {
+
+				dollyEnd.set( event.clientX, event.clientY );
+				dollyDelta.subVectors( dollyEnd, dollyStart );
+
+				if ( dollyDelta.y > 0 ) {
+
+					dollyOut( getZoomScale() );
+
+				} else if ( dollyDelta.y < 0 ) {
+
+					dollyIn( getZoomScale() );
+
+				}
+
+				dollyStart.copy( dollyEnd );
+				scope.update();
+
+			}
+
+			function handleMouseMovePan( event ) {
+
+				panEnd.set( event.clientX, event.clientY );
+				panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
+				pan( panDelta.x, panDelta.y );
+				panStart.copy( panEnd );
+				scope.update();
+
+			}
+
+			function handleMouseUp( ) { // no-op
+			}
+
+			function handleMouseWheel( event ) {
+
+				if ( event.deltaY < 0 ) {
+
+					dollyIn( getZoomScale() );
+
+				} else if ( event.deltaY > 0 ) {
+
+					dollyOut( getZoomScale() );
+
+				}
+
+				scope.update();
+
+			}
+
+			function handleKeyDown( event ) {
+
+				let needsUpdate = false;
+
+				switch ( event.code ) {
+
+					case scope.keys.UP:
+						pan( 0, scope.keyPanSpeed );
+						needsUpdate = true;
+						break;
+
+					case scope.keys.BOTTOM:
+						pan( 0, - scope.keyPanSpeed );
+						needsUpdate = true;
+						break;
+
+					case scope.keys.LEFT:
+						pan( scope.keyPanSpeed, 0 );
+						needsUpdate = true;
+						break;
+
+					case scope.keys.RIGHT:
+						pan( - scope.keyPanSpeed, 0 );
+						needsUpdate = true;
+						break;
+
+				}
+
+				if ( needsUpdate ) {
+
+					// prevent the browser from scrolling on cursor keys
+					event.preventDefault();
+					scope.update();
+
+				}
+
+			}
+
+			function handleTouchStartRotate( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
+				} else {
+
+					const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+					const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+					rotateStart.set( x, y );
+
+				}
+
+			}
+
+			function handleTouchStartPan( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					panStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
+				} else {
+
+					const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+					const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+					panStart.set( x, y );
+
+				}
+
+			}
+
+			function handleTouchStartDolly( event ) {
+
+				const dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+				const dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+				const distance = Math.sqrt( dx * dx + dy * dy );
+				dollyStart.set( 0, distance );
+
+			}
+
+			function handleTouchStartDollyPan( event ) {
+
+				if ( scope.enableZoom ) handleTouchStartDolly( event );
+				if ( scope.enablePan ) handleTouchStartPan( event );
+
+			}
+
+			function handleTouchStartDollyRotate( event ) {
+
+				if ( scope.enableZoom ) handleTouchStartDolly( event );
+				if ( scope.enableRotate ) handleTouchStartRotate( event );
+
+			}
+
+			function handleTouchMoveRotate( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					rotateEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
+				} else {
+
+					const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+					const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+					rotateEnd.set( x, y );
+
+				}
+
+				rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
+				const element = scope.domElement;
+				rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
+
+				rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+				rotateStart.copy( rotateEnd );
+
+			}
+
+			function handleTouchMovePan( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					panEnd.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
+
+				} else {
+
+					const x = 0.5 * ( event.touches[ 0 ].pageX + event.touches[ 1 ].pageX );
+					const y = 0.5 * ( event.touches[ 0 ].pageY + event.touches[ 1 ].pageY );
+					panEnd.set( x, y );
+
+				}
+
+				panDelta.subVectors( panEnd, panStart ).multiplyScalar( scope.panSpeed );
+				pan( panDelta.x, panDelta.y );
+				panStart.copy( panEnd );
+
+			}
+
+			function handleTouchMoveDolly( event ) {
+
+				const dx = event.touches[ 0 ].pageX - event.touches[ 1 ].pageX;
+				const dy = event.touches[ 0 ].pageY - event.touches[ 1 ].pageY;
+				const distance = Math.sqrt( dx * dx + dy * dy );
+				dollyEnd.set( 0, distance );
+				dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
+				dollyOut( dollyDelta.y );
+				dollyStart.copy( dollyEnd );
+
+			}
+
+			function handleTouchMoveDollyPan( event ) {
+
+				if ( scope.enableZoom ) handleTouchMoveDolly( event );
+				if ( scope.enablePan ) handleTouchMovePan( event );
+
+			}
+
+			function handleTouchMoveDollyRotate( event ) {
+
+				if ( scope.enableZoom ) handleTouchMoveDolly( event );
+				if ( scope.enableRotate ) handleTouchMoveRotate( event );
+
+			}
+
+			function handleTouchEnd( ) { // no-op
+			} //
+			// event handlers - FSM: listen for events and reset state
+			//
+
+
+			function onPointerDown( event ) {
+
+				if ( scope.enabled === false ) return;
+
+				switch ( event.pointerType ) {
+
+					case 'mouse':
+					case 'pen':
+						onMouseDown( event );
+						break;
+        // TODO touch
+
+				}
+
+			}
+
+			function onPointerMove( event ) {
+
+				if ( scope.enabled === false ) return;
+
+				switch ( event.pointerType ) {
+
+					case 'mouse':
+					case 'pen':
+						onMouseMove( event );
+						break;
+        // TODO touch
+
+				}
+
+			}
+
+			function onPointerUp( event ) {
+
+				switch ( event.pointerType ) {
+
+					case 'mouse':
+					case 'pen':
+						onMouseUp( event );
+						break;
+        // TODO touch
+
+				}
+
+			}
+
+			function onMouseDown( event ) {
+
+				// Prevent the browser from scrolling.
+				event.preventDefault(); // Manually set the focus since calling preventDefault above
+				// prevents the browser from setting it automatically.
+
+				scope.domElement.focus ? scope.domElement.focus() : window.focus();
+				let mouseAction;
+
+				switch ( event.button ) {
+
+					case 0:
+						mouseAction = scope.mouseButtons.LEFT;
+						break;
+
+					case 1:
+						mouseAction = scope.mouseButtons.MIDDLE;
+						break;
+
+					case 2:
+						mouseAction = scope.mouseButtons.RIGHT;
+						break;
+
+					default:
+						mouseAction = - 1;
+
+				}
+
+				switch ( mouseAction ) {
+
+					case THREE.MOUSE.DOLLY:
+						if ( scope.enableZoom === false ) return;
+						handleMouseDownDolly( event );
+						state = STATE.DOLLY;
+						break;
+
+					case THREE.MOUSE.ROTATE:
+						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+							if ( scope.enablePan === false ) return;
+							handleMouseDownPan( event );
+							state = STATE.PAN;
+
+						} else {
+
+							if ( scope.enableRotate === false ) return;
+							handleMouseDownRotate( event );
+							state = STATE.ROTATE;
+
+						}
+
+						break;
+
+					case THREE.MOUSE.PAN:
+						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+							if ( scope.enableRotate === false ) return;
+							handleMouseDownRotate( event );
+							state = STATE.ROTATE;
+
+						} else {
+
+							if ( scope.enablePan === false ) return;
+							handleMouseDownPan( event );
+							state = STATE.PAN;
+
+						}
+
+						break;
+
+					default:
+						state = STATE.NONE;
+
+				}
+
+				if ( state !== STATE.NONE ) {
+
+					scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove );
+					scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp );
+					scope.dispatchEvent( _startEvent );
+
+				}
+
+			}
+
+			function onMouseMove( event ) {
+
+				if ( scope.enabled === false ) return;
+				event.preventDefault();
+
+				switch ( state ) {
+
+					case STATE.ROTATE:
+						if ( scope.enableRotate === false ) return;
+						handleMouseMoveRotate( event );
+						break;
+
+					case STATE.DOLLY:
+						if ( scope.enableZoom === false ) return;
+						handleMouseMoveDolly( event );
+						break;
+
+					case STATE.PAN:
+						if ( scope.enablePan === false ) return;
+						handleMouseMovePan( event );
+						break;
+
+				}
+
+			}
+
+			function onMouseUp( event ) {
+
+				scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+				scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
+				if ( scope.enabled === false ) return;
+				handleMouseUp( event );
+				scope.dispatchEvent( _endEvent );
+				state = STATE.NONE;
+
+			}
+
+			function onMouseWheel( event ) {
+
+				if ( scope.enabled === false || scope.enableZoom === false || state !== STATE.NONE && state !== STATE.ROTATE ) return;
+				event.preventDefault();
+				scope.dispatchEvent( _startEvent );
+				handleMouseWheel( event );
+				scope.dispatchEvent( _endEvent );
+
+			}
+
+			function onKeyDown( event ) {
+
+				if ( scope.enabled === false || scope.enablePan === false ) return;
+				handleKeyDown( event );
+
+			}
+
+			function onTouchStart( event ) {
+
+				if ( scope.enabled === false ) return;
+				event.preventDefault(); // prevent scrolling
+
+				switch ( event.touches.length ) {
+
+					case 1:
+						switch ( scope.touches.ONE ) {
+
+							case THREE.TOUCH.ROTATE:
+								if ( scope.enableRotate === false ) return;
+								handleTouchStartRotate( event );
+								state = STATE.TOUCH_ROTATE;
+								break;
+
+							case THREE.TOUCH.PAN:
+								if ( scope.enablePan === false ) return;
+								handleTouchStartPan( event );
+								state = STATE.TOUCH_PAN;
+								break;
+
+							default:
+								state = STATE.NONE;
+
+						}
+
+						break;
+
+					case 2:
+						switch ( scope.touches.TWO ) {
+
+							case THREE.TOUCH.DOLLY_PAN:
+								if ( scope.enableZoom === false && scope.enablePan === false ) return;
+								handleTouchStartDollyPan( event );
+								state = STATE.TOUCH_DOLLY_PAN;
+								break;
+
+							case THREE.TOUCH.DOLLY_ROTATE:
+								if ( scope.enableZoom === false && scope.enableRotate === false ) return;
+								handleTouchStartDollyRotate( event );
+								state = STATE.TOUCH_DOLLY_ROTATE;
+								break;
+
+							default:
+								state = STATE.NONE;
+
+						}
+
+						break;
+
+					default:
+						state = STATE.NONE;
+
+				}
+
+				if ( state !== STATE.NONE ) {
+
+					scope.dispatchEvent( _startEvent );
+
+				}
+
+			}
+
+			function onTouchMove( event ) {
+
+				if ( scope.enabled === false ) return;
+				event.preventDefault(); // prevent scrolling
+
+				switch ( state ) {
+
+					case STATE.TOUCH_ROTATE:
+						if ( scope.enableRotate === false ) return;
+						handleTouchMoveRotate( event );
+						scope.update();
+						break;
+
+					case STATE.TOUCH_PAN:
+						if ( scope.enablePan === false ) return;
+						handleTouchMovePan( event );
+						scope.update();
+						break;
+
+					case STATE.TOUCH_DOLLY_PAN:
+						if ( scope.enableZoom === false && scope.enablePan === false ) return;
+						handleTouchMoveDollyPan( event );
+						scope.update();
+						break;
+
+					case STATE.TOUCH_DOLLY_ROTATE:
+						if ( scope.enableZoom === false && scope.enableRotate === false ) return;
+						handleTouchMoveDollyRotate( event );
+						scope.update();
+						break;
+
+					default:
+						state = STATE.NONE;
+
+				}
+
+			}
+
+			function onTouchEnd( event ) {
+
+				if ( scope.enabled === false ) return;
+				handleTouchEnd( event );
+				scope.dispatchEvent( _endEvent );
+				state = STATE.NONE;
+
+			}
+
+			function onContextMenu( event ) {
+
+				if ( scope.enabled === false ) return;
+				event.preventDefault();
+
+			} //
+
+
+			scope.domElement.addEventListener( 'contextmenu', onContextMenu );
+			scope.domElement.addEventListener( 'pointerdown', onPointerDown );
+			scope.domElement.addEventListener( 'wheel', onMouseWheel, {
+				passive: false
+			} );
+			scope.domElement.addEventListener( 'touchstart', onTouchStart, {
+				passive: false
+			} );
+			scope.domElement.addEventListener( 'touchend', onTouchEnd );
+			scope.domElement.addEventListener( 'touchmove', onTouchMove, {
+				passive: false
+			} ); // force an update at start
+
+			this.update();
+
+		}
+
+	} // This set of controls performs orbiting, dollying (zooming), and panning.
+	// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
+	// This is very similar to OrbitControls, another set of touch behavior
+	//
+	//    Orbit - right mouse, or left mouse + ctrl/meta/shiftKey / touch: two-finger rotate
+	//    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
+	//    Pan - left mouse, or arrow keys / touch: one-finger move
+
+
+	class MapControls extends OrbitControls {
+
+		constructor( object, domElement ) {
+
+			super( object, domElement );
+			this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
+
+			this.mouseButtons.LEFT = THREE.MOUSE.PAN;
+			this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+			this.touches.ONE = THREE.TOUCH.PAN;
+			this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+
+		}
+
+	}
+
+	THREE.MapControls = MapControls;
+	THREE.OrbitControls = OrbitControls;
+
+} )();
+
+
+/* ===== inlined addon: Reflector.js ===== */
+( function () {
+
+	class Reflector extends THREE.Mesh {
+
+		constructor( geometry, options = {} ) {
+
+			super( geometry );
+			this.type = 'Reflector';
+			const scope = this;
+			const color = options.color !== undefined ? new THREE.Color( options.color ) : new THREE.Color( 0x7F7F7F );
+			const textureWidth = options.textureWidth || 512;
+			const textureHeight = options.textureHeight || 512;
+			const clipBias = options.clipBias || 0;
+			const shader = options.shader || Reflector.ReflectorShader; //
+
+			const reflectorPlane = new THREE.Plane();
+			const normal = new THREE.Vector3();
+			const reflectorWorldPosition = new THREE.Vector3();
+			const cameraWorldPosition = new THREE.Vector3();
+			const rotationMatrix = new THREE.Matrix4();
+			const lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
+			const clipPlane = new THREE.Vector4();
+			const view = new THREE.Vector3();
+			const target = new THREE.Vector3();
+			const q = new THREE.Vector4();
+			const textureMatrix = new THREE.Matrix4();
+			const virtualCamera = new THREE.PerspectiveCamera();
+			const parameters = {
+				minFilter: THREE.LinearFilter,
+				magFilter: THREE.LinearFilter,
+				format: THREE.RGBFormat
+			};
+			const renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
+
+			if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
+
+				renderTarget.texture.generateMipmaps = false;
+
+			}
+
+			const material = new THREE.ShaderMaterial( {
+				uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
+				fragmentShader: shader.fragmentShader,
+				vertexShader: shader.vertexShader
+			} );
+			material.uniforms[ 'tDiffuse' ].value = renderTarget.texture;
+			material.uniforms[ 'color' ].value = color;
+			material.uniforms[ 'textureMatrix' ].value = textureMatrix;
+			this.material = material;
+
+			this.onBeforeRender = function ( renderer, scene, camera ) {
+
+				reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
+				cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
+				rotationMatrix.extractRotation( scope.matrixWorld );
+				normal.set( 0, 0, 1 );
+				normal.applyMatrix4( rotationMatrix );
+				view.subVectors( reflectorWorldPosition, cameraWorldPosition ); // Avoid rendering when reflector is facing away
+
+				if ( view.dot( normal ) > 0 ) return;
+				view.reflect( normal ).negate();
+				view.add( reflectorWorldPosition );
+				rotationMatrix.extractRotation( camera.matrixWorld );
+				lookAtPosition.set( 0, 0, - 1 );
+				lookAtPosition.applyMatrix4( rotationMatrix );
+				lookAtPosition.add( cameraWorldPosition );
+				target.subVectors( reflectorWorldPosition, lookAtPosition );
+				target.reflect( normal ).negate();
+				target.add( reflectorWorldPosition );
+				virtualCamera.position.copy( view );
+				virtualCamera.up.set( 0, 1, 0 );
+				virtualCamera.up.applyMatrix4( rotationMatrix );
+				virtualCamera.up.reflect( normal );
+				virtualCamera.lookAt( target );
+				virtualCamera.far = camera.far; // Used in WebGLBackground
+
+				virtualCamera.updateMatrixWorld();
+				virtualCamera.projectionMatrix.copy( camera.projectionMatrix ); // Update the texture matrix
+
+				textureMatrix.set( 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0 );
+				textureMatrix.multiply( virtualCamera.projectionMatrix );
+				textureMatrix.multiply( virtualCamera.matrixWorldInverse );
+				textureMatrix.multiply( scope.matrixWorld ); // Now update projection matrix with new clip plane, implementing code from: http://www.terathon.com/code/oblique.html
+				// Paper explaining this technique: http://www.terathon.com/lengyel/Lengyel-Oblique.pdf
+
+				reflectorPlane.setFromNormalAndCoplanarPoint( normal, reflectorWorldPosition );
+				reflectorPlane.applyMatrix4( virtualCamera.matrixWorldInverse );
+				clipPlane.set( reflectorPlane.normal.x, reflectorPlane.normal.y, reflectorPlane.normal.z, reflectorPlane.constant );
+				const projectionMatrix = virtualCamera.projectionMatrix;
+				q.x = ( Math.sign( clipPlane.x ) + projectionMatrix.elements[ 8 ] ) / projectionMatrix.elements[ 0 ];
+				q.y = ( Math.sign( clipPlane.y ) + projectionMatrix.elements[ 9 ] ) / projectionMatrix.elements[ 5 ];
+				q.z = - 1.0;
+				q.w = ( 1.0 + projectionMatrix.elements[ 10 ] ) / projectionMatrix.elements[ 14 ]; // Calculate the scaled plane vector
+
+				clipPlane.multiplyScalar( 2.0 / clipPlane.dot( q ) ); // Replacing the third row of the projection matrix
+
+				projectionMatrix.elements[ 2 ] = clipPlane.x;
+				projectionMatrix.elements[ 6 ] = clipPlane.y;
+				projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
+				projectionMatrix.elements[ 14 ] = clipPlane.w; // Render
+
+				renderTarget.texture.encoding = renderer.outputEncoding;
+				scope.visible = false;
+				const currentRenderTarget = renderer.getRenderTarget();
+				const currentXrEnabled = renderer.xr.enabled;
+				const currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+				renderer.xr.enabled = false; // Avoid camera modification
+
+				renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
+
+				renderer.setRenderTarget( renderTarget );
+				renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+
+				if ( renderer.autoClear === false ) renderer.clear();
+				renderer.render( scene, virtualCamera );
+				renderer.xr.enabled = currentXrEnabled;
+				renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+				renderer.setRenderTarget( currentRenderTarget ); // Restore viewport
+
+				const viewport = camera.viewport;
+
+				if ( viewport !== undefined ) {
+
+					renderer.state.viewport( viewport );
+
+				}
+
+				scope.visible = true;
+
+			};
+
+			this.getRenderTarget = function () {
+
+				return renderTarget;
+
+			};
+
+		}
+
+	}
+
+	Reflector.prototype.isReflector = true;
+	Reflector.ReflectorShader = {
+		uniforms: {
+			'color': {
+				value: null
+			},
+			'tDiffuse': {
+				value: null
+			},
+			'textureMatrix': {
+				value: null
+			}
+		},
+		vertexShader:
+  /* glsl */
+  `
+		uniform mat4 textureMatrix;
+		varying vec4 vUv;
+
+		void main() {
+
+			vUv = textureMatrix * vec4( position, 1.0 );
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`,
+		fragmentShader:
+  /* glsl */
+  `
+		uniform vec3 color;
+		uniform sampler2D tDiffuse;
+		varying vec4 vUv;
+
+		float blendOverlay( float base, float blend ) {
+
+			return( base < 0.5 ? ( 2.0 * base * blend ) : ( 1.0 - 2.0 * ( 1.0 - base ) * ( 1.0 - blend ) ) );
+
+		}
+
+		vec3 blendOverlay( vec3 base, vec3 blend ) {
+
+			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
+
+		}
+
+		void main() {
+
+			vec4 base = texture2DProj( tDiffuse, vUv );
+			gl_FragColor = vec4( blendOverlay( base.rgb, color ), 1.0 );
+
+		}`
+	};
+
+	THREE.Reflector = Reflector;
+
+} )();
+
+</script>
+<script>
+'use strict';
+if(!window.THREE){document.body.style.background='#070a12';document.write('<div style="color:#8fa6c8;font:14px sans-serif;text-align:center;padding-top:40vh">3D 库加载失败，请检查网络后刷新</div>');}
+(function(){
+/* ============================================================
+   雨夜便利店 · 三渲二微缩街角
+   ============================================================ */
+const REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x080c16);
+scene.fog = new THREE.FogExp2(0x0a1020, 0.012);
+
+const MOBILE = (window.matchMedia && window.matchMedia('(pointer:coarse)').matches) || window.innerWidth<768;
+const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, MOBILE?1.5:2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+document.body.appendChild(renderer.domElement);
+
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 200);
+(function fitCamera(){
+  const a=window.innerWidth/window.innerHeight;
+  camera.fov = a<0.8?66:(a<1.2?45:38);
+  const r = a<0.8?46:(a<1.2?35:32.6);
+  const dir=new THREE.Vector3(13,10.5,27.5).normalize();
+  camera.position.copy(dir.multiplyScalar(r));
+  camera.updateProjectionMatrix();
+})();
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.target.set(-2.5, 2.4, -2);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.rotateSpeed = 0.55;
+controls.zoomSpeed = 0.7;
+controls.panSpeed = 0.6;
+controls.minDistance = 9;
+controls.maxDistance = 55;
+controls.minPolarAngle = 0.12;
+controls.maxPolarAngle = Math.PI*0.49;
+controls.autoRotate = !REDUCE;
+controls.autoRotateSpeed = 0.35;
+controls.addEventListener('start', ()=>{ controls.autoRotate = false; });
+
+/* ---------- 光照 ---------- */
+scene.add(new THREE.HemisphereLight(0x4a5d8a, 0x0a0c12, 0.4));
+const moon = new THREE.DirectionalLight(0x8fb0ee, 0.4);
+moon.position.set(-26, 36, -20);
+moon.castShadow = true;
+moon.shadow.mapSize.set(2048,2048);
+moon.shadow.camera.left=-30; moon.shadow.camera.right=30;
+moon.shadow.camera.top=30; moon.shadow.camera.bottom=-30;
+moon.shadow.camera.near=5; moon.shadow.camera.far=90;
+moon.shadow.bias=-0.0006;
+scene.add(moon);
+const fillCool = new THREE.DirectionalLight(0x8fb6ff, 0.25);
+fillCool.position.set(24, 12, 26); scene.add(fillCool);
+
+/* ---------- 卡通阶梯色 ---------- */
+const gradData = new Uint8Array([75, 150, 210, 255]);
+const gradMap = new THREE.DataTexture(gradData, 4, 1, THREE.LuminanceFormat);
+gradMap.minFilter = THREE.NearestFilter; gradMap.magFilter = THREE.NearestFilter;
+gradMap.needsUpdate = true;
+
+const matCache = {};
+function T(color, opt){
+  const key = color + JSON.stringify(opt||{});
+  if(!matCache[key]) matCache[key] = new THREE.MeshToonMaterial(Object.assign({color:color, gradientMap:gradMap}, opt||{}));
+  return matCache[key];
+}
+const outlineMat = new THREE.MeshBasicMaterial({color:0x0f1320, side:THREE.BackSide});
+function outline(mesh, s){
+  const o = new THREE.Mesh(mesh.geometry, outlineMat);
+  o.scale.setScalar(s||1.065);
+  o.castShadow = false; o.receiveShadow = false;
+  mesh.add(o); return mesh;
+}
+function B(w,h,d,color,x,y,z,parent,opt){
+  opt = opt||{};
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), opt.mat || T(color, opt.matOpt));
+  m.position.set(x,y,z);
+  if(opt.rot) m.rotation.set(opt.rot[0]||0,opt.rot[1]||0,opt.rot[2]||0);
+  m.castShadow = opt.cast!==false; m.receiveShadow = opt.rcv!==false;
+  if(opt.outline) outline(m, opt.os);
+  (parent||scene).add(m); return m;
+}
+function Cyl(rt,rb,h,color,x,y,z,parent,seg,opt){
+  opt=opt||{};
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg||12), opt.mat||T(color,opt.matOpt));
+  m.position.set(x,y,z);
+  if(opt.rot) m.rotation.set(opt.rot[0]||0,opt.rot[1]||0,opt.rot[2]||0);
+  m.castShadow=opt.cast!==false; m.receiveShadow=opt.rcv!==false;
+  if(opt.outline) outline(m,opt.os);
+  (parent||scene).add(m); return m;
+}
+function Plane(w,h,tex,x,y,z,parent,opt){
+  opt=opt||{};
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h), opt.mat || new THREE.MeshBasicMaterial({map:tex, transparent:opt.transparent!==false, side:THREE.DoubleSide}));
+  m.position.set(x,y,z);
+  if(opt.rot) m.rotation.set(opt.rot[0]||0,opt.rot[1]||0,opt.rot[2]||0);
+  m.castShadow=false; m.receiveShadow=false;
+  (parent||scene).add(m); return m;
+}
+const V3 = (x,y,z)=>new THREE.Vector3(x,y,z);
+function tube(p1,p2,r,color,parent,seg){
+  const dir=p2.clone().sub(p1); const len=dir.length();
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,seg||8), T(color));
+  m.position.copy(p1).addScaledVector(dir,0.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.normalize());
+  m.castShadow=true; m.receiveShadow=true;
+  (parent||scene).add(m); return m;
+}
+/* 实例化小件（商品/饮料罐） */
+function instanced(geo, items, mat, parent){
+  const im=new THREE.InstancedMesh(geo, mat, items.length);
+  const m4=new THREE.Matrix4(), q=new THREE.Quaternion(), p=new THREE.Vector3(), s=new THREE.Vector3(), e=new THREE.Euler();
+  items.forEach((it,i)=>{
+    p.set(it.x,it.y,it.z);
+    e.set(it.rx||0,it.ry||0,it.rz||0); q.setFromEuler(e);
+    s.set(it.sx!==undefined?it.sx:1, it.sy!==undefined?it.sy:1, it.sz!==undefined?it.sz:1);
+    m4.compose(p,q,s); im.setMatrixAt(i,m4);
+  });
+  im.instanceMatrix.needsUpdate=true; im.castShadow=false; im.receiveShadow=true;
+  (parent||scene).add(im); return im;
+}
+
+/* ---------- 程序化纹理 ---------- */
+function canvasTex(w,h,draw){
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const g=c.getContext('2d'); draw(g,w,h);
+  const t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=4; return t;
+}
+const FONT='"Arial Black","Yu Gothic","Meiryo","Hiragino Sans",sans-serif';
+const FONT_R='"Yu Gothic","Meiryo","Hiragino Sans",sans-serif';
+
+/* 混凝土人行道 */
+const texConcrete = canvasTex(512,512,(g,w,h)=>{
+  g.fillStyle='#6f7888'; g.fillRect(0,0,w,h);
+  for(let i=0;i<2600;i++){ const v=95+Math.random()*50; g.fillStyle=`rgba(${v},${v+4},${v+12},${0.15+Math.random()*0.2})`; g.fillRect(Math.random()*w,Math.random()*h,2,2); }
+  g.strokeStyle='#586070'; g.lineWidth=3;
+  for(let i=0;i<=4;i++){ g.beginPath(); g.moveTo(i*128,0); g.lineTo(i*128,h); g.stroke(); g.beginPath(); g.moveTo(0,i*128); g.lineTo(w,i*128); g.stroke(); }
+  g.strokeStyle='rgba(220,226,235,.5)'; g.lineWidth=1;
+  for(let i=0;i<4;i++){ g.beginPath(); g.moveTo(i*128+2,0); g.lineTo(i*128+2,h); g.stroke(); g.beginPath(); g.moveTo(0,i*128+2); g.lineTo(w,i*128+2); g.stroke(); }
+});
+texConcrete.wrapS=texConcrete.wrapT=THREE.RepeatWrapping; texConcrete.repeat.set(6,6);
+
+/* 沥青路面暗纹 */
+const texAsphalt = canvasTex(512,512,(g,w,h)=>{
+  g.fillStyle='#0a0f1a'; g.fillRect(0,0,w,h);
+  for(let i=0;i<4000;i++){ const v=12+Math.random()*26; g.fillStyle=`rgba(${v},${v+6},${v+16},${0.25+Math.random()*0.3})`; g.fillRect(Math.random()*w,Math.random()*h,2,2); }
+});
+texAsphalt.wrapS=texAsphalt.wrapT=THREE.RepeatWrapping; texAsphalt.repeat.set(7,7);
+
+/* 主招牌 */
+const texMainSign = canvasTex(1024,256,(g,w,h)=>{
+  const grd=g.createLinearGradient(0,0,w,h); grd.addColorStop(0,'#0e2a63'); grd.addColorStop(1,'#1c56ad');
+  g.fillStyle=grd; g.fillRect(0,0,w,h);
+  g.fillStyle='#10214a'; g.fillRect(0,0,w,10); g.fillRect(0,h-10,w,10);
+  g.fillStyle='#37d3a5'; g.fillRect(0,158,w,8); g.fillStyle='#ffd36b'; g.fillRect(0,166,w,4);
+  /* 月亮标 */
+  g.fillStyle='#ffe9a8'; g.beginPath(); g.arc(110,86,46,0,Math.PI*2); g.fill();
+  g.fillStyle='#13398a'; g.beginPath(); g.arc(132,74,42,0,Math.PI*2); g.fill();
+  g.fillStyle='#fff'; g.font=`bold 92px ${FONT}`; g.textBaseline='middle'; g.fillText('NIGHT MART',180,88);
+  g.fillStyle='#f6ecd9'; g.font=`bold 34px ${FONT_R}`; g.fillText('ナイトマート　24時間　年中無休',60,214);
+  g.fillStyle='#ff5a4e'; g.beginPath(); g.arc(950,78,52,0,Math.PI*2); g.fill();
+  g.fillStyle='#fff'; g.font=`bold 34px ${FONT}`; g.fillText('24h',912,80);
+});
+
+/* 侧面竖灯箱 */
+const texBladeSign = canvasTex(192,512,(g,w,h)=>{
+  const grd=g.createLinearGradient(0,0,0,h); grd.addColorStop(0,'#13418c'); grd.addColorStop(1,'#0e2a63');
+  g.fillStyle=grd; g.fillRect(0,0,w,h);
+  g.fillStyle='#37d3a5'; g.fillRect(0,200,w,6); g.fillStyle='#ffd36b'; g.fillRect(0,206,w,3);
+  g.save(); g.translate(w/2,h/2-30); g.rotate(-Math.PI/2);
+  g.fillStyle='#fff'; g.font=`bold 78px ${FONT}`; g.textAlign='center'; g.fillText('NIGHT MART',0,0); g.restore();
+  g.fillStyle='#ffe9a8'; g.beginPath(); g.arc(w/2,420,28,0,Math.PI*2); g.fill();
+  g.fillStyle='#13398a'; g.beginPath(); g.arc(w/2+12,414,24,0,Math.PI*2); g.fill();
+});
+
+/* OPEN 灯牌 */
+const texOpen = canvasTex(256,128,(g,w,h)=>{
+  g.fillStyle='#0e5fd6'; g.fillRect(0,0,w,h); g.strokeStyle='#8fd0ff'; g.lineWidth=8; g.strokeRect(6,6,w-12,h-12);
+  g.fillStyle='#fff'; g.font=`bold 62px ${FONT}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText('OPEN',w/2-20,h/2);
+  g.fillStyle='#ff5a4e'; g.beginPath(); g.arc(w-40,30,16,0,Math.PI*2); g.fill();
+  g.fillStyle='#fff'; g.font=`bold 18px ${FONT_R}`; g.fillText('24h',w-40,31);
+});
+
+/* 自动贩卖机正面 */
+const texVending = canvasTex(512,1024,(g,w,h)=>{
+  const grd=g.createLinearGradient(0,0,0,170); grd.addColorStop(0,'#7b4fe0'); grd.addColorStop(1,'#2a2e86');
+  g.fillStyle=grd; g.fillRect(0,0,w,170);
+  g.fillStyle='#fff'; g.font=`bold 74px ${FONT}`; g.textAlign='center'; g.fillText('DRINK',w/2,86);
+  g.fillStyle='#ffe9a8'; g.font=`bold 30px ${FONT_R}`; g.fillText('あたたか・つめたい',w/2,135);
+  /* 展示橱窗 */
+  g.fillStyle='#141d2b'; g.fillRect(20,190,360,560);
+  g.strokeStyle='#3a4a66'; g.lineWidth=6; g.strokeRect(20,190,360,560);
+  const canCols=['#e84d4d','#3b82f6','#f5c542','#38c98a','#f076c0','#ff8a3d','#7dd3fc','#a3e635'];
+  for(let r=0;r<5;r++)for(let c=0;c<4;c++){
+    const x=50+c*82,y=230+r*100;
+    g.fillStyle=canCols[(r*4+c)%canCols.length];
+    g.beginPath(); g.roundRect(x,y,52,72,10); g.fill();
+    g.fillStyle='rgba(255,255,255,.85)'; g.fillRect(x+4,y+18,44,14);
+    g.fillStyle='#fff'; g.font=`bold 15px ${FONT}`; g.fillText('DRINK',x+26,y+55);
+    g.fillStyle='#ffd36b'; g.fillRect(x+2,y+76,48,18); g.fillStyle='#8a1f1f'; g.font=`bold 13px ${FONT_R}`; g.fillText('120円',x+26,y+90);
+  }
+  /* 按钮区 */
+  g.fillStyle='#222c3f'; g.fillRect(392,190,100,560);
+  for(let r=0;r<8;r++){ g.fillStyle= r%2? '#ff7a59':'#7ad0ff'; g.beginPath(); g.arc(442,230+r*64,16,0,Math.PI*2); g.fill(); g.fillStyle='#e8edf6'; g.fillRect(410,248+r*64,64,6); }
+  /* 取货口 */
+  g.fillStyle='#e8ecf2'; g.fillRect(0,750,w,274);
+  g.fillStyle='#0b1018'; g.fillRect(40,820,430,110);
+  g.fillStyle='#3a4a66'; g.fillRect(40,820,430,14);
+  g.fillStyle='#8fd0ff'; g.fillRect(60,860,90,12); g.fillStyle='#ffd36b'; g.fillRect(170,860,90,12);
+  g.fillStyle='#33405c'; g.fillRect(380,790,70,24);
+  g.fillStyle='#1c2740'; g.font=`bold 26px ${FONT_R}`; g.textAlign='center'; g.fillText('おつり・お金',250,800);
+});
+/* roundRect 兼容 */
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    if(typeof r==='number'){var rr=[r,r,r,r];} else {var rr=r;}
+    this.beginPath();
+    this.moveTo(x+rr[0],y);
+    this.arcTo(x+w,y,x+w,y+h,rr[1]); this.arcTo(x+w,y+h,x,y+h,rr[2]);
+    this.arcTo(x,y+h,x,y,rr[3]); this.arcTo(x,y,x+w,y,rr[0]); this.closePath(); return this;
+  };
+}
+
+/* 海报 */
+function posterTex(bg1,bg2,title,sub,accent){
+  return canvasTex(256,384,(g,w,h)=>{
+    const grd=g.createLinearGradient(0,0,w,h); grd.addColorStop(0,bg1); grd.addColorStop(1,bg2);
+    g.fillStyle=grd; g.fillRect(0,0,w,h);
+    g.fillStyle=accent; g.fillRect(0,0,w,64);
+    g.fillStyle='#fff'; g.font=`bold 38px ${FONT_R}`; g.textAlign='center'; g.fillText(title,w/2,45);
+    g.fillStyle='rgba(255,255,255,.9)'; g.font=`bold 30px ${FONT_R}`;
+    const lines=sub.split('\n'); lines.forEach((l,i)=>g.fillText(l,w/2,150+i*52));
+    g.fillStyle='rgba(255,255,255,.25)'; g.beginPath(); g.arc(w-40,h-50,46,0,Math.PI*2); g.fill();
+  });
+}
+const texPosterA = posterTex('#d94838','#a51f1f','SALE','おにぎり\n100円〜','#ffe08a');
+const texPosterB = posterTex('#1f74d6','#103a86','新商品','ホット\nコーヒー','#8fd0ff');
+const texPosterC = posterTex('#2aa87a','#0f6b4d','セール','スイーツ\n半額','#ffd36b');
+
+/* 杂志封面 */
+const magColors=['#e8556b','#3b9af5','#f5a623','#8e6bd9','#37c98e','#e8833a'];
+const texMags = magColors.map((c,i)=>canvasTex(128,176,(g,w,h)=>{
+  g.fillStyle='#f4f1e8'; g.fillRect(0,0,w,h);
+  g.fillStyle=c; g.fillRect(10,34,w-20,h-90);
+  g.fillStyle='rgba(255,255,255,.45)'; g.beginPath(); g.arc(w/2,92,28,0,Math.PI*2); g.fill();
+  g.fillStyle='#1c2740'; g.fillRect(0,0,w,24);
+  g.fillStyle='#fff'; g.font=`bold 15px ${FONT_R}`; g.textAlign='center'; g.fillText('月刊 '+('MAGAZINE'[i]),w/2,17);
+  g.fillStyle='#1c2740'; g.fillRect(10,h-50,w-20,12);
+}));
+
+/* 门贴 入口/出口 */
+const texIn = canvasTex(128,128,(g,w,h)=>{g.fillStyle='#1fae6a';g.beginPath();g.arc(64,64,60,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font='bold 72px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('入',64,68);});
+const texOut = canvasTex(128,128,(g,w,h)=>{g.fillStyle='#d94838';g.beginPath();g.arc(64,64,60,0,Math.PI*2);g.fill();g.fillStyle='#fff';g.font='bold 72px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('出',64,68);});
+
+/* STAFF 门 */
+const texStaff = canvasTex(256,128,(g,w,h)=>{g.fillStyle='#c9cdd6';g.fillRect(0,0,w,h);g.strokeStyle='#7b8494';g.lineWidth=6;g.strokeRect(4,4,w-8,h-8);g.fillStyle='#33405c';g.font=`bold 26px ${FONT_R}`;g.textAlign='center';g.fillText('STAFF ONLY',w/2,48);g.font=`bold 22px ${FONT_R}`;g.fillText('関係者以外立入禁止',w/2,90);});
+
+/* 停车指示牌 */
+const texPSign = canvasTex(256,256,(g,w,h)=>{g.fillStyle='#1f5fc0';g.fillRect(0,0,w,h);g.strokeStyle='#fff';g.lineWidth=10;g.strokeRect(8,8,w-16,h-16);g.fillStyle='#fff';g.font=`bold 150px ${FONT}`;g.textAlign='center';g.textBaseline='middle';g.fillText('P',w/2,h/2-18);g.font=`bold 30px ${FONT_R}`;g.fillText('駐輪場',w/2,222);});
+
+/* 排水沟格栅 */
+const texGrate = canvasTex(512,64,(g,w,h)=>{
+  g.fillStyle='#2b313c'; g.fillRect(0,0,w,h);
+  g.fillStyle='#10141c';
+  for(let x=8;x<w;x+=26) g.fillRect(x,6,12,h-12);
+  g.strokeStyle='#525d6e'; g.lineWidth=2; g.strokeRect(0,0,w,h);
+});
+
+/* 玻璃雨痕 */
+const texStreak = canvasTex(256,512,(g,w,h)=>{
+  g.clearRect(0,0,w,h);
+  for(let i=0;i<70;i++){
+    const x=Math.random()*w, len=40+Math.random()*220, y0=Math.random()*h*0.6;
+    g.strokeStyle=`rgba(200,225,255,${0.10+Math.random()*0.25})`;
+    g.lineWidth=0.8+Math.random()*1.8;
+    g.beginPath(); g.moveTo(x,y0);
+    let y=y0;
+    while(y<y0+len){ g.lineTo(x+Math.sin(y*0.12+i)*2.2, y+14); y+=14; }
+    g.stroke();
+    g.fillStyle=`rgba(210,232,255,${0.2+Math.random()*0.3})`;
+    g.beginPath(); g.ellipse(x,y0+len,1.2+Math.random()*2,2.5+Math.random()*4,0,0,Math.PI*2); g.fill();
+  }
+});
+texStreak.wrapS=texStreak.wrapT=THREE.RepeatWrapping;
+
+/* 柔光 / 蒸汽贴图 */
+const texGlow = canvasTex(128,128,(g,w,h)=>{
+  const grd=g.createRadialGradient(w/2,h/2,2,w/2,h/2,w/2);
+  grd.addColorStop(0,'rgba(255,255,255,1)'); grd.addColorStop(0.4,'rgba(255,255,255,.45)'); grd.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=grd; g.fillRect(0,0,w,h);
+});
+const texSteam = texGlow;
+
+/* 门垫 */
+const texMat = canvasTex(256,128,(g,w,h)=>{
+  g.fillStyle='#7a3038'; g.fillRect(0,0,w,h);
+  g.strokeStyle='#c97880'; g.lineWidth=6; g.strokeRect(8,8,w-16,h-16);
+  g.fillStyle='#f0e4d8'; g.font=`bold 40px ${FONT_R}`; g.textAlign='center'; g.textBaseline='middle'; g.fillText('WELCOME',w/2,h/2);
+});
+
+/* 公告栏海报栏 */
+const texBoard = canvasTex(256,320,(g,w,h)=>{
+  g.fillStyle='#3d5a46'; g.fillRect(0,0,w,h); g.fillStyle='#c8a86b'; g.fillRect(10,10,w-20,h-20);
+  g.fillStyle='#fff'; g.fillRect(28,30,90,120); g.fillStyle='#e8556b'; g.fillRect(34,40,78,10); g.fillStyle='#aab'; g.fillRect(34,64,78,6); g.fillRect(34,80,70,6); g.fillRect(34,96,78,6);
+  g.fillStyle='#fff2dd'; g.fillRect(138,30,90,120); g.fillStyle='#3b9af5'; g.fillRect(144,40,78,10); g.fillStyle='#aab'; g.fillRect(144,64,70,6); g.fillRect(144,80,78,6);
+  g.fillStyle='#fff'; g.fillRect(28,166,90,130); g.fillStyle='#f5a623'; g.fillRect(34,176,78,10); g.fillStyle='#aab'; g.fillRect(34,200,78,6); g.fillRect(34,216,66,6);
+  g.fillStyle='#ffe9ec'; g.fillRect(138,166,90,130); g.fillStyle='#2aa87a'; g.fillRect(144,176,78,10); g.fillStyle='#aab'; g.fillRect(144,200,78,6);
+});
+
+const anim = []; /* 动画注册列表 */
+const flickers = [];
+function addFlicker(mat, base, seed){ flickers.push({mat,base,seed}); }
+
+/* ---------- 柔光斑 / 水波纹 ---------- */
+function glow(x,y,z,sx,sy,color,opacity){
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({map:texGlow,color:color,transparent:true,opacity:opacity||0.4,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  m.rotation.x=-Math.PI/2; m.position.set(x,y,z); m.scale.set(sx,sy,1);
+  m.userData.baseOp=opacity||0.4; scene.add(m); return m;
+}
+/* 发光体柔光（平面贴片 / 面向镜头的光晕） */
+function halo(x,y,z,sx,sy,color,opacity,parent,rot){
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({map:texGlow,color:color,transparent:true,opacity:opacity,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));
+  m.position.set(x,y,z); m.scale.set(sx,sy,1);
+  if(rot)m.rotation.set(rot[0],rot[1],rot[2]);
+  m.userData.baseOp=opacity; (parent||scene).add(m); return m;
+}
+function haloSprite(x,y,z,s,color,opacity){
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:texGlow,color:color,transparent:true,opacity:opacity,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  sp.position.set(x,y,z); sp.scale.set(s,s,1); sp.userData.baseOp=opacity; scene.add(sp); return sp;
+}
+function ripple(x,y,z,scale,rate,color){
+  const m=new THREE.Mesh(new THREE.RingGeometry(0.08,0.11,28), new THREE.MeshBasicMaterial({color:color||0x9ec0ea,transparent:true,opacity:0,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  m.rotation.x=-Math.PI/2; m.position.set(x,y,z); scene.add(m);
+  const phase=Math.random();
+  anim.push((t)=>{const k=(t*rate+phase)%1; const s=0.3+k*scale; m.scale.set(s,s,s); m.material.opacity=(1-k)*0.42;});
+  return m;
+}
+
+/* ============================================================
+   底座 / 道路 / 人行道
+   ============================================================ */
+/* 深色模型底座 */
+B(44,1,44,0x151923,0,-0.5,0,scene);
+/* 底座边框（微缩托盘感） */
+const rimMat = T(0x10141d);
+[ [0,0.24,21.7,44,0.48,0.6],[0,0.24,-21.7,44,0.48,0.6],[21.7,0.24,0,0.6,0.48,44],[-21.7,0.24,0,0.6,0.48,44] ].forEach(r=>{
+  B(r[3],r[4],r[5],0x10141d,r[0],r[1],r[2],scene,{cast:false,rcv:false});
+});
+
+/* 湿润沥青：整面反射镜 + 暗色压暗层 */
+const reflector = new THREE.Reflector(new THREE.PlaneGeometry(44,44),{
+  clipBias:0.003, textureWidth:1024, textureHeight:1024, color:0x44577e
+});
+reflector.rotation.x=-Math.PI/2; reflector.position.y=0.006; scene.add(reflector);
+
+const roadMat = new THREE.MeshBasicMaterial({map:texAsphalt, color:0x142036, transparent:true, opacity:0.3, depthWrite:false});
+B(44,0.01,13,0,0,0.012,15.5,scene,{mat:roadMat,cast:false,rcv:false});
+B(13,0.01,44,0,15.5,0.012,0,scene,{mat:roadMat,cast:false,rcv:false});
+
+/* 大人行道板（覆盖非道路区域） */
+const sidewalkMat = T(0xffffff,{map:texConcrete});
+B(31,0.18,31,0,-6.5,0.09,-6.5,scene,{mat:sidewalkMat,cast:false});
+
+/* 路缘石 */
+const curbMat = T(0x9aa3b0);
+B(31,0.2,0.3,0,-6.5,0.1,8.85,scene,{mat:curbMat,cast:false});
+B(0.3,0.2,31,0,8.85,0.1,-6.5,scene,{mat:curbMat,cast:false});
+B(0.3,0.2,0.3,0,8.85,0.1,8.85,scene,{mat:curbMat,cast:false});
+
+/* 道路标线 */
+const lineMat = new THREE.MeshBasicMaterial({color:0xdfe6f0});
+const lineYellow = new THREE.MeshBasicMaterial({color:0xd8c45a});
+function roadLine(w,d,x,z,mat){ B(w,0.012,d,0,x,0.03,z,scene,{mat:mat,cast:false,rcv:false}); }
+/* 斑马线 A（前景道路） */
+for(let i=0;i<7;i++) roadLine(5.2,0.55,14.8,10.2+i*0.92,lineMat);
+/* 斑马线 B（右侧道路） */
+for(let i=0;i<7;i++) roadLine(0.55,5.2,10.2+i*0.92,14.8,lineMat);
+/* 停止线 */
+roadLine(13,0.18,15.5,9.9,lineMat); roadLine(0.18,13,9.9,15.5,lineMat);
+/* 中央虚线 */
+for(let x=-20;x<=20;x+=3) roadLine(1.4,0.14,x,18.6,lineYellow);
+for(let z=-20;z<=20;z+=3) roadLine(0.14,1.4,18.6,z,lineYellow);
+
+/* 排水沟格栅 */
+texGrate.wrapS=texGrate.wrapT=THREE.RepeatWrapping; texGrate.repeat.set(10,1);
+Plane(28,0.32,texGrate,-6.5,0.035,9.3,scene,{rot:[-Math.PI/2,0,0],transparent:true});
+
+/* 井盖 */
+Cyl(0.55,0.55,0.05,0x2a313d,16,0.045,11,scene,28);
+const manholeRing=new THREE.Mesh(new THREE.TorusGeometry(0.42,0.03,8,28), T(0x444d5c));
+manholeRing.rotation.x=Math.PI/2; manholeRing.position.set(16,0.08,11); scene.add(manholeRing);
+
+/* 积水洼 */
+function puddle(x,z,sx,sz){
+  const m=new THREE.Mesh(new THREE.CircleGeometry(1,32), new THREE.MeshStandardMaterial({color:0x0b1526, roughness:0.03, metalness:0.35}));
+  m.rotation.x=-Math.PI/2; m.scale.set(sx,sz,1); m.position.set(x,0.045,z);
+  m.receiveShadow=true; scene.add(m);
+  ripple(x,0.06,z,Math.max(sx,sz)*1.4,0.25,0x8fb4e0);
+  return m;
+}
+puddle(13,12.8,1.3,0.75); puddle(17.2,17,1.9,1.1); puddle(5.6,12.6,1.0,0.6);
+puddle(12.6,5.4,0.75,0.5); puddle(-3,13,0.95,0.55); puddle(14.8,3.2,0.7,0.45);
+glow(13,0.055,12.8,2.0,1.1,0x8fc4ff,0.22);
+glow(17.2,0.055,17,2.4,1.3,0x9fc0ff,0.2);
+glow(12.6,0.055,5.4,1.2,0.8,0x7fc4ff,0.18);
+/* 路面随机雨滴环 */
+for(let i=0;i<14;i++){
+  const onRoad = Math.random()<0.5;
+  const x = onRoad? (-20+Math.random()*40) : (10+Math.random()*11);
+  const z = onRoad ? (9.5+Math.random()*11.5) : (-20+Math.random()*29);
+  if(x>9.2&&z<9.2) continue;
+  ripple(x,0.055,z,1.2+Math.random()*1.2,0.3+Math.random()*0.25,0x8fb0dd);
+}
+
+/* ============================================================
+   便利店建筑
+   ============================================================ */
+const store = new THREE.Group(); scene.add(store);
+const wallMat = T(0xece6d8);
+/* 室内地面 */
+B(16,0.12,10,0xd0c6ad,-3,0.12,-7,store,{mat:T(0xd0c6ad)});
+/* 墙体 */
+B(16,4.8,0.25,0,-3,2.55,-11.95,store,{mat:wallMat});
+B(0.25,4.8,9.8,0,-10.9,2.55,-7,store,{mat:wallMat});
+B(0.25,4.8,9.8,0,4.9,2.55,-7,store,{mat:wallMat});
+/* 室内吊顶 */
+B(15.4,0.12,9.4,0,-3,4.4,-7,store,{mat:T(0xf4f0e8)});
+
+/* 玻璃幕墙材质 */
+const glassMat = new THREE.MeshPhysicalMaterial({color:0xdceeff, transparent:true, opacity:0.1, roughness:0.05, metalness:0, clearcoat:1, clearcoatRoughness:0.08, side:THREE.DoubleSide, depthWrite:false});
+const frameMat = T(0xf4f4f0);
+/* 门槛/横梁 */
+B(16,0.35,0.2,0,-3,0.28,-1.9,store,{mat:frameMat});
+B(16,0.4,0.24,0,-3,3.15,-1.9,store,{mat:frameMat});
+/* 竖框 + 固定橱窗 */
+const posts=[-11,-8,-4.8,-2.2,1,5];
+posts.forEach(x=>B(0.18,2.6,0.18,0,x,1.72,-1.9,store,{mat:frameMat}));
+const bays=[[-11,-8],[-8,-4.8],[-2.2,1],[1,5]];
+bays.forEach(b=>{
+  const w=(b[1]-b[0])-0.22;
+  const g=B(w,2.5,0.04,0,(b[0]+b[1])/2,1.72,-1.88,store,{mat:glassMat,cast:false,rcv:false});
+  B(w,0.07,0.08,0,(b[0]+b[1])/2,0.62,-1.85,store,{mat:frameMat});
+  B(w,0.07,0.08,0,(b[0]+b[1])/2,2.82,-1.85,store,{mat:frameMat});
+});
+
+/* 自动移门 */
+const doorL=new THREE.Group(), doorR=new THREE.Group();
+doorL.position.set(-4.15,0,-1.62); doorR.position.set(-2.85,0,-1.62);
+scene.add(doorL,doorR);
+function doorPanel(g){
+  B(1.14,2.25,0.03,0,0,1.62,0,g,{mat:glassMat,cast:false,rcv:false});
+  B(1.28,0.09,0.08,0,0,0.5,0,g,{mat:frameMat});
+  B(1.28,0.09,0.08,0,0,2.76,0,g,{mat:frameMat});
+  B(0.07,2.4,0.08,0,-0.61,1.62,0,g,{mat:frameMat});
+  B(0.07,2.4,0.08,0,0.61,1.62,0,g,{mat:frameMat});
+  Cyl(0.022,0.022,0.55,0xd8dce4,0.5,1.45,0.08,g,8);
+}
+doorPanel(doorL); doorPanel(doorR);
+/* 门贴 入/出 */
+Plane(0.3,0.3,texIn,-4.15,0.55,-1.56,scene,{transparent:true});
+Plane(0.3,0.3,texOut,-2.85,0.55,-1.56,scene,{transparent:true});
+/* OPEN 灯牌 */
+const openMat=new THREE.MeshStandardMaterial({map:texOpen, emissive:0xffffff, emissiveMap:texOpen, emissiveIntensity:1.3, fog:false});
+Plane(0.7,0.35,texOpen,-3.5,2.62,-1.55,scene,{mat:openMat,transparent:false});
+addFlicker(openMat,1.3,7.7);
+halo(-3.5,2.62,-1.52,0.9,0.5,0x8fd0ff,0.45);
+
+/* 招牌 */
+B(16,1.45,0.22,0,-3,3.95,-1.9,store,{mat:T(0x102a63)});
+const signMat=new THREE.MeshStandardMaterial({map:texMainSign, emissive:0xffffff, emissiveMap:texMainSign, emissiveIntensity:1.15, fog:false});
+Plane(15.6,1.15,texMainSign,-3,3.98,-1.76,store,{mat:signMat,transparent:false});
+addFlicker(signMat,1.15,2.1);
+halo(-3,3.98,-1.7,16.5,1.8,0x3f8bff,0.18,store);
+halo(-3,1.75,-1.5,15.2,2.3,0xffd9a0,0.06,scene);
+/* 侧面竖灯箱 */
+B(0.12,1.5,0.9,0,5.4,3.95,-1.9,store,{mat:T(0x102a63)});
+const bladeMat=new THREE.MeshStandardMaterial({map:texBladeSign, emissive:0xffffff, emissiveMap:texBladeSign, emissiveIntensity:1.2, fog:false});
+Plane(0.84,1.4,texBladeSign,5.47,3.95,-1.9,store,{mat:bladeMat,rot:[0,Math.PI/2,0],transparent:false});
+addFlicker(bladeMat,1.2,11.3);
+halo(5.51,3.95,-1.9,1.0,1.7,0x66b0ff,0.18,store,[0,Math.PI/2,0]);
+
+/* 雨棚 */
+B(17,0.2,1.4,0,-3,3.05,-1.25,store,{mat:T(0xf2f2ee)});
+B(17,0.14,0.1,0,-3,2.96,-0.54,store,{mat:T(0x2f8fdd)});
+const soffitMat=new THREE.MeshStandardMaterial({color:0xffe6c2, emissive:0xffc98a, emissiveIntensity:0.9, fog:false});
+B(16.4,0.04,1.05,0,-3,2.93,-1.22,store,{mat:soffitMat,cast:false});
+[-9,-3.5,2].forEach(x=>{
+  const d=new THREE.Mesh(new THREE.CircleGeometry(0.11,18), new THREE.MeshStandardMaterial({color:0xfff2dd,emissive:0xffd9a0,emissiveIntensity:1.6,fog:false}));
+  d.position.set(x,2.9,-1.22); d.rotation.x=Math.PI/2; d.castShadow=false; store.add(d);
+});
+/* 落水管 */
+Cyl(0.05,0.05,3.0,0xb8c0cc,-10.85,1.6,-1.75,store,8);
+Cyl(0.05,0.05,3.0,0xb8c0cc,4.85,1.6,-1.75,store,8);
+
+/* 屋顶 */
+B(16.4,0.3,10.2,0,-3,4.78,-7,store,{mat:T(0xd9dde4)});
+B(16.4,0.5,0.22,0,-3,4.95,-1.95,store,{mat:T(0xf2f2ee)});
+B(16.4,0.5,0.22,0,-3,4.95,-12.05,store,{mat:T(0xd0d6df)});
+B(0.22,0.5,10.2,0,-11.1,4.95,-7,store,{mat:T(0xd0d6df)});
+B(0.22,0.5,10.2,0,5.1,4.95,-7,store,{mat:T(0xd0d6df)});
+B(2.2,0.8,1.6,0,-8,5.2,-10.4,store,{mat:T(0x99a3b2),outline:true});
+Cyl(0.22,0.22,0.7,0xb8c0cc,-3,5.1,-10.6,store,16);
+Cyl(0.15,0.15,0.5,0xb8c0cc,1,5.0,-10.7,store,12);
+
+/* 玻璃上的雨水痕迹 */
+const streakMat=new THREE.MeshBasicMaterial({map:texStreak,transparent:true,opacity:0.55,depthWrite:false,side:THREE.DoubleSide});
+const streaks=Plane(15.7,2.55,texStreak,-3,1.75,-1.5,scene,{mat:streakMat,transparent:true});
+texStreak.repeat.set(3,1);
+
+/* 门垫 */
+Plane(2.4,0.95,texMat,-3.5,0.185,-1.15,scene,{rot:[-Math.PI/2,0,0],transparent:true});
+
+/* 室内灯光 */
+const panelMat=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xfff2dd,emissiveIntensity:2.0,fog:false});
+[[-6.5,-8.5],[0,-8.5],[-6.5,-5],[0,-5]].forEach(p=>{
+  B(3.2,0.06,1.1,0,p[0],4.33,p[1],store,{mat:panelMat,cast:false});
+});
+const pl1=new THREE.PointLight(0xffd9a6,1.6,18,1); pl1.position.set(-6,4.05,-7.5); scene.add(pl1);
+const pl2=new THREE.PointLight(0xffe0b8,1.28,16,1); pl2.position.set(-1,4.05,-4.5); scene.add(pl2);
+const pl3=new THREE.PointLight(0xcfe6ff,0.9,12,1); pl3.position.set(3.4,3.0,-7.5); scene.add(pl3);
+const pl4=new THREE.PointLight(0xffd9a8,1.05,12,1); pl4.position.set(-3.5,3.2,-3.4); scene.add(pl4);
+const pl6=new THREE.PointLight(0xffd9a8,0.5,9,1); pl6.position.set(-3.5,2.5,-1.3); scene.add(pl6);
+const pl5=new THREE.PointLight(0xffe2b8,1.15,14,1); pl5.position.set(-3,3.6,-10.2); scene.add(pl5);
+/* 室内暖光帘（透过玻璃的暖色溢出） */
+const texWarm = canvasTex(16,256,(g,w,h)=>{
+  const grd=g.createLinearGradient(0,0,0,h);
+  grd.addColorStop(0,'rgba(255,200,130,0.9)'); grd.addColorStop(0.55,'rgba(255,214,160,0.55)'); grd.addColorStop(1,'rgba(255,224,180,0.25)');
+  g.fillStyle=grd; g.fillRect(0,0,w,h);
+});
+const warmCard=new THREE.Mesh(new THREE.PlaneGeometry(15.5,2.7),new THREE.MeshBasicMaterial({map:texWarm,transparent:true,opacity:0.2,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,fog:false}));
+warmCard.position.set(-3,1.85,-2.35); store.add(warmCard);
+
+/* ============================================================
+   店内陈设
+   ============================================================ */
+const productPalette=[0xe85548,0x3b9af5,0xf5c542,0x38c98a,0xf076c0,0xff8a3d,0x8e6bd9,0x7dd3fc,0xe8e8f0,0x9aa6b8];
+const allProducts=[];
+function pushProduct(x,y,z,sx,sy,sz,color){ allProducts.push({x,y,z,sx,sy,sz,color}); }
+
+/* 背板货架 */
+function backShelf(cx){
+  const frame=T(0x5a83c4);
+  B(4.6,2.1,0.7,0,cx,1.25,-11.45,store,{mat:frame,outline:true});
+  B(4.4,1.9,0.06,0,cx,1.3,-11.78,store,{mat:T(0xe8e2d6)});
+  B(4.6,0.3,0.64,0,cx,2.34,-11.45,store,{mat:T(0x3f6fb8)});
+  B(4.2,0.12,0.08,0,cx,2.34,-11.1,store,{mat:T(0xeaf2ff)});
+  [0.55,1.05,1.55,2.05].forEach(y=>B(4.4,0.06,0.62,0,cx,y,-11.45,store,{mat:T(0xf2f4f8)}));
+  for(let t=0;t<4;t++){
+    const y=0.55+t*0.5+0.22;
+    for(let i=0;i<13;i++){
+      const x=cx-2.08+i*0.345+ (Math.random()-0.5)*0.05;
+      const big = (t===3 && i%3===0);
+      pushProduct(x, y+(big?0.06:0), -11.12, big?0.34:0.3, big?0.52:0.4, 0.18, productPalette[(i*2+t*3+Math.floor(cx*7)+300)%productPalette.length]);
+    }
+    /* 后排补货 */
+    for(let i=0;i<10;i++){
+      const x=cx-1.9+i*0.42;
+      pushProduct(x,y-0.03,-11.4,0.26,0.34,0.16, productPalette[(i+t*5+Math.floor(cx*5)+250)%productPalette.length]);
+    }
+  }
+}
+[-8.4,-3.5,1.4].forEach(backShelf);
+
+/* 左墙开放式货架 */
+B(0.7,1.9,5.0,0,-10.52,1.12,-8.2,store,{mat:T(0x5a83c4),outline:true});
+[0.55,1.05,1.55].forEach(y=>B(0.62,0.06,4.8,0,-10.52,y,-8.2,store,{mat:T(0xf2f4f8)}));
+for(let t=0;t<3;t++){
+  const y=0.55+t*0.5+0.22;
+  for(let i=0;i<15;i++){
+    const z=-10.4+i*0.32;
+    pushProduct(-10.15,y,z,0.2,0.4,0.24,productPalette[(i+t*4)%productPalette.length]);
+  }
+}
+/* 储物柜 */
+B(0.55,1.9,1.5,0,-10.55,1.12,-10.7,store,{mat:T(0x8aa0b8),outline:true});
+B(0.06,0.06,1.3,0,-10.25,1.4,-10.7,store,{mat:T(0x5a6b85)});
+B(0.06,0.06,1.3,0,-10.25,0.75,-10.7,store,{mat:T(0x5a6b85)});
+
+/* 杂志架 */
+B(0.55,1.0,1.5,0,-10.5,0.65,-3.3,store,{mat:T(0xd8dce4),outline:true});
+for(let r=0;r<2;r++)for(let i=0;i<4;i++){
+  Plane(0.32,0.44,texMags[(r*4+i)%texMags.length],-10.16,0.42+r*0.46,-3.9+i*0.36,store,{rot:[0,Math.PI/2,0]});
+}
+
+/* 饮料冰柜（右墙，5 台） */
+const allCans=[];
+function fridge(zc){
+  B(0.82,3.0,1.66,0,4.4,1.68,zc,store,{mat:T(0xeef1f6),outline:true});
+  B(0.05,2.45,1.52,0,4.0,1.62,zc,store,{mat:new THREE.MeshStandardMaterial({color:0xdfeeff,emissive:0xbfe0ff,emissiveIntensity:0.75}),cast:false});
+  /* 门玻璃 */
+  [-0.38,0.38].forEach(off=>{
+    B(0.04,2.35,0.72,0,3.95,1.6,zc+off,store,{mat:glassMat,cast:false,rcv:false});
+    B(0.06,2.35,0.05,0,3.92,1.6,zc+off-0.36,store,{mat:T(0xd0d6df)});
+    B(0.06,2.35,0.05,0,3.92,1.6,zc+off+0.36,store,{mat:T(0xd0d6df)});
+    B(0.06,0.06,0.72,0,3.92,0.45,zc+off,store,{mat:T(0xd0d6df)});
+    B(0.06,0.06,0.72,0,3.92,2.75,zc+off,store,{mat:T(0xd0d6df)});
+  });
+  B(0.5,0.16,1.5,0,4.15,3.2,zc,store,{mat:new THREE.MeshStandardMaterial({color:0xbfe6ff,emissive:0x7fc4ff,emissiveIntensity:1.4}),cast:false});
+  /* 饮料罐 */
+  for(let s=0;s<3;s++){
+    const y=0.75+s*0.66;
+    for(let row=0;row<2;row++)for(let col=0;col<5;col++){
+      allCans.push({x:4.16,y:y,z:zc-0.55+col*0.28,sx:0.1,sy:0.19,sz:0.1,color:productPalette[(s*5+col+row*2+Math.floor(zc*10)+300)%productPalette.length]});
+    }
+  }
+}
+[-10.3,-8.64,-6.98,-5.32,-3.66].forEach(fridge);
+
+/* 中岛货架 */
+function island(x,z){
+  B(3.4,1.6,1.1,0,x,0.98,z,store,{mat:T(0x5a83c4),outline:true});
+  B(0.12,1.5,1.02,0,x-1.64,0.95,z,store,{mat:T(0x3f6fb8)});
+  B(0.12,1.5,1.02,0,x+1.64,0.95,z,store,{mat:T(0x3f6fb8)});
+  [0.55,1.0,1.45].forEach(y=>{
+    B(3.3,0.06,1.0,0,x,y,z,store,{mat:T(0xf2f4f8)});
+    for(let i=0;i<11;i++){
+      const xx=x-1.5+i*0.3;
+      pushProduct(xx,y+0.22,z+0.32,0.28,0.42,0.18,productPalette[(i)%productPalette.length]);
+      pushProduct(xx,y+0.22,z-0.32,0.28,0.42,0.18,productPalette[(i+4)%productPalette.length]);
+      if(i%3===0){
+        pushProduct(xx+0.06,y+0.26,z+0.34,0.34,0.5,0.2,productPalette[(i+2)%productPalette.length]);
+        pushProduct(xx+0.06,y+0.26,z-0.34,0.34,0.5,0.2,productPalette[(i+6)%productPalette.length]);
+      }
+    }
+  });
+  B(3.4,0.08,0.1,0,x,1.72,z+0.5,store,{mat:T(0x3f6fb8)});
+  B(3.4,0.08,0.1,0,x,1.72,z-0.5,store,{mat:T(0x3f6fb8)});
+}
+island(-6.2,-6.6); island(-0.6,-6.2);
+
+/* 便当 / 饭团冷藏柜 */
+B(2.3,0.95,0.95,0,-7,0.66,-3.3,store,{mat:T(0xeef1f6),outline:true});
+B(2.1,0.05,0.75,0,-7,1.15,-3.3,store,{mat:new THREE.MeshStandardMaterial({color:0xfff2dd,emissive:0xffd9a0,emissiveIntensity:0.5,fog:false}),cast:false});
+for(let i=0;i<7;i++){
+  pushProduct(-7.9+i*0.3,1.3,-3.3,0.26,0.12,0.22,productPalette[(i+2)%productPalette.length]);
+  if(i<6){
+    const tri=new THREE.Mesh(new THREE.ConeGeometry(0.11,0.13,3), T(0x22242a));
+    tri.position.set(-7.75+i*0.3,1.32,-3.62); tri.rotation.set(Math.PI/2,0,Math.PI/2);
+    tri.castShadow=false; store.add(tri);
+  }
+}
+B(2.2,0.5,0.03,0,-7,1.4,-2.8,store,{mat:glassMat,cast:false,rcv:false});
+B(2.2,0.03,0.85,0,-7,1.68,-3.2,store,{mat:glassMat,rot:[0.35,0,0],cast:false,rcv:false});
+
+/* 收银台 */
+B(2.3,1.05,0.85,0,-1,0.72,-3.5,store,{mat:T(0xeef1f6),outline:true});
+B(2.4,0.08,0.95,0,-1,1.27,-3.5,store,{mat:T(0xd8dce4)});
+B(2.3,0.55,0.06,0,-1,0.82,-3.05,store,{mat:T(0x3f6fb8)});
+/* 收银机 */
+B(0.4,0.2,0.35,0,-1.6,1.42,-3.3,store,{mat:T(0xf4f6fa)});
+B(0.4,0.28,0.05,0,-1.6,1.6,-3.2,store,{mat:T(0x2a3242),rot:[-0.5,0,0]});
+/* 咖啡机 */
+B(0.55,0.72,0.45,0,-0.1,1.66,-3.5,store,{mat:T(0x3a3f4a),outline:true});
+B(0.42,0.16,0.03,0,-0.1,1.82,-3.26,store,{mat:T(0x11141b)});
+B(0.04,0.08,0.06,0,-0.25,1.35,-3.22,store,{mat:T(0x9aa6b8)});
+B(0.04,0.08,0.06,0,0.05,1.35,-3.22,store,{mat:T(0x9aa6b8)});
+Cyl(0.07,0.07,0.12,0xf4f2ee,-0.25,1.36,-3.0,store,12);
+/* 微波炉 */
+B(0.6,0.38,0.42,0,-1.85,1.49,-3.8,store,{mat:T(0xb9c0cc),outline:true});
+B(0.4,0.26,0.03,0,-1.9,1.49,-3.58,store,{mat:T(0x1c2433)});
+
+/* 关东煮柜台 */
+B(1.2,1.05,0.8,0,1.9,0.72,-3.4,store,{mat:T(0x9a3f31),outline:true});
+B(1.05,0.1,0.62,0,1.9,1.28,-3.4,store,{mat:new THREE.MeshStandardMaterial({color:0x4a2014,emissive:0xff7a3a,emissiveIntensity:0.6}),cast:false});
+B(1.1,0.5,0.03,0,1.9,1.55,-2.98,store,{mat:glassMat,cast:false,rcv:false});
+B(1.1,0.03,0.7,0,1.9,1.82,-3.3,store,{mat:glassMat,rot:[0.4,0,0],cast:false,rcv:false});
+for(let i=0;i<4;i++){
+  Cyl(0.07,0.07,0.06,0xd8c9a8,1.6+i*0.2,1.36,-3.4+((i%2)?0.18:-0.18),store,10);
+}
+/* 关东煮小旗 */
+const texOden=canvasTex(128,96,(g,w,h)=>{g.fillStyle='#c93b2e';g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='bold 44px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('おでん',w/2,h/2);});
+Cyl(0.02,0.02,0.7,0x888,2.45,1.65,-2.95,store,6);
+Plane(0.34,0.26,texOden,2.45,1.85,-2.95,store);
+
+/* 蒸汽 */
+function steamAt(x,z){
+  for(let i=0;i<5;i++){
+    const s=new THREE.Sprite(new THREE.SpriteMaterial({map:texSteam,color:0xffffff,transparent:true,opacity:0,depthWrite:false}));
+    s.position.set(x,1.35,z); s.scale.set(0.12,0.12,1); store.add(s);
+    const ph=i/5;
+    anim.push((t)=>{
+      const k=(t*0.2+ph)%1;
+      s.position.set(x+Math.sin(t*2.2+i)*0.05,1.4+k*0.95,z+Math.cos(t*1.7+i)*0.03);
+      const sc=0.1+k*0.34; s.scale.set(sc,sc,1);
+      s.material.opacity = k<0.2 ? (k/0.2)*0.22 : 0.22*(1-(k-0.2)/0.8);
+    });
+  }
+}
+steamAt(1.9,-3.4);
+
+/* 购物篮堆叠 */
+for(let i=0;i<3;i++){
+  B(0.5,0.16,0.38,i===0?0xe85548:(i===1?0x3f9ad8:0x38c98a),-5.4,0.3+i*0.17,-2.9,store,{mat:T(i===0?0xe85548:(i===1?0x3f9ad8:0x38c98a))});
+}
+
+/* 后场门 */
+B(1.1,2.3,0.06,0,-8.8,1.33,-11.8,store,{mat:T(0x9aa6b8),outline:true});
+Plane(0.8,0.4,texStaff,-8.8,2.2,-11.75,store);
+B(0.06,0.06,0.1,0x33405c,-8.4,1.25,-11.72,store,{mat:T(0x33405c)});
+
+/* 店内海报 */
+Plane(0.7,1.05,texPosterA,2.6,2.9,-11.8,store);
+Plane(0.7,1.05,texPosterB,-10.76,2.9,-9.4,store,{rot:[0,Math.PI/2,0]});
+Plane(0.7,1.05,texPosterC,4.76,2.9,-2.6,store,{rot:[0,-Math.PI/2,0]});
+/* 地面导视黄线 */
+for(let z=-2.6;z>-10;z-=0.9){
+  B(0.12,0.012,0.55,0,-3.5,0.19,z,store,{mat:new THREE.MeshBasicMaterial({color:0xe8c84a}),cast:false,rcv:false});
+}
+
+/* 批量生成实例化商品 */
+const productGeo=new THREE.BoxGeometry(1,1,1);
+const productByColor={};
+allProducts.forEach(p=>{ (productByColor[p.color] = productByColor[p.color]||[]).push(p); });
+Object.keys(productByColor).forEach(col=>{
+  const items=productByColor[col];
+  const arr=items.map(p=>({x:p.x,y:p.y,z:p.z,sx:p.sx,sy:p.sy,sz:p.sz}));
+  instanced(productGeo, arr, T(parseInt(col)), store);
+});
+const canGeo=new THREE.CylinderGeometry(1,1,1,10);
+const canByColor={};
+allCans.forEach(p=>{ (canByColor[p.color] = canByColor[p.color]||[]).push(p); });
+Object.keys(canByColor).forEach(col=>{
+  instanced(canGeo, canByColor[col], T(parseInt(col)), store);
+});
+
+/* ============================================================
+   外部街角
+   ============================================================ */
+/* 自动贩卖机 */
+const vm = new THREE.Group(); vm.position.set(6.7,0,-0.9); scene.add(vm);
+B(1.6,3.2,0.9,0,0,1.6,0,vm,{mat:T(0xdfe5ee),outline:true});
+B(1.5,0.12,0.85,0,0,3.12,0,vm,{mat:T(0x3a3f6b)});
+const vendingMat=new THREE.MeshStandardMaterial({map:texVending,emissive:0xffffff,emissiveMap:texVending,emissiveIntensity:0.95,fog:false});
+Plane(1.42,2.9,texVending,0,1.62,0.46,vm,{mat:vendingMat,transparent:false});
+addFlicker(vendingMat,0.95,4.4);
+halo(0,1.62,0.5,1.7,3.3,0xb06bff,0.18,vm);
+B(1.6,0.1,0.95,0,0,0.05,0,vm,{mat:T(0x8892a0)});
+/* 侧墙广告海报 */
+B(0.08,2.0,1.5,0,5.02,2.4,-7.5,scene,{mat:T(0x2c3340)});
+Plane(1.32,1.85,texPosterB,5.07,2.4,-7.5,scene,{rot:[0,Math.PI/2,0]});
+Cyl(0.04,0.04,3.6,0xa8b0bc,5.02,1.9,-11.2,scene,8);
+glow(6.7,0.19,-0.2,3.2,1.6,0x7fc4ff,0.45);
+glow(6.7,0.2,-0.2,1.4,0.7,0xff6ad5,0.28);
+
+/* 自行车 */
+function makeBike(color){
+  const g=new THREE.Group();
+  const wheelGeo=new THREE.TorusGeometry(0.32,0.035,8,20);
+  [-0.55,0.55].forEach(wx=>{
+    const w=new THREE.Mesh(wheelGeo,T(0x20242c)); w.position.set(wx,0.32,0); w.castShadow=true; g.add(w);
+    for(let s=0;s<6;s++){
+      const a=s/6*Math.PI*2;
+      tube(V3(wx,0.32,0),V3(wx+Math.cos(a)*0.29,0.32+Math.sin(a)*0.29,0),0.008,0x8a92a0,g,6);
+    }
+  });
+  /* 挡泥板 */
+  const fenderGeo=new THREE.TorusGeometry(0.36,0.025,6,16,Math.PI*0.75);
+  [0.55,-0.55].forEach((wx,i)=>{
+    const f=new THREE.Mesh(fenderGeo,T(0x9aa6b8)); f.position.set(wx,0.32,0); f.rotation.z=Math.PI/2+ (i?0.2:-0.1); g.add(f);
+  });
+  const A=V3(-0.55,0.32,0), Bp=V3(0.55,0.32,0), S=V3(-0.18,0.8,0), H=V3(0.5,0.8,0), K=V3(0,0.48,0);
+  tube(A,K,0.025,color,g); tube(K,Bp,0.025,color,g); tube(A,S,0.025,color,g);
+  tube(S,H,0.025,color,g); tube(H,Bp,0.025,color,g); tube(S,K,0.025,color,g);
+  tube(H,V3(0.55,1.0,0),0.025,color,g);
+  tube(V3(0.55,1.0,0),V3(0.55,1.0,0.28),0.018,color,g,6);
+  tube(V3(0.55,1.0,0),V3(0.55,1.0,-0.28),0.018,color,g,6);
+  B(0.24,0.05,0.16,0,-0.18,0.88,0,g,{mat:T(0x22242c)});
+  const crank=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.05,10),T(0x8a92a0));
+  crank.rotation.x=Math.PI/2; crank.position.set(0,0.48,0); g.add(crank);
+  /* 车筐 */
+  const basket=new THREE.Mesh(new THREE.CylinderGeometry(0.2,0.16,0.22,10,1,true),T(0x5a6372));
+  basket.position.set(0.62,0.78,0); g.add(basket);
+  tube(K,V3(0,0.06,0),0.015,0x444d5c,g,6);
+  g.traverse(o=>{if(o.isMesh){o.castShadow=true;}});
+  return g;
+}
+const bike1=makeBike(0x5a9fd8); bike1.position.set(7.0,0.18,-5.4); bike1.rotation.y=Math.PI; scene.add(bike1);
+const bike2=makeBike(0xd8804a); bike2.position.set(7.9,0.18,-7.4); bike2.rotation.y=Math.PI; bike2.scale.setScalar(0.96); scene.add(bike2);
+/* 停车线 & 车架 */
+for(let x=6.3;x<=8.3;x+=0.8) B(0.06,0.012,1.9,0,x,0.186,-6.4,scene,{mat:new THREE.MeshBasicMaterial({color:0xeef1f6}),cast:false,rcv:false});
+tube(V3(6.35,0.28,-4.4),V3(6.35,0.28,-8.4),0.03,0x444d5c); tube(V3(6.35,0.55,-4.4),V3(6.35,0.55,-8.4),0.025,0x444d5c);
+
+/* 雨伞架 */
+const us=new THREE.Group(); us.position.set(-6.0,0,-1.25); scene.add(us);
+Cyl(0.22,0.2,0.5,0x8a92a0,0,0.25,0,us,14);
+[0xd8503e,0x3f7fd8,0xe8c04a].forEach((c,i)=>{
+  const ox=[-0.08,0.06,0.12][i], oz=[0.02,-0.08,0.07][i];
+  Cyl(0.014,0.014,0.85,0x444d5c,ox,0.85,oz,us,6,{rot:[0,0,[0.12,-0.08,0.06][i]]});
+  const cone=new THREE.Mesh(new THREE.ConeGeometry(0.26,0.22,14),T(c));
+  cone.position.set(ox+0.05,1.18,oz); cone.rotation.z=-[0.12,-0.08,0.06][i]; cone.castShadow=true; us.add(cone);
+});
+
+/* 分类垃圾桶 */
+function trashBin(x,z,color,label){
+  const g=new THREE.Group(); g.position.set(x,0,z); scene.add(g);
+  B(0.45,0.72,0.4,0,0,0.36,0,g,{mat:T(color),outline:true});
+  B(0.5,0.07,0.45,0,0,0.75,0,g,{mat:T(0x9aa6b8)});
+  B(0.2,0.04,0.05,0,0,0.79,0,g,{mat:T(0x33405c)});
+  return g;
+}
+trashBin(3.0,-1.2,0x5a9fd8); trashBin(3.55,-1.2,0x4ab07a); trashBin(2.45,-1.2,0x9aa6b8);
+
+/* 路灯 */
+const lamp=new THREE.Group(); lamp.position.set(-8.6,0,4.6); scene.add(lamp);
+Cyl(0.07,0.09,6,0x3a414e,0,3,0,lamp,12);
+Cyl(0.18,0.22,0.3,0x3a414e,0,0.15,0,lamp,12);
+tube(V3(0,5.85,0),V3(1.35,6.15,0),0.05,0x3a414e,lamp);
+B(0.55,0.14,0.28,0,1.55,6.05,0,lamp,{mat:T(0x2c3340)});
+const lampLens=new THREE.Mesh(new THREE.BoxGeometry(0.45,0.05,0.22),new THREE.MeshStandardMaterial({color:0xffe9c0,emissive:0xffc98a,emissiveIntensity:2.2,fog:false}));
+lampLens.position.set(1.55,5.96,0); lamp.add(lampLens);
+const lampLight=new THREE.PointLight(0xffc98a,1.1,13,2); lampLight.position.set(1.55,5.8,0); lamp.add(lampLight);
+haloSprite(-7.05,6.0,4.6,1.7,0xffb96e,0.5);
+glow(-7.05,0.19,4.6,3.4,2.0,0xffb96e,0.5);
+
+/* 电线杆 */
+function pole(x,z,h){
+  const g=new THREE.Group(); g.position.set(x,0,z); scene.add(g);
+  Cyl(0.11,0.14,h,0x5a4a3c,0,h/2,0,g,10);
+  B(2.0,0.12,0.14,0,0,h*0.82,0,g,{mat:T(0x5a4a3c)});
+  for(let i=-1;i<=1;i++){
+    Cyl(0.05,0.05,0.18,0xe8e8f0,i*0.8,h*0.82+0.14,0,g,8);
+  }
+  return g;
+}
+const poleA=pole(8.3,8.1,8);
+const poleB=pole(-15,6.6,7.2);
+const poleC=pole(20.7,-2,7.2);
+/* 垂落电线（弧垂） */
+function wire(a,b,off){
+  const mid=a.clone().add(b).multiplyScalar(0.5); mid.y-=0.55+Math.random()*0.25;
+  const curve=new THREE.QuadraticBezierCurve3(a,mid,b);
+  const geo=new THREE.BufferGeometry().setFromPoints(curve.getPoints(20));
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0x10131a,transparent:true,opacity:0.85}));
+  scene.add(line);
+}
+wire(V3(8.3,6.55,8.1),V3(-15,5.9,6.6));
+wire(V3(8.3,6.75,8.1),V3(-15,6.1,6.6));
+wire(V3(8.3,6.55,8.1),V3(20.7,5.9,-2));
+wire(V3(8.3,6.75,8.1),V3(20.7,6.1,-2));
+wire(V3(-15,6.0,6.6),V3(-20.9,5.6,2.5));
+wire(V3(5.1,5.6,-4.2),V3(8.3,6.55,8.1));
+
+/* 交通信号灯 */
+const sig=new THREE.Group();
+tube(V3(8.3,6.0,8.1),V3(11.7,6.0,8.1),0.07,0x3a414e);
+sig.position.set(11.8,0,8.1); scene.add(sig);
+B(0.42,1.25,0.32,0,0,5.65,0,sig,{mat:T(0x2c3340),outline:true});
+const sigLights={};
+['red','yellow','green'].forEach((c,i)=>{
+  const col={red:0xff3b2e,yellow:0xffc23a,green:0x33d68a}[c];
+  const mat=new THREE.MeshStandardMaterial({color:0x1a1a1a,emissive:col,emissiveIntensity:0.15,fog:false});
+  const lens=new THREE.Mesh(new THREE.CircleGeometry(0.13,20),mat);
+  lens.position.set(0,6.05-i*0.38,0.17); sig.add(lens);
+  const lens2=lens.clone(); lens2.rotation.y=Math.PI/2; lens2.position.set(0.22,6.05-i*0.38,0); sig.add(lens2);
+  sigLights[c]=mat;
+});
+const sigGlow=glow(12.6,0.05,9.8,2.2,1.2,0x33d68a,0.4);
+const sigHalo=haloSprite(11.8,5.7,8.42,0.95,0x33d68a,0.6);
+
+/* 护栏 */
+function railX(x0,x1,z){
+  const g=new THREE.Group(); scene.add(g);
+  for(let x=x0;x<=x1+0.01;x+=2) B(0.08,0.9,0.08,0,x,0.45,z,g,{mat:T(0xeef1f6)});
+  B(x1-x0,0.07,0.07,0,(x0+x1)/2,0.78,z,g,{mat:T(0xeef1f6)});
+  B(x1-x0,0.07,0.07,0,(x0+x1)/2,0.55,z,g,{mat:T(0xeef1f6)});
+}
+function railZ(z0,z1,x){
+  const g=new THREE.Group(); scene.add(g);
+  for(let z=z0;z<=z1+0.01;z+=2) B(0.08,0.9,0.08,0,x,0.45,z,g,{mat:T(0xeef1f6)});
+  B(0.07,0.07,z1-z0,0,x,0.78,(z0+z1)/2,g,{mat:T(0xeef1f6)});
+  B(0.07,0.07,z1-z0,0,x,0.55,(z0+z1)/2,g,{mat:T(0xeef1f6)});
+}
+railX(-21,-13,8.85); railX(3.4,8.4,8.85); railZ(-21,-4.6,8.85);
+
+/* 停车指示牌 */
+Cyl(0.05,0.05,2.2,0x5a6372,6.2,1.1,7.1,scene,8);
+Plane(0.7,0.7,texPSign,6.2,2.5,7.1,scene,{rot:[-0.15,0.35,0]});
+
+/* 小巷 */
+B(0.25,4.2,10.8,0,-20,2.1,-7,scene,{mat:T(0x6e7682)});
+B(9,4.2,0.25,0,-15.5,2.1,-12.4,scene,{mat:T(0x747c89)});
+B(0.25,4.2,2.2,0,-20,2.1,-0.3,scene,{mat:T(0x6e7682)});
+/* 巷内湿地 */
+Plane(8.6,10.2,new THREE.Texture(),-15.5,0.185,-7,scene,{rot:[-Math.PI/2,0,0],mat:new THREE.MeshStandardMaterial({color:0x101722,roughness:0.08,metalness:0.1}),transparent:false});
+/* 空调外机 */
+function acUnit(zc){
+  const g=new THREE.Group(); g.position.set(-11.2,0,zc); scene.add(g);
+  B(0.55,0.95,1.1,0,0,1.25,0,g,{mat:T(0xb8c0cc),outline:true});
+  const fan=new THREE.Group(); fan.position.set(-0.29,1.28,0); g.add(fan);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(0.3,0.03,8,20),T(0x5a6372)); ring.rotation.y=Math.PI/2; fan.add(ring);
+  const blades=new THREE.Mesh(new THREE.CircleGeometry(0.28,16),T(0x444d5c)); blades.rotation.y=Math.PI/2; fan.add(blades);
+  for(let i=0;i<4;i++){
+    const bl=B(0.02,0.2,0.08,0,0,0,0,fan,{mat:T(0x2c3340)});
+    bl.position.set(0,0.02,0); bl.rotation.x=i*Math.PI/2; bl.position.set(0,Math.cos(i*Math.PI/2)*0.12,Math.sin(i*Math.PI/2)*0.12);
+    bl.rotation.y=Math.PI/2;
+  }
+  anim.push(()=>{ fan.rotation.x += 0.04; });
+}
+acUnit(-9); acUnit(-5.4);
+/* 墙面管线 */
+Cyl(0.04,0.04,3.6,0x8a8278,-10.86,1.9,-10.4,scene,8);
+Cyl(0.04,0.04,3.0,0x8a8278,-10.86,1.6,-4.4,scene,8);
+/* 巷灯 */
+B(0.3,0.16,0.14,0,-19.8,2.6,-2.2,scene,{mat:T(0x33405c)});
+const alleyLamp=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.22),new THREE.MeshStandardMaterial({color:0xffe9c0,emissive:0xffc98a,emissiveIntensity:2.0}));
+alleyLamp.position.set(-19.84,2.6,-2.2); alleyLamp.rotation.y=Math.PI/2; scene.add(alleyLamp);
+glow(-19.2,0.2,-2.4,2.2,1.4,0xffc98a,0.45);
+ripple(-17,0.21,-3.2,1.1,0.25); ripple(-14,0.21,-6.5,1.3,0.2);
+/* 木箱 */
+B(0.7,0.55,0.7,0,-17,0.28,-3.6,scene,{mat:T(0x8a6a45),outline:true});
+B(0.6,0.45,0.6,0,-17,0.82,-3.6,scene,{mat:T(0x7a5a3c),outline:true});
+B(0.55,0.6,0.5,0,-15.2,0.3,-3.9,scene,{mat:T(0x8a6a45)});
+/* 公告栏（A 字板） */
+const board=new THREE.Group(); board.position.set(-11.9,0,-0.8); board.rotation.y=0.5; scene.add(board);
+B(0.95,1.15,0.06,0,0,1.15,0,board,{mat:T(0xf0ead8)});
+Plane(0.85,1.05,texBoard,0,1.15,0.04,board);
+tube(V3(-0.4,0,0),V3(0.1,0.9,0),0.025,0x6e5a40,board);
+tube(V3(0.4,0,0),V3(-0.1,0.9,0),0.025,0x6e5a40,board);
+
+/* 低空雨雾（贴地缓慢漂移） */
+const mistList=[];
+[[13,0.9,14,13,3.2],[-11,0.8,4,11,2.6],[17,1.0,-6,12,3.0]].forEach((m,i)=>{
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:texGlow,color:0x9fb6e0,transparent:true,opacity:0.07,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}));
+  sp.position.set(m[0],m[1],m[2]); sp.scale.set(m[3],m[4],1);
+  sp.userData={ox:m[0],ph:i*2.1,base:0.07}; mistList.push(sp); scene.add(sp);
+});
+anim.push((t)=>{
+  mistList.forEach(sp=>{
+    sp.position.x = sp.userData.ox + Math.sin(t*0.12+sp.userData.ph)*2.2;
+    sp.material.opacity = sp.userData.base*(0.7+0.3*Math.sin(t*0.3+sp.userData.ph));
+  });
+});
+/* 店前灯光倒影 */
+glow(-3.5,0.2,-0.9,10,2.6,0xffd9a0,0.5);
+glow(-3.5,0.195,-0.2,8.5,1.2,0x4aa3ff,0.3);
+glow(-3.5,0.05,9.8,9,2.6,0xffd9a0,0.3);
+glow(-3.5,0.052,10.9,12,1.7,0x3f8bff,0.22);
+glow(6.7,0.052,11,3,1.6,0xb06bff,0.22);
+glow(-3.5,0.05,12.4,7,2.2,0xffd9a0,0.18);
+glow(6.7,0.05,10.4,2.6,1.6,0x7fc4ff,0.3);
+/* 屋檐滴水点 + 地面涟漪 */
+for(let i=0;i<12;i++){
+  const x=-10.2+i*1.32;
+  const geo=new THREE.BufferGeometry().setFromPoints([V3(0,0,0),V3(0,-0.3,0)]);
+  const line=new THREE.Line(geo,new THREE.LineBasicMaterial({color:0xbcd2ee,transparent:true,opacity:0.5}));
+  scene.add(line);
+  const phase=Math.random();
+  ripple(x,0.2,-0.55,0.55,0.5+Math.random()*0.3,0x9ec0ea);
+  anim.push((t)=>{
+    const k=(t*0.8+phase)%1;
+    line.position.set(x,3.0-k*2.6,-0.55);
+    line.material.opacity=k<0.85?0.55:0.55*(1-(k-0.85)/0.15);
+  });
+}
+
+/* ============================================================
+   降雨系统
+   ============================================================ */
+const RAIN_N=MOBILE?2800:4200;
+const rainGeo=new THREE.BufferGeometry();
+const rainPos=new Float32Array(RAIN_N*6);
+const drops=[];
+function resetDrop(d,initial){
+  let x=-30+Math.random()*60, z=-30+Math.random()*60;
+  if(x>-11.5&&x<5.5&&z>-12.5&&z<-1.5){ x-=18; }
+  d.x=x; d.z=z;
+  d.y= initial ? Math.random()*34 : 30+Math.random()*6;
+  d.s=9+Math.random()*7;
+}
+for(let i=0;i<RAIN_N;i++){
+  const d={}; resetDrop(d,true); drops.push(d);
+  const idx=i*6;
+  rainPos[idx]=d.x; rainPos[idx+1]=d.y; rainPos[idx+2]=d.z;
+  rainPos[idx+3]=d.x+0.09; rainPos[idx+4]=d.y+0.36; rainPos[idx+5]=d.z+0.02;
+}
+rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+const rain=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0xaec6e8,transparent:true,opacity:0.26}));
+rain.frustumCulled=false; scene.add(rain);
+const WIND=1.6;
+function updateRain(dt){
+  for(let i=0;i<RAIN_N;i++){
+    const d=drops[i]; const idx=i*6;
+    d.y-=d.s*dt; d.x-=WIND*dt;
+    if(d.y<0.15||d.x<-31){ resetDrop(d,false); }
+    rainPos[idx]=d.x; rainPos[idx+1]=d.y; rainPos[idx+2]=d.z;
+    rainPos[idx+3]=d.x+0.09; rainPos[idx+4]=d.y+0.36; rainPos[idx+5]=d.z+0.02;
+  }
+  rainGeo.attributes.position.needsUpdate=true;
+}
+
+/* ============================================================
+   动画逻辑
+   ============================================================ */
+/* 自动门偶发开合 */
+let dState='wait', dT=0, dWait=5+Math.random()*6, doorOpen=0;
+anim.push((t,dt)=>{
+  dT+=dt;
+  if(dState==='wait'){ if(dT>dWait){dState='open';dT=0;} }
+  else if(dState==='open'){ doorOpen=Math.min(1,dT/1.1); if(dT>1.1+2.4){dState='close';dT=0;} }
+  else { doorOpen=1-Math.min(1,dT/1.1); if(dT>1.1){dState='wait';dT=0;dWait=6+Math.random()*8;} }
+  doorL.position.x=-4.15-1.15*doorOpen;
+  doorR.position.x=-2.85+1.15*doorOpen;
+});
+/* 招牌 / 灯箱闪烁 */
+anim.push((t)=>{
+  flickers.forEach(f=>{
+    let v=f.base;
+    const a=Math.sin(t*7+f.seed)+Math.sin(t*17.3+f.seed*1.7);
+    if(a>1.78) v*=0.2+Math.random()*0.4;
+    if(Math.sin(t*29+f.seed*3)>0.96) v*=0.55;
+    f.mat.emissiveIntensity=v;
+  });
+});
+/* 交通信号灯 */
+anim.push((t)=>{
+  const cyc=t%16, state=cyc<7?'green':cyc<10?'yellow':'red';
+  sigLights.red.emissiveIntensity=state==='red'?2.6:0.15;
+  sigLights.yellow.emissiveIntensity=state==='yellow'?2.4:0.15;
+  sigLights.green.emissiveIntensity=state==='green'?2.2:0.15;
+  const sigCol=state==='red'?0xff3b2e:state==='yellow'?0xffc23a:0x33d68a;
+  sigGlow.material.color.set(sigCol);
+  sigHalo.material.color.set(sigCol);
+  sigGlow.material.opacity=sigGlow.userData.baseOp*(state==='yellow'?0.6:1);
+  sigHalo.material.opacity=sigHalo.userData.baseOp*(state==='yellow'?0.5:1);
+});
+/* 玻璃雨痕下滑 */
+anim.push((t)=>{ texStreak.offset.y=-(t*0.045)%1; });
+/* 积水反光呼吸 */
+const glowList=[];
+scene.traverse(o=>{ if(o.userData&&o.userData.baseOp!==undefined) glowList.push(o); });
+anim.push((t)=>{
+  glowList.forEach((m,i)=>{ m.material.opacity=m.userData.baseOp*(0.88+0.12*Math.sin(t*1.8+i*1.3)); });
+  updateRain(dt);
+});
+
+/* ============================================================
+   渲染循环
+   ============================================================ */
+window.addEventListener('resize',()=>{
+  const a=window.innerWidth/window.innerHeight;
+  camera.fov = a<0.8?66:(a<1.2?45:38);
+  camera.aspect=a;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+const clock=new THREE.Clock();
+let dt=0;
+if(REDUCE){
+  renderer.render(scene,camera);
+  controls.addEventListener('change',()=>renderer.render(scene,camera));
+}else{
+  (function loop(){
+    requestAnimationFrame(loop);
+    dt=Math.min(clock.getDelta(),0.05);
+    const t=clock.elapsedTime;
+    for(let i=0;i<anim.length;i++) anim[i](t,dt);
+    controls.update();
+    renderer.render(scene,camera);
+  })();
+}
+window.__sceneReady=true;
+})();
+
+</script>
+</body>
+</html>

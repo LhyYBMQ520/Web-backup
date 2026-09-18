@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 生成 HTML 对比</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2.5' y='4.5' width='13' height='13' rx='2' fill='%23ffffff' stroke='%232563eb' stroke-width='1.6'/%3E%3Crect x='8.5' y='6.5' width='13' height='13' rx='2' fill='%23ffffff' stroke='%2316a34a' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
+<style>
+  :root{
+    --bg:#f5f6f8;
+    --card:#ffffff;
+    --border:#e4e7ec;
+    --border-soft:#eef0f3;
+    --text:#1f2937;
+    --text-dim:#6b7280;
+    --text-mute:#9ca3af;
+    --accent:#2563eb;
+    --accent-soft:#eff5ff;
+    --accent-border:#bfdbfe;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:#dbeafe}
+
+  /* ===== 顶部标题 ===== */
+  .page-head{max-width:1600px;margin:0 auto;padding:30px 20px 16px;text-align:center}
+  .page-head h1{font-size:24px;font-weight:700;color:#111827;letter-spacing:.01em}
+  .page-head h1 i{color:var(--accent);font-size:21px;margin-right:9px;vertical-align:-2px}
+  .page-head .subtitle{margin-top:6px;font-size:13px;color:var(--text-dim)}
+
+  main{max-width:1600px;margin:0 auto;padding:0 20px 46px}
+
+  /* ===== 统一提示词卡片 ===== */
+  .prompt-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    padding:15px 18px;margin-bottom:18px;
+  }
+  .prompt-label{
+    display:flex;align-items:center;gap:7px;
+    font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:10px;
+  }
+  .prompt-label > i{font-size:14px;color:var(--accent)}
+  .copy-btn{
+    margin-left:auto;display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:500;font-family:inherit;
+    color:var(--accent);background:var(--accent-soft);
+    border:1px solid var(--accent-border);border-radius:6px;
+    padding:5px 12px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+  }
+  .copy-btn:hover{background:#dbeafe}
+  .copy-btn i{font-size:12.5px}
+  .copy-btn.copied{color:#15803d;background:#f0fdf4;border-color:#bbf7d0}
+
+  #prompt{
+    background:#f9fafb;border:1px dashed var(--border);border-radius:8px;
+    padding:14px 16px;font-size:13.5px;line-height:1.95;color:#374151;
+    max-height:46vh;overflow:auto;
+  }
+  #prompt p{margin-bottom:10px}
+  #prompt p:last-child{margin-bottom:0}
+  #prompt p:first-child{margin-top:0}
+
+  /* ===== 模型模块网格 ===== */
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .model-card{
+    background:var(--card);border:1px solid var(--border);border-radius:10px;
+    overflow:hidden;display:flex;flex-direction:column;min-width:0;
+    box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .mc-head{
+    display:flex;align-items:center;gap:9px;padding:11px 14px;
+    border-bottom:1px solid var(--border-soft);background:#fcfcfd;
+  }
+  .mc-dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .mc-name{font-size:14px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  /* 思索强度徽章：Low / Medium / High / XHigh / Max */
+  .mc-badge{
+    display:inline-flex;align-items:center;gap:5px;flex:none;
+    font-size:11px;font-weight:700;letter-spacing:.02em;
+    border-radius:20px;padding:2px 10px;white-space:nowrap;
+  }
+  .mc-badge i{font-size:10.5px}
+  .mc-badge.lv-low{color:#475569;background:#f1f5f9;border:1px solid #cbd5e1}
+  .mc-badge.lv-mid{color:#1d4ed8;background:#dbeafe;border:1px solid #93c5fd}
+  .mc-badge.lv-high{color:#b45309;background:#fef3c7;border:1px solid #fde68a}
+  .mc-badge.lv-xhigh{color:#c2410c;background:#ffedd5;border:1px solid #fdba74}
+  .mc-badge.lv-max{color:#be123c;background:#ffe4e6;border:1px solid #fda4af}
+  /* 预览开关（眼睛） */
+  .mc-eye{
+    margin-left:auto;flex:none;display:inline-flex;align-items:center;justify-content:center;
+    width:30px;height:30px;border-radius:6px;border:1px solid var(--border);
+    background:#fff;color:var(--text-mute);cursor:pointer;
+    transition:background .15s,border-color .15s,color .15s;
+  }
+  .mc-eye:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-soft)}
+  .mc-eye i{font-size:14px}
+  .mc-eye.on{color:var(--accent);background:var(--accent-soft);border-color:var(--accent-border)}
+  .mc-open{
+    flex:none;display:inline-flex;align-items:center;gap:6px;
+    font-size:12px;color:var(--accent);text-decoration:none;
+    background:var(--accent-soft);border:1px solid var(--accent-border);
+    padding:5px 11px;border-radius:6px;white-space:nowrap;transition:background .15s;
+  }
+  .mc-open:hover{background:#dbeafe}
+  .mc-open i{font-size:11px}
+  /* 预览视口：固定高度，iframe 与占位绝对定位重叠，任一状态都不会叠加撑高 */
+  .mc-viewport{position:relative;height:72vh;min-height:520px;background:#fff}
+  .mc-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+  /* 未加载 / 加载中占位 */
+  .mc-placeholder{
+    position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:12px;text-align:center;
+    padding:20px;background:#fafbfc;cursor:pointer;color:var(--text-mute);
+    transition:background .15s;
+  }
+  .mc-placeholder:hover{background:#f3f6fb}
+  .mc-placeholder .ph-icon{font-size:34px;color:#c3cad8;transition:color .15s}
+  .mc-placeholder:hover .ph-icon{color:var(--accent)}
+  .mc-placeholder .ph-title{font-size:13.5px;font-weight:600;color:var(--text-dim)}
+  .mc-placeholder .ph-desc{font-size:12px;color:var(--text-mute);max-width:260px;line-height:1.7}
+  .mc-placeholder.loading{cursor:default}
+  .mc-placeholder.loading:hover{background:#fafbfc}
+  .mc-placeholder.loading .ph-icon{color:var(--accent);animation:ph-spin 1s linear infinite}
+  @keyframes ph-spin{to{transform:rotate(360deg)}}
+
+  @media (max-width:980px){
+    .grid{grid-template-columns:1fr}
+    .mc-viewport{min-height:440px;height:64vh}
+    .mc-eye{width:36px;height:36px}
+  }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1><i class="fa-solid fa-layer-group"></i>AI HTML three.js建模：雨夜便利店</h1>
+  <p class="subtitle">同一提示词，多模型生成结果并排对比 · 预览默认关闭，点击眼睛按钮按需加载</p>
+</header>
+
+<main>
+  <section class="prompt-card">
+    <div class="prompt-label">
+      <i class="fa-solid fa-comment-dots"></i>
+      统一提示词
+      <button class="copy-btn" id="copyPrompt" type="button">
+        <i class="fa-regular fa-copy"></i>
+        <span>复制提示词</span>
+      </button>
+    </div>
+    <div id="prompt">
+      <p>请制作一个雨夜便利店街角小场景，以第三视角观察整个场景，整体像一个可以自由拖拽、旋转、缩放观看的微缩三维模型 / 小型景观，没有任何UI界面元素。地面为一个完整的正方形底座，所有元素都搭建在这个底座上，构图紧凑、层次清晰，整体呈现出小巧、精致、可收藏的模型感。画面风格为三渲二，强调浓厚的日式二次元动画氛围，材质表现干净，轮廓明确，色彩柔和但富有夜景霓虹的层次感。</p>
+      <p>场景主体是一处日式便利店街角，便利店位于底座的视觉中心，外部有典型的日式街角元素：便利店招牌、玻璃橱窗、自动门、屋檐雨棚、门口地垫、自动贩卖机、自行车、雨伞架、垃圾桶、路灯、电线杆、电线、路牌、街角护栏、停车位、排水沟、积水路面、反光斑马线、小巷入口、空调外机、小型公告栏或海报栏等。街道不需要太大，但要有明确的街角转折感，像日本动画里常见的夜晚社区一角。</p>
+      <p>不要人物，但便利店内部一定要有足够内容，并且可以透过大面积玻璃窗清楚看到店内。店内可见典型便利店陈设，例如：整齐排列的货架、饮料柜、便当区、饭团和零食陈列、收银台、咖啡机、杂志架、宣传海报、店内灯箱、冰柜、关东煮柜台、地面导视、储物柜或后场门等。要让便利店内部显得明亮、温暖、真实、充实，与室外潮湿昏暗的雨夜形成鲜明对比，营造出非常典型的日式动画雨夜氛围。</p>
+      <p>美术风格重点强调：高精细建模、三渲二卡通渲染、清晰的轮廓线、细腻但简洁的材质层次、湿润的夜景反光、暖色室内灯光与冷色雨夜街景对比、浓厚的二次元日常场景感。整体气质应偏向安静、治愈、带一点都市夜晚孤独感但依然温暖，像一幕被定格下来的日本动画街角场景模型。</p>
+      <p>加入一些基础动效来增强生命力：持续降雨、屋檐滴水、地面积水波纹、便利店招牌或灯箱轻微闪烁、自动门偶尔开合、雨水沿玻璃滑落、街道路面积水反射灯光、远处交通信号灯微弱变化等。整体效果应像一个静止而精致的三维微缩世界，但带有恰到好处的细微动态，突出其三渲二、二次元、雨夜、便利店、街角、小巧精致的核心特征。</p>
+    </div>
+  </section>
+
+  <section id="grid" class="grid"></section>
+</main>
+
+<script>
+/* ============================================================
+ * 配置区：把各模型生成的 HTML 放进 model-html-compare 文件夹，
+ * 文件名与下方 file 保持一致即可；模型名、数量可随意增减。
+ * 模型名末尾加「（Low）/（Medium）/（High）/（XHigh）/（Max）」会
+ * 自动显示为对应颜色的思索强度徽章（中文 低/中/高/极高 也兼容）。
+ * 预览默认不加载，点击眼睛按钮才加载，再点一次即卸载释放性能。
+ * ============================================================ */
+const MODELS = [
+  { name: 'Claude Opus 5（Max）',    file: 'Claude-Opus-5.html' },
+  { name: '（豆包）Seed 2.1 Pro（High）',    file: 'Seed-2.1-Pro.html' },
+  { name: 'DeepSeek 4.1 Flash（High）',  file: 'DeepSeek-4.1-Flash.html' },
+  { name: 'GPT-6 Astra（xhigh）',    file: 'GPT-6-Astra.html' }
+];
+
+const COLORS = ['#2563eb', '#16a34a', '#d97706', '#db2777', '#0891b2', '#7c3aed'];
+const DIR = 'model-html-compare/';
+
+const ICON_EYE       = '<i class="fa-solid fa-eye"></i>';
+const ICON_EYE_SLASH = '<i class="fa-solid fa-eye-slash"></i>';
+const ICON_SPINNER   = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* 把模型名末尾的等级括号解析为思索强度徽章 */
+const TOKEN_TO_LEVEL = {
+  low:'low', medium:'mid', high:'high', xhigh:'xhigh', max:'max',
+  '低':'low', '中':'mid', '高':'high', '极高':'max'
+};
+const LEVEL_LABEL = { low:'Low', mid:'Medium', high:'High', xhigh:'XHigh', max:'Max' };
+
+function renderModelName(rawName){
+  const m = rawName.match(/^(.*?)[（(](max|xhigh|high|medium|low|极高|高|中|低)[)）]\s*$/i);
+  if(!m) return '<span class="mc-name">' + esc(rawName) + '</span>';
+  const key = /^[低中高]$|^极高$/.test(m[2]) ? m[2] : m[2].toLowerCase();
+  const level = TOKEN_TO_LEVEL[key];
+  const label = LEVEL_LABEL[level];
+  return '<span class="mc-name">' + esc(m[1].trim()) + '</span>' +
+         '<span class="mc-badge lv-' + level + '" title="思索强度：' + label + '">' +
+         '<i class="fa-solid fa-brain"></i>' + label + '</span>';
+}
+
+/* 占位面板内容 */
+function idlePlaceholder(){
+  return '<i class="fa-solid fa-eye-slash ph-icon"></i>' +
+         '<div class="ph-title">预览未加载</div>' +
+         '<div class="ph-desc">多个三维页面同时渲染会拖慢性能，点击此处或右上角眼睛按钮加载该模型页面</div>';
+}
+
+const grid = document.getElementById('grid');
+MODELS.forEach(function(m, i){
+  const src = DIR + m.file;
+  const card = document.createElement('div');
+  card.className = 'model-card';
+  card.innerHTML =
+    '<div class="mc-head">' +
+      '<span class="mc-dot" style="background:' + COLORS[i % COLORS.length] + '"></span>' +
+      renderModelName(m.name) +
+      '<button class="mc-eye" type="button" title="加载预览">' + ICON_EYE_SLASH + '</button>' +
+      '<a class="mc-open" href="' + esc(src) + '" target="_blank" rel="noopener">' +
+        '新窗口打开' +
+        '<i class="fa-solid fa-arrow-up-right-from-square"></i>' +
+      '</a>' +
+    '</div>' +
+    '<div class="mc-viewport">' +
+      '<iframe class="mc-frame" title="' + esc(m.name) + ' 生成结果" hidden></iframe>' +
+      '<div class="mc-placeholder">' + idlePlaceholder() + '</div>' +
+    '</div>';
+  grid.appendChild(card);
+
+  const eye = card.querySelector('.mc-eye');
+  const iframe = card.querySelector('.mc-frame');
+  const placeholder = card.querySelector('.mc-placeholder');
+
+  function setLoading(){
+    placeholder.classList.add('loading');
+    placeholder.innerHTML = ICON_SPINNER + '<div class="ph-title">正在加载…</div>';
+  }
+  function setIdle(){
+    placeholder.classList.remove('loading');
+    placeholder.innerHTML = idlePlaceholder();
+  }
+  function load(){
+    eye.classList.add('on');
+    eye.innerHTML = ICON_EYE;
+    eye.title = '关闭预览（卸载页面，释放性能）';
+    if(iframe.getAttribute('src') !== src){
+      /* 加载期间只保留占位，iframe 隐藏，避免两个区域各占一份高度 */
+      iframe.hidden = true;
+      setLoading();
+      placeholder.hidden = false;
+      iframe.src = src;
+      clearTimeout(loadTimer);
+      /* 兜底：子页面若引用了迟迟不完成的外部资源，6 秒后也强制露出 */
+      loadTimer = setTimeout(reveal, 6000);
+    } else {
+      iframe.hidden = false;
+      placeholder.hidden = true;
+    }
+  }
+  let loadTimer = null;
+  function reveal(){
+    clearTimeout(loadTimer);
+    if(eye.classList.contains('on') &&
+       iframe.getAttribute('src') !== 'about:blank'){
+      placeholder.hidden = true;
+      iframe.hidden = false;
+    }
+  }
+  function unload(){
+    clearTimeout(loadTimer);
+    eye.classList.remove('on');
+    eye.innerHTML = ICON_EYE_SLASH;
+    eye.title = '加载预览';
+    iframe.hidden = true;
+    iframe.src = 'about:blank';   /* 卸载文档，停止内部动画 / 渲染循环 */
+    placeholder.hidden = false;
+    setIdle();
+  }
+  eye.addEventListener('click', function(){
+    if(eye.classList.contains('on')) unload(); else load();
+  });
+  placeholder.addEventListener('click', function(){
+    if(!eye.classList.contains('on')) load();
+  });
+  iframe.addEventListener('load', reveal);
+});
+
+/* ===== 复制提示词 ===== */
+const ICON_COPY  = '<i class="fa-regular fa-copy"></i>';
+const ICON_CHECK = '<i class="fa-solid fa-check"></i>';
+
+function fallbackCopy(text, done){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch(e){ ok = false; }
+  ta.remove();
+  if(ok) done();
+}
+
+const copyBtn = document.getElementById('copyPrompt');
+copyBtn.addEventListener('click', function(){
+  const text = document.getElementById('prompt').innerText.trim();
+  const done = function(){
+    copyBtn.classList.add('copied');
+    copyBtn.innerHTML = ICON_CHECK + '<span>已复制</span>';
+    setTimeout(function(){
+      copyBtn.classList.remove('copied');
+      copyBtn.innerHTML = ICON_COPY + '<span>复制提示词</span>';
+    }, 2000);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){
+      fallbackCopy(text, done);
+    });
+  } else {
+    fallbackCopy(text, done);
+  }
+});
+</script>
+</body>
+</html>

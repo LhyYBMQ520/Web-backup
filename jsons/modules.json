@@ -18,6 +18,12 @@
     "tag": "Speedtest"
   },
   {
+    "link": "compare.html",
+    "name": "雨夜便利店",
+    "desc": "多模型生成网页对比",
+    "tag": "compare"
+  },
+  {
     "link": "http3.html",
     "name": "新协议",
     "desc": "关于http3和http3测试页",
