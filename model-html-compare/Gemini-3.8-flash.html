@@ -98,7 +98,7 @@
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 0.92; // 适度调低曝光（从1.15降为0.92），杜绝泛白过曝，使夜色更深沉通透
 
     // 轨道控制器：自由平滑旋转、平移、缩放，严格限制不能看穿底座下方
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -110,13 +110,13 @@
     controls.maxPolarAngle = Math.PI / 2 - 0.03; // 防止翻转到底座底面
     controls.autoRotate = false;
 
-    // --- 后期处理：辉光 Bloom 打造动漫雨夜霓虹漫反射 ---
+    // --- 后期处理：精致克制的动漫雨夜霓虹漫反射（降低泛光、提高阈值，杜绝白茫茫一片） ---
     const renderScene = new THREE.RenderPass(scene, camera);
     const bloomPass = new THREE.UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.65, // strength
-      0.45, // radius
-      0.82  // threshold
+      0.42, // 从0.82压低至0.42，保持锐利与二次元清晰轮廓
+      0.35, // 扩散半径适度收敛
+      0.82  // 提升发光门槛至0.82，仅对灯芯与霓虹灯条发光，避免整个建筑大面积泛白
     );
     const composer = new THREE.EffectComposer(renderer);
     composer.addPass(renderScene);
@@ -822,7 +822,7 @@
     addOutline(signMesh, 0.015);
 
     // 招牌向下投射的柔和灯光与霓虹光晕
-    const signGlowLight = new THREE.PointLight(0xbbf0ff, 1.4, 7);
+    const signGlowLight = new THREE.PointLight(0x9bd8ff, 0.95, 6);
     signGlowLight.position.set(0, STORE_HEIGHT - 0.8, STORE_DEPTH / 2 + 1.0);
     storeGroup.add(signGlowLight);
 
@@ -849,26 +849,26 @@
 
     // 室内天花板条形荧光灯组 (Bright 3800K Anime Konbini Lights)
     const lightFixtureGeom = new THREE.BoxGeometry(0.35, 0.08, 4.2);
-    const lightFixtureMat = new THREE.MeshBasicMaterial({ color: 0xfff7ea });
+    const lightFixtureMat = new THREE.MeshBasicMaterial({ color: 0xffedd5 });
     for (let lx = -2.6; lx <= 2.8; lx += 2.2) {
       const fixture = new THREE.Mesh(lightFixtureGeom, lightFixtureMat);
       fixture.position.set(lx, STORE_HEIGHT - 0.08, -0.6);
       storeGroup.add(fixture);
     }
 
-    // 核心室内光源：明亮、温暖的金黄奶白光芒，与室外冷蓝夜色剧烈对比！
-    const interiorWarmLight1 = new THREE.PointLight(0xffecc2, 2.6, 12, 1.2);
+    // 核心室内光源：温暖金黄，清晰不刺眼
+    const interiorWarmLight1 = new THREE.PointLight(0xffe2b8, 1.85, 11, 1.4);
     interiorWarmLight1.position.set(-1.0, 3.2, -1.0);
     interiorWarmLight1.castShadow = true;
     interiorWarmLight1.shadow.bias = -0.002;
     storeGroup.add(interiorWarmLight1);
 
-    const interiorWarmLight2 = new THREE.PointLight(0xffdfa9, 1.8, 10, 1.4);
+    const interiorWarmLight2 = new THREE.PointLight(0xffd599, 1.25, 9, 1.5);
     interiorWarmLight2.position.set(2.0, 3.0, 0.5);
     storeGroup.add(interiorWarmLight2);
 
     // 室内柔和漫射环境光
-    const interiorFill = new THREE.DirectionalLight(0xffebcd, 0.8);
+    const interiorFill = new THREE.DirectionalLight(0xffdfba, 0.45);
     interiorFill.position.set(0, 2.5, 3);
     interiorFill.target = interiorFloor;
     storeGroup.add(interiorFill);
@@ -1176,9 +1176,9 @@
       cap.position.y = 2.44;
       g.add(cap);
 
-      // 独立投射灯光
-      const vmLight = new THREE.PointLight(isRed ? 0xff6b6b : 0x60a5fa, 1.3, 4.5);
-      vmLight.position.set(0, 1.2, 0.8);
+      // 独立投射灯光（温和霓虹，不耀眼夺目）
+      const vmLight = new THREE.PointLight(isRed ? 0xff5555 : 0x4d94ff, 0.75, 3.2);
+      vmLight.position.set(0, 1.2, 0.7);
       g.add(vmLight);
 
       return g;
@@ -1350,18 +1350,38 @@
     lampShade.position.set(1.2, 5.5, 0);
     lampGroup.add(lampShade);
 
-    // 发光灯泡
-    const lampBulb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffedd5 }));
+    // 发光灯泡与高亮灯芯
+    const lampBulb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), new THREE.MeshBasicMaterial({ color: 0xffedd5 }));
     lampBulb.position.set(1.2, 5.35, 0);
     lampGroup.add(lampBulb);
 
-    // 路灯向地面打下的温暖锥形暖光 (Street Spot Light)
-    const streetSpot = new THREE.SpotLight(0xffb703, 3.2, 11, Math.PI / 4, 0.6, 1.2);
+    // 路灯向地面打下的温暖锥形暖光 (Street Spot Light) - 舒适适度，不泛白
+    const streetSpot = new THREE.SpotLight(0xff991c, 2.4, 11, Math.PI / 4.5, 0.65, 1.4);
     streetSpot.position.set(-7.6, 5.3, 4.8);
     streetSpot.target.position.set(-7.6, 0, 4.8);
     streetSpot.castShadow = true;
     worldGroup.add(streetSpot);
     worldGroup.add(streetSpot.target);
+
+    // 路灯雨夜丁达尔丁尔束光锥 (极为轻柔微透，避免阻挡视线与过曝)
+    const coneBeamGeom = new THREE.ConeGeometry(2.3, 5.3, 24, 1, true);
+    coneBeamGeom.translate(0, -2.65, 0);
+    const coneBeamMat = new THREE.MeshBasicMaterial({
+      color: 0xffaa44,
+      transparent: true,
+      opacity: 0.055, // 仅保留 0.055 的极其轻盈半透明度
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    const lampConeBeam = new THREE.Mesh(coneBeamGeom, coneBeamMat);
+    lampConeBeam.position.set(1.2, 5.35, 0);
+    lampGroup.add(lampConeBeam);
+
+    // 路灯顶部点光源补光，温和柔顺
+    const lampFillLight = new THREE.PointLight(0xffaf52, 0.9, 5);
+    lampFillLight.position.set(1.2, 5.2, 0);
+    lampGroup.add(lampFillLight);
 
     // 4.7.4 日本街角经典白色护栏 (Japanese White Street Guard Rails)
     const railMat = makeToonMaterial({ color: 0xf8fafc, roughness: 0.3 });
@@ -1642,21 +1662,22 @@
     // 5. 动态降雨、屋檐滴水与天气动效系统 (Rain & Weather Animation)
     // ==========================================
 
-    // 5.1 二次元风格下倾连绵雨丝粒子 (Falling Anime Rain Particle System)
-    const RAIN_COUNT = 1800;
+    // 5.1 二次元风格细密雨丝系统 (Fine Anime Rainy Night System - 调整为舒适温和的细雨，精准覆盖底座区域)
+    const RAIN_COUNT = 650; // 从1800降至650，雨量由暴雨调整为日式动画意境的温和细雨
     const rainPositions = new Float32Array(RAIN_COUNT * 6); // 线段两端 (x1, y1, z1, x2, y2, z2)
     const rainVelocities = new Float32Array(RAIN_COUNT);
 
-    const RAIN_BOUND_XZ = BASE_SIZE * 0.95;
-    const RAIN_HEIGHT_MIN = 0;
-    const RAIN_HEIGHT_MAX = 18;
-    const RAIN_LENGTH = 0.65;
-    const RAIN_SLANT_X = -0.12; // 雨丝随风微微向左侧倾斜
+    // 精确匹配正方形底座边界 (BASE_SIZE = 22, 半径 11)，彻底消除偏置错位
+    const RAIN_BOUND_XZ = BASE_SIZE;
+    const RAIN_HEIGHT_MIN = 0.05; // 刚触碰底座路面即回收，绝不穿透底座下边缘
+    const RAIN_HEIGHT_MAX = 13.5;
+    const RAIN_LENGTH = 0.38; // 缩短雨丝长度，从0.65降为0.38，更加精致细软
+    const RAIN_SLANT_X = -0.06; // 雨丝微倾斜角度收敛，更显轻柔垂直
 
     for (let i = 0; i < RAIN_COUNT; i++) {
       const idx = i * 6;
       const x = (Math.random() - 0.5) * RAIN_BOUND_XZ;
-      const y = Math.random() * RAIN_HEIGHT_MAX;
+      const y = Math.random() * (RAIN_HEIGHT_MAX - RAIN_HEIGHT_MIN) + RAIN_HEIGHT_MIN;
       const z = (Math.random() - 0.5) * RAIN_BOUND_XZ;
 
       rainPositions[idx] = x;
@@ -1667,21 +1688,21 @@
       rainPositions[idx + 4] = y - RAIN_LENGTH;
       rainPositions[idx + 5] = z;
 
-      rainVelocities[i] = 0.35 + Math.random() * 0.25;
+      rainVelocities[i] = 0.16 + Math.random() * 0.12; // 降速更为平缓柔和，避免暴雨急促感
     }
 
     const rainGeom = new THREE.BufferGeometry();
     rainGeom.setAttribute('position', new THREE.BufferAttribute(rainPositions, 3));
 
     const rainMat = new THREE.LineBasicMaterial({
-      color: 0x90b8e6,
+      color: 0x9dc6f8,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.38, // 柔和半透明，不喧宾夺主，凸显模型微缩精致感
       blending: THREE.AdditiveBlending
     });
 
     const rainLines = new THREE.LineSegments(rainGeom, rainMat);
-    scene.add(rainLines);
+    worldGroup.add(rainLines); // 挂载到 worldGroup，与整个微缩底座完全同轴无错位！
 
     // 5.2 屋檐雨滴下落与水花 (Eaves Water Droplets)
     const DROP_COUNT = 32;
@@ -1713,12 +1734,12 @@
     // ==========================================
     // 6. 环境整体灯光氛围布局 (Color & Mood Lighting)
     // ==========================================
-    // 寒冷潮湿的雨夜深蓝主色调环境光
-    const ambientLight = new THREE.AmbientLight(0x132238, 1.1);
+    // 寒冷潮湿但通透的深靛青蓝夜空环境光
+    const ambientLight = new THREE.AmbientLight(0x1a2e48, 1.35);
     scene.add(ambientLight);
 
     // 漫射天光 (月夜薄云透出的微弱冷辉)
-    const moonDirLight = new THREE.DirectionalLight(0x40628e, 0.7);
+    const moonDirLight = new THREE.DirectionalLight(0x567da6, 0.9);
     moonDirLight.position.set(12, 18, 14);
     moonDirLight.castShadow = true;
     moonDirLight.shadow.mapSize.width = 2048;
@@ -1732,10 +1753,15 @@
     moonDirLight.shadow.bias = -0.0005;
     scene.add(moonDirLight);
 
-    // 街角反差辅助冷色勾边背光
-    const rimLight = new THREE.DirectionalLight(0x2a4365, 0.6);
+    // 街角二次元反差辅助冷色勾边背光 (Rim Light)
+    const rimLight = new THREE.DirectionalLight(0x385c8a, 0.85);
     rimLight.position.set(-15, 12, -15);
     scene.add(rimLight);
+
+    // 便利店大门外路面金黄暖色漫反射光晕 (Ground Warm Light Spill - 柔和微光)
+    const streetWarmGlow = new THREE.PointLight(0xffb84d, 0.95, 6.5, 1.3);
+    streetWarmGlow.position.set(STORE_POS_X + 1.2, 0.4, STORE_POS_Z + STORE_DEPTH / 2 + 2.0);
+    worldGroup.add(streetWarmGlow);
 
     // ==========================================
     // 7. 动画主循环与状态控制器 (Render Loop & State Manager)
@@ -1770,11 +1796,11 @@
         posArr[idx] += RAIN_SLANT_X * v;
         posArr[idx + 3] += RAIN_SLANT_X * v;
 
-        // 触地重置到高空
+        // 触底重置到正上方，并约束 XZ 边界防止随斜向位移漂移到底座外
         if (posArr[idx + 4] < RAIN_HEIGHT_MIN) {
           const rx = (Math.random() - 0.5) * RAIN_BOUND_XZ;
           const rz = (Math.random() - 0.5) * RAIN_BOUND_XZ;
-          const ry = RAIN_HEIGHT_MAX + Math.random() * 2;
+          const ry = RAIN_HEIGHT_MAX + Math.random() * 1.5;
 
           posArr[idx] = rx;
           posArr[idx + 1] = ry;
@@ -1783,6 +1809,12 @@
           posArr[idx + 3] = rx + RAIN_SLANT_X * RAIN_LENGTH;
           posArr[idx + 4] = ry - RAIN_LENGTH;
           posArr[idx + 5] = rz;
+        }
+
+        // 若向左飘移超出底座左边缘，从右侧循环包裹进入，确保无论下多久都严丝合缝在底座正上方
+        if (posArr[idx] < -RAIN_BOUND_XZ / 2) {
+          posArr[idx] += RAIN_BOUND_XZ;
+          posArr[idx + 3] += RAIN_BOUND_XZ;
         }
       }
       rainGeom.attributes.position.needsUpdate = true;
