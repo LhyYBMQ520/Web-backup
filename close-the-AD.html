@@ -5,109 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我让你关闭广告了啊！</title>
   <link rel="stylesheet" href="assets/tailwind.css">
+  <link rel="stylesheet" href="fontawesome-free-7.2.0-web/css/all.min.css">
   
-  <style>
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    
-    @keyframes pulse {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.1); opacity: 0.8; }
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    
-    .shake {
-      animation: shake 0.3s ease-in-out;
-    }
-    
-    @keyframes slide-in {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    .slide-in {
-      animation: slide-in 0.3s ease-out forwards;
-    }
-
-    /* 开关样式：固定尺寸，确保不被压缩 */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 40px; /* 固定宽度，不允许收缩 */
-      height: 20px; /* 固定高度 */
-      cursor: pointer;
-      user-select: none; /* 防止点击时选中文字 */
-      flex-shrink: 0; /* 禁止flex布局下被压缩 */
-    }
-    
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 20px;
-    }
-    
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 2px;
-      bottom: 2px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    
-    input:checked + .slider {
-      background-color: #4361EE;
-    }
-    
-    input:checked + .slider:before {
-      transform: translateX(20px); /* 位移匹配开关宽度，避免超出 */
-    }
-
-    /* 新增：提示文本容器样式 */
-    #ad-blocker-notice {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      padding: 2rem;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 0.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      z-index: 10; /* 确保在广告容器下方，但高于背景装饰 */
-      max-width: 90vw; /* 防止溢出视口 */
-      /* 默认显示，因为其 z-index 较低，会被广告遮挡 */
-    }
-
-    /* 修改：提升 message 的 z-index 到最高 */
-    #message {
-      z-index: 9999 !important; /* 使用 !important 确保优先级最高 */
-    }
-  </style>
 </head>
 <body class="page-ad bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen font-inter flex items-center justify-center p-4 overflow-x-hidden">
+  <div id="portrait-lock" role="alert" aria-live="assertive">
+    <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+    <strong>请将手机横屏</strong>
+    <span>横屏后才能继续</span>
+  </div>
+
   <!-- 背景装饰 -->
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
     <div class="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
@@ -123,14 +30,26 @@
   
   <!-- 广告遮罩层 -->
   <div id="ad-overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300"></div>
+
+  <!-- 两阶段任务状态 -->
+  <aside id="level-sidebar" aria-label="关卡进度">
+    <div id="level-one" class="level-card active">
+      <span class="level-icon"><i class="fa-solid fa-hand-pointer"></i></span>
+      <div><strong>第一关</strong><p class="text-xs mt-0.5">点击关闭按钮</p></div>
+    </div>
+    <div id="level-two" class="level-card">
+      <span class="level-icon"><i class="fa-solid fa-eye"></i></span>
+      <div><strong>第二关</strong><p class="text-xs mt-0.5">保持睁眼</p></div>
+    </div>
+  </aside>
   
   <!-- 提示信息 (现在移出广告容器，独立放置，并设置最高层级) -->
   <div id="message" class="hidden absolute top-16 right-0 bg-gray-800 text-white text-sm py-1.5 px-3 rounded-lg shadow-lg z-30 slide-in whitespace-nowrap">
-    再按到我一次才能关闭广告哦
+    再按一次关闭按钮才能关闭广告哦
   </div>
   
   <!-- 广告框容器 -->
-  <div id="ad-container" class="relative z-50 bg-white rounded-2xl ad-shadow max-w-md w-full overflow-hidden float-animation">
+  <div id="ad-container" class="relative z-50 bg-white rounded-2xl ad-shadow max-w-md w-full overflow-hidden float-animation select-none">
     <!-- 广告头部标签 -->
     <div class="bg-primary text-white text-center py-1.5 text-sm font-medium">
       芝士一个广告
@@ -177,12 +96,35 @@
     
   </div>
 
-  <!-- 新增：广告拦截提示文本容器 -->
-  <div id="ad-blocker-notice" class="text-gray-700">
-    <p class="text-lg font-medium">如果你点进此网页可以直接看到这些字，</p>
-    <p class="text-lg font-medium mt-2">那大概率是你的广告拦截插件拦截了弹窗，</p>
-    <p class="text-lg font-medium mt-2">请关闭插件后再访问此网页。</p>
+  <!-- 第二关全屏视频层与加载状态 -->
+  <div id="blink-challenge" class="hidden" role="dialog" aria-modal="true" aria-labelledby="blink-title">
+    <video id="ad-video" muted playsinline preload="auto" src="./video/never-gonna-give-you-up-18s.mp4"></video>
+    <video id="blink-video" autoplay muted playsinline hidden></video>
+    <div id="video-shade"></div>
+    <div id="remaining-time" aria-live="polite">18</div>
+    <button id="unmute-video-btn" type="button" aria-label="解除视频静音"><i class="fa-solid fa-volume-xmark"></i><span>解除静音</span></button>
+
+    <div id="loading-panel" class="loading-panel relative">
+      <div class="blink-eye-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+      <h2 id="blink-title">正在准备视频</h2>
+      <p id="blink-status">正在请求摄像头权限...</p>
+      <div class="progress-label"><span><i class="fa-solid fa-cloud-arrow-down mr-1"></i>模型加载</span><span id="model-progress-text">等待加载</span></div>
+      <div id="model-progress" aria-label="模型加载进度"><div id="model-progress-bar"></div></div>
+      <div class="progress-label"><span><i class="fa-solid fa-film mr-1"></i>视频加载</span><span id="video-progress-text">等待加载</span></div>
+      <div id="video-progress" aria-label="视频加载进度"><div id="video-progress-bar"></div></div>
+    </div>
+
   </div>
+  <div id="blink-warning" class="blink-warning hidden" role="alertdialog" aria-modal="true">
+    <div class="blink-warning-panel">
+      <div class="blink-warning-eye"><i class="fa-regular fa-eye"></i></div>
+      <h2 id="blink-warning-title">请勿眨眼</h2>
+      <p id="blink-warning-message">系统检测到你眨眼了<br>请重新观看视频</p>
+      <button id="restart-video-btn" type="button"><i class="fa-solid fa-rotate-right mr-2"></i>我没眨眼</button>
+    </div>
+  </div>
+
+  <div id="success-notice" class="success-notice hidden" role="status" aria-live="polite">你过关！（铜人音）</div>
 
   <script>
     // 获取DOM元素
@@ -190,8 +132,12 @@
     const adContainer = document.getElementById('ad-container');
     const adOverlay = document.getElementById('ad-overlay');
     const message = document.getElementById('message');
+    const levelOne = document.getElementById('level-one');
+    const levelTwo = document.getElementById('level-two');
+    const successNotice = document.getElementById('success-notice');
     const fixBtnSwitch = document.getElementById('fix-btn-switch');
     const switchMusic = document.getElementById('switch-music'); // 音频元素
+    switchMusic.volume = 0.5; // 杂鱼开关音乐默认音量为 50%
 
     // 状态变量
     let clickCount = 0;
@@ -200,7 +146,11 @@
     let isFixed = false; 
     let isClickLocked = false; 
     const LOCK_DURATION = 500; // 0.5秒锁定时长
-    
+
+    function showSuccessNotice() {
+      successNotice.classList.remove('hidden');
+    }
+
     // 小杂鱼开关事件（控制音乐循环播放和按钮固定）
     fixBtnSwitch.addEventListener('change', (e) => {
       isFixed = e.target.checked;
@@ -232,26 +182,45 @@
       clickCount++;
       
       if (clickCount === 1) {
+        // 第一关第一次点击后开始移动，沿用原有交互
         isClickLocked = true;
         message.classList.remove('hidden');
         closeBtn.classList.add('pulse-animation');
         adContainer.classList.add('shake');
         setTimeout(() => adContainer.classList.remove('shake'), 300);
-        
-        if (!isFixed) {
-          startMovingButton();
-        }
-        
-        setTimeout(() => {
-          isClickLocked = false;
-        }, LOCK_DURATION);
-        
+        if (!isFixed) startMovingButton();
+        setTimeout(() => { isClickLocked = false; }, LOCK_DURATION);
       } else if (clickCount === 2) {
-        // 关闭广告时同步停止音乐
+        // 点中移动按钮后按原逻辑关闭广告，再进入第二关
+        isClickLocked = true;
         stopMovingButton();
         switchMusic.pause();
         switchMusic.currentTime = 0;
+        levelOne.classList.remove('active');
+        levelOne.classList.add('done');
+        levelOne.querySelector('.level-icon').innerHTML = '<i class="fa-solid fa-check"></i>';
         closeAdvertisement();
+        setTimeout(() => {
+          isClickLocked = false;
+          levelTwo.classList.add('active');
+          window.startBlinkChallenge(() => {
+            levelTwo.classList.remove('active');
+            levelTwo.classList.add('done');
+            levelTwo.querySelector('.level-icon').innerHTML = '<i class="fa-solid fa-check"></i>';
+            showSuccessNotice();
+          });
+        }, 350);
+      }
+    });
+
+    levelTwo.addEventListener('click', () => {
+      if (levelTwo.classList.contains('active') && !blinkChallengeActive) {
+        window.startBlinkChallenge(() => {
+          levelTwo.classList.remove('active');
+          levelTwo.classList.add('done');
+          levelTwo.querySelector('.level-icon').innerHTML = '<i class="fa-solid fa-check"></i>';
+          showSuccessNotice();
+        });
       }
     });
     
@@ -299,6 +268,257 @@
     document.body.addEventListener('click', () => {
       switchMusic.load(); // 预加载音频，提升播放流畅度
     }, { once: true });
+
+    // -------------------- 眨眼验证 --------------------
+    const blinkChallenge = document.getElementById('blink-challenge');
+    const blinkVideo = document.getElementById('blink-video');
+    const adVideo = document.getElementById('ad-video');
+    const blinkWarning = document.getElementById('blink-warning');
+    const blinkWarningTitle = document.getElementById('blink-warning-title');
+    const blinkWarningMessage = document.getElementById('blink-warning-message');
+    const restartVideoBtn = document.getElementById('restart-video-btn');
+    const loadingPanel = document.getElementById('loading-panel');
+    const remainingTime = document.getElementById('remaining-time');
+    const unmuteVideoBtn = document.getElementById('unmute-video-btn');
+    const blinkStatus = document.getElementById('blink-status');
+    const modelProgressBar = document.getElementById('model-progress-bar');
+    const modelProgressText = document.getElementById('model-progress-text');
+    const videoProgressBar = document.getElementById('video-progress-bar');
+    const videoProgressText = document.getElementById('video-progress-text');
+
+    const BLINK_HOLD_MS = 18000;
+    const EYE_CLOSED_THRESHOLD = 0.19;
+    let videoReady = false;
+    let modelReady = false;
+    let blinkLandmarker;
+    let blinkStream;
+    let blinkAnimationFrame;
+    let blinkChallengeActive = false;
+    let videoStarted = false;
+    let blinkDoneCallback;
+
+    // Face Landmarker 的眼部索引。每只眼睛取上下左右点计算 EAR。
+    const LEFT_EYE = { left: 33, right: 133, top: 159, bottom: 145 };
+    const RIGHT_EYE = { left: 362, right: 263, top: 386, bottom: 374 };
+
+    function distance(a, b) {
+      return Math.hypot(a.x - b.x, a.y - b.y);
+    }
+
+    function eyeAspectRatio(landmarks, eye) {
+      const horizontal = distance(landmarks[eye.left], landmarks[eye.right]);
+      const vertical = distance(landmarks[eye.top], landmarks[eye.bottom]);
+      return horizontal ? vertical / horizontal : 1;
+    }
+
+    function setModelProgress(value, text) {
+      modelProgressBar.style.width = `${Math.max(0, Math.min(100, value))}%`;
+      modelProgressText.textContent = text;
+    }
+
+    function setVideoProgress(value, text) {
+      videoProgressBar.style.width = `${Math.max(0, Math.min(100, value))}%`;
+      videoProgressText.textContent = text;
+    }
+
+    function updateRemainingTime() {
+      const remaining = Math.max(0, Math.ceil(BLINK_HOLD_MS / 1000 - adVideo.currentTime));
+      remainingTime.textContent = `广告还剩${remaining}秒`;
+    }
+
+    function startVideoChallenge() {
+      if (!videoReady || !modelReady || videoStarted) return;
+      videoStarted = true;
+      loadingPanel.classList.add('hidden');
+      adVideo.currentTime = 0;
+      blinkStatus.textContent = '请保持睁眼，不要眨眼';
+      blinkChallengeActive = true;
+      updateRemainingTime();
+      adVideo.play().then(() => runBlinkFrame()).catch(error => {
+        console.error('视频播放失败：', error);
+        blinkStatus.textContent = '视频播放失败，请点击页面后重试';
+      });
+    }
+
+    adVideo.addEventListener('loadedmetadata', () => {
+      setVideoProgress(20, '读取视频');
+    });
+    adVideo.addEventListener('canplay', () => {
+      videoReady = true;
+      setVideoProgress(100, '已完成');
+      startVideoChallenge();
+    });
+    adVideo.addEventListener('timeupdate', () => {
+      const progress = Math.min(100, adVideo.duration ? (adVideo.currentTime / adVideo.duration) * 100 : 0);
+      setVideoProgress(Math.max(progress, videoReady ? 100 : progress), videoReady ? '已完成' : '加载中');
+      updateRemainingTime();
+    });
+    adVideo.volume = 0.5;
+    unmuteVideoBtn.addEventListener('click', () => {
+      adVideo.muted = !adVideo.muted;
+      adVideo.volume = 0.5;
+      unmuteVideoBtn.innerHTML = adVideo.muted
+        ? '<i class="fa-solid fa-volume-xmark"></i><span>解除静音</span>'
+        : '<i class="fa-solid fa-volume-high"></i><span>静音</span>';
+    });
+
+    async function loadFaceLandmarker() {
+      if (blinkLandmarker) {
+        setModelProgress(100, '已完成');
+        modelReady = true;
+        return blinkLandmarker;
+      }
+      setModelProgress(8, '加载运行库');
+      const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.19/+esm');
+      setModelProgress(32, '加载 WASM');
+      const fileset = await vision.FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.19/wasm'
+      );
+      setModelProgress(56, '加载人脸模型');
+      blinkLandmarker = await vision.FaceLandmarker.createFromOptions(fileset, {
+        baseOptions: {
+          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+          delegate: 'GPU'
+        },
+        runningMode: 'VIDEO',
+        numFaces: 1,
+        minFaceDetectionConfidence: 0.6,
+        minFacePresenceConfidence: 0.6,
+        minTrackingConfidence: 0.6
+      });
+      setModelProgress(100, '已完成');
+      modelReady = true;
+      return blinkLandmarker;
+    }
+
+    function resetBlinkChallenge() {
+      remainingTime.textContent = '广告还剩18秒';
+    }
+
+    function restartVideoChallenge() {
+      blinkWarning.classList.add('hidden');
+      blinkWarningTitle.textContent = '请勿眨眼';
+      blinkWarningMessage.innerHTML = '系统检测到你眨眼了<br>请重新观看视频';
+      blinkChallengeActive = true;
+      videoStarted = true;
+      adVideo.currentTime = 0;
+      resetBlinkChallenge();
+      blinkStatus.textContent = '请保持睁眼，不要眨眼';
+      adVideo.play().then(() => runBlinkFrame()).catch(error => {
+        console.error('视频播放失败：', error);
+        blinkStatus.textContent = '视频播放失败，请检查浏览器自动播放权限';
+      });
+    }
+
+    restartVideoBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      restartVideoChallenge();
+    });
+
+    function stopBlinkChallenge() {
+      blinkChallengeActive = false;
+      cancelAnimationFrame(blinkAnimationFrame);
+      if (blinkStream) {
+        blinkStream.getTracks().forEach(track => track.stop());
+        blinkStream = null;
+      }
+      blinkVideo.srcObject = null;
+      adVideo.pause();
+      adVideo.currentTime = 0;
+      blinkWarning.classList.add('hidden');
+      blinkChallenge.classList.add('hidden');
+    }
+
+    async function runBlinkFrame() {
+      if (!blinkChallengeActive || !blinkLandmarker || blinkVideo.readyState < 2) return;
+      const now = performance.now();
+      const result = blinkLandmarker.detectForVideo(blinkVideo, now);
+      const landmarks = result.faceLandmarks?.[0];
+
+      if (!landmarks) {
+        adVideo.pause();
+        blinkChallengeActive = false;
+        cancelAnimationFrame(blinkAnimationFrame);
+        blinkStatus.textContent = '没有检测到人脸，请正对摄像头';
+        blinkWarningTitle.textContent = '请正对摄像头';
+        blinkWarningMessage.innerHTML = '摄像头未检测到人脸<br>请调整位置后重试';
+        blinkWarning.classList.remove('hidden');
+        remainingTime.textContent = `广告还剩${Math.ceil(BLINK_HOLD_MS / 1000)}秒`;
+        return;
+      }
+
+      const leftEar = eyeAspectRatio(landmarks, LEFT_EYE);
+      const rightEar = eyeAspectRatio(landmarks, RIGHT_EYE);
+      const eyesClosed = (leftEar + rightEar) / 2 < EYE_CLOSED_THRESHOLD;
+
+      if (eyesClosed) {
+        // 眨眼时暂停视频并显示截图风格提示，点击按钮后从头开始
+        adVideo.pause();
+        blinkChallengeActive = false;
+        cancelAnimationFrame(blinkAnimationFrame);
+        blinkStatus.textContent = '检测到闭眼，观看已暂停';
+        blinkWarning.classList.remove('hidden');
+        return;
+      }
+
+      blinkStatus.textContent = '请保持睁眼，不要眨眼';
+      if (adVideo.paused && !adVideo.ended) {
+        adVideo.play().catch(error => console.error('视频恢复播放失败：', error));
+      }
+      const elapsed = Math.min(BLINK_HOLD_MS, adVideo.currentTime * 1000);
+      const progress = Math.min(1, elapsed / BLINK_HOLD_MS);
+      remainingTime.textContent = `广告还剩${Math.max(0, Math.ceil((BLINK_HOLD_MS - elapsed) / 1000))}秒`;
+
+      if (adVideo.ended || progress >= 1) {
+        stopBlinkChallenge();
+        if (blinkDoneCallback) blinkDoneCallback();
+        return;
+      }
+      blinkAnimationFrame = requestAnimationFrame(runBlinkFrame);
+    }
+
+    window.startBlinkChallenge = async function(onSuccess) {
+      blinkDoneCallback = onSuccess;
+      blinkChallenge.classList.remove('hidden');
+      blinkWarning.classList.add('hidden');
+      loadingPanel.classList.remove('hidden');
+      videoReady = false;
+      modelReady = false;
+      videoStarted = false;
+      adVideo.pause();
+      adVideo.currentTime = 0;
+      setModelProgress(blinkLandmarker ? 100 : 0, blinkLandmarker ? '已完成' : '等待加载');
+      setVideoProgress(0, '等待加载');
+      if (adVideo.readyState >= 3) {
+        videoReady = true;
+        setVideoProgress(100, '已完成');
+      }
+      updateRemainingTime();
+      blinkStatus.textContent = '正在请求摄像头权限...';
+      resetBlinkChallenge();
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error('当前页面不是安全上下文，无法访问摄像头');
+        }
+        blinkStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+          audio: false
+        });
+        blinkVideo.srcObject = blinkStream;
+        await blinkVideo.play();
+        blinkStatus.textContent = '正在加载模型，请稍候...';
+        await loadFaceLandmarker();
+        modelReady = true;
+        startVideoChallenge();
+      } catch (error) {
+        console.error('眨眼验证初始化失败：', error);
+        stopBlinkChallenge();
+        blinkChallenge.classList.remove('hidden');
+        blinkStatus.textContent = '摄像头或模型加载失败，请检查权限和网络后重试';
+      }
+    };
   </script>
+
 </body>
 </html>
