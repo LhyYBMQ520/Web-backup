@@ -9,11 +9,6 @@
   
 </head>
 <body class="page-ad bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen font-inter flex items-center justify-center p-4 overflow-x-hidden">
-  <div id="portrait-lock" role="alert" aria-live="assertive">
-    <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
-    <strong>请将手机横屏</strong>
-    <span>横屏后才能继续</span>
-  </div>
 
   <!-- 背景装饰 -->
   <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
@@ -99,7 +94,7 @@
   <!-- 第二关全屏视频层与加载状态 -->
   <div id="blink-challenge" class="hidden" role="dialog" aria-modal="true" aria-labelledby="blink-title">
     <video id="ad-video" muted playsinline preload="auto" src="./video/never-gonna-give-you-up-18s.mp4"></video>
-    <video id="blink-video" autoplay muted playsinline hidden></video>
+    <video id="blink-video" class="camera-source" autoplay muted playsinline aria-hidden="true"></video>
     <div id="video-shade"></div>
     <div id="remaining-time" aria-live="polite">18</div>
     <button id="unmute-video-btn" type="button" aria-label="解除视频静音"><i class="fa-solid fa-volume-xmark"></i><span>解除静音</span></button>
@@ -287,7 +282,11 @@
     const videoProgressText = document.getElementById('video-progress-text');
 
     const BLINK_HOLD_MS = 18000;
-    const EYE_CLOSED_THRESHOLD = 0.19;
+    const EYE_CLOSED_THRESHOLD = 0.2;
+    const CLOSED_FRAME_LIMIT = 8;
+    const NO_FACE_FRAME_LIMIT = 1;
+    const FACE_DETECTION_GRACE_MS = 0;
+    const CAMERA_WARMUP_MS = 1200;
     let videoReady = false;
     let modelReady = false;
     let blinkLandmarker;
@@ -295,11 +294,14 @@
     let blinkAnimationFrame;
     let blinkChallengeActive = false;
     let videoStarted = false;
+    let noFaceFrames = 0;
+    let faceDetectionStartedAt = 0;
+    let closedEyeFrames = 0;
     let blinkDoneCallback;
 
     // Face Landmarker 的眼部索引。每只眼睛取上下左右点计算 EAR。
-    const LEFT_EYE = { left: 33, right: 133, top: 159, bottom: 145 };
-    const RIGHT_EYE = { left: 362, right: 263, top: 386, bottom: 374 };
+    const LEFT_EYE = { left: 33, right: 133, top: 159, bottom: 145, top2: 158, bottom2: 153 };
+    const RIGHT_EYE = { left: 362, right: 263, top: 386, bottom: 374, top2: 385, bottom2: 380 };
 
     function distance(a, b) {
       return Math.hypot(a.x - b.x, a.y - b.y);
@@ -307,7 +309,7 @@
 
     function eyeAspectRatio(landmarks, eye) {
       const horizontal = distance(landmarks[eye.left], landmarks[eye.right]);
-      const vertical = distance(landmarks[eye.top], landmarks[eye.bottom]);
+      const vertical = (distance(landmarks[eye.top], landmarks[eye.bottom]) + distance(landmarks[eye.top2], landmarks[eye.bottom2])) / 2;
       return horizontal ? vertical / horizontal : 1;
     }
 
@@ -333,6 +335,9 @@
       adVideo.currentTime = 0;
       blinkStatus.textContent = '请保持睁眼，不要眨眼';
       blinkChallengeActive = true;
+      noFaceFrames = 0;
+      faceDetectionStartedAt = performance.now();
+      closedEyeFrames = 0;
       updateRemainingTime();
       adVideo.play().then(() => runBlinkFrame()).catch(error => {
         console.error('视频播放失败：', error);
@@ -378,13 +383,13 @@
       blinkLandmarker = await vision.FaceLandmarker.createFromOptions(fileset, {
         baseOptions: {
           modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
-          delegate: 'GPU'
+          delegate: 'CPU'
         },
         runningMode: 'VIDEO',
         numFaces: 1,
-        minFaceDetectionConfidence: 0.6,
-        minFacePresenceConfidence: 0.6,
-        minTrackingConfidence: 0.6
+        minFaceDetectionConfidence: 0.35,
+        minFacePresenceConfidence: 0.35,
+        minTrackingConfidence: 0.35
       });
       setModelProgress(100, '已完成');
       modelReady = true;
@@ -399,6 +404,9 @@
       blinkWarning.classList.add('hidden');
       blinkWarningTitle.textContent = '请勿眨眼';
       blinkWarningMessage.innerHTML = '系统检测到你眨眼了<br>请重新观看视频';
+      noFaceFrames = 0;
+      faceDetectionStartedAt = performance.now();
+      closedEyeFrames = 0;
       blinkChallengeActive = true;
       videoStarted = true;
       adVideo.currentTime = 0;
@@ -431,12 +439,24 @@
     }
 
     async function runBlinkFrame() {
-      if (!blinkChallengeActive || !blinkLandmarker || blinkVideo.readyState < 2) return;
+      if (!blinkChallengeActive || !blinkLandmarker) return;
+      if (blinkVideo.readyState < 2 || !blinkVideo.videoWidth || !blinkVideo.videoHeight) {
+        blinkAnimationFrame = requestAnimationFrame(runBlinkFrame);
+        return;
+      }
       const now = performance.now();
+      if (!faceDetectionStartedAt) faceDetectionStartedAt = now;
+      const cameraWarmupComplete = now - faceDetectionStartedAt >= CAMERA_WARMUP_MS;
       const result = blinkLandmarker.detectForVideo(blinkVideo, now);
       const landmarks = result.faceLandmarks?.[0];
 
       if (!landmarks) {
+        noFaceFrames += 1;
+        blinkStatus.textContent = '正在寻找人脸...';
+        if (now - faceDetectionStartedAt < FACE_DETECTION_GRACE_MS || noFaceFrames < NO_FACE_FRAME_LIMIT) {
+          blinkAnimationFrame = requestAnimationFrame(runBlinkFrame);
+          return;
+        }
         adVideo.pause();
         blinkChallengeActive = false;
         cancelAnimationFrame(blinkAnimationFrame);
@@ -447,12 +467,15 @@
         remainingTime.textContent = `广告还剩${Math.ceil(BLINK_HOLD_MS / 1000)}秒`;
         return;
       }
+      noFaceFrames = 0;
 
       const leftEar = eyeAspectRatio(landmarks, LEFT_EYE);
       const rightEar = eyeAspectRatio(landmarks, RIGHT_EYE);
-      const eyesClosed = (leftEar + rightEar) / 2 < EYE_CLOSED_THRESHOLD;
+      const averageEar = (leftEar + rightEar) / 2;
+      const eyesClosed = cameraWarmupComplete && averageEar > 0 && averageEar < EYE_CLOSED_THRESHOLD;
+      closedEyeFrames = eyesClosed ? closedEyeFrames + 1 : 0;
 
-      if (eyesClosed) {
+      if (closedEyeFrames >= CLOSED_FRAME_LIMIT) {
         // 眨眼时暂停视频并显示截图风格提示，点击按钮后从头开始
         adVideo.pause();
         blinkChallengeActive = false;
@@ -486,6 +509,9 @@
       videoReady = false;
       modelReady = false;
       videoStarted = false;
+      noFaceFrames = 0;
+      faceDetectionStartedAt = 0;
+      closedEyeFrames = 0;
       adVideo.pause();
       adVideo.currentTime = 0;
       setModelProgress(blinkLandmarker ? 100 : 0, blinkLandmarker ? '已完成' : '等待加载');
@@ -501,11 +527,21 @@
         if (!navigator.mediaDevices?.getUserMedia) {
           throw new Error('当前页面不是安全上下文，无法访问摄像头');
         }
-        blinkStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-          audio: false
-        });
+        try {
+          blinkStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'user' }, width: { ideal: 640, max: 1280 }, height: { ideal: 480, max: 720 } },
+            audio: false
+          });
+        } catch (cameraError) {
+          blinkStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        }
+        const [track] = blinkStream.getVideoTracks();
+        if (track) track.applyConstraints({ width: { ideal: 640 }, height: { ideal: 480 } }).catch(() => {});
         blinkVideo.srcObject = blinkStream;
+        await new Promise(resolve => {
+          if (blinkVideo.readyState >= 1 && blinkVideo.videoWidth) resolve();
+          else blinkVideo.addEventListener('loadedmetadata', resolve, { once: true });
+        });
         await blinkVideo.play();
         blinkStatus.textContent = '正在加载模型，请稍候...';
         await loadFaceLandmarker();
