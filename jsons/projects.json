@@ -53,5 +53,10 @@
     "name": "Image-processing",
     "desc": "基于 Python + Pillow + FastAPI 的一站式在线图像处理工具库",
     "url": "https://github.com/LhyYBMQ520/Image-processing"
+  },
+  {
+    "name": "JMcomic-web",
+    "desc": "基于jmcomic库的Web端漫画搜索，下载工具",
+    "url": "https://github.com/LhyYBMQ520/JMcomic-web"
   }
 ]
