@@ -178,10 +178,11 @@
 const MODELS = [
   { name: 'Claude Opus 5（Max）',    file: 'Claude-Opus-5.html' },
   { name: '（豆包）Seed 2.1 Pro（High）',    file: 'Seed-2.1-Pro.html' },
-  { name: 'DeepSeek 4.1 Flash（High）',  file: 'DeepSeek-4.1-Flash.html' },
+  { name: 'DeepSeek V4.1 Flash 1017（Max）',  file: 'DeepSeek-V4.1-Flash-1017.html' },
   { name: 'GPT-6 Astra（xhigh）',    file: 'GPT-6-Astra.html' },
   { name: 'Gemini 3.8 Flash',    file: 'Gemini-3.8-flash.html' },
   { name: 'MiMo X Pro Preview',    file: 'MiMo-X-Pro-Preview.html' },
+  { name: 'MiMo V2.6 Pro UltraSpeed',    file: 'MiMo-V2.6-Pro-UltraSpeed.html' },
   { name: 'GLM 5.3 Flash（High）',    file: 'GLM-5.3-Flash.html' },
   { name: 'Grok 4.7（High）',    file: 'Grok-4.7.html' }
 ];
@@ -261,8 +262,8 @@ MODELS.forEach(function(m, i){
     eye.innerHTML = ICON_EYE;
     eye.title = '关闭预览（卸载页面，释放性能）';
     if(iframe.getAttribute('src') !== src){
-      /* 加载期间只保留占位，iframe 隐藏，避免两个区域各占一份高度 */
-      iframe.hidden = true;
+      /* 加载遮罩覆盖 iframe，但保留其布局尺寸，供子页面初始化相机和画布 */
+      iframe.hidden = false;
       setLoading();
       placeholder.hidden = false;
       iframe.src = src;
