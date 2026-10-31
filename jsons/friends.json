@@ -42,26 +42,20 @@
     "desc": "我们要参与、沟通、记录时代。"
   },
   {
-    "url": "https://cpos.plos.edu.ci",
-    "icon": "https://cpos.plos.edu.ci/icon.png",
-    "name": "CoolPotOS Documentation",
-    "desc": "CoolPotOS系列项目官网"
-  },
-  {
     "url": "https://blog.lris625.top",
     "icon": "https://pic1.imgdb.cn/item/68fe309a3203f7be00a0c198.png",
     "name": "Lucas的小博客",
     "desc": "欲买桂花同载酒，终不似，少年游"
   },
   {
-    "url": "https://blog.lkyu.cf",
-    "icon": "https://blog.lkyu.cf/favicon.ico",
+    "url": "https://blog.lkyu.top",
+    "icon": "https://blog.lkyu.top/favicon.ico",
     "name": "翎钰的小窝",
     "desc": "lkyu 的个人兴趣类博客"
   },
   {
-    "url": "https://moe.lkyu.cf",
-    "icon": "https://moe.lkyu.cf/icon.webp",
+    "url": "https://moe.lkyu.top",
+    "icon": "https://moe.lkyu.top/icon.webp",
     "name": "MOE 购机指南",
     "desc": "写给大学生的电脑科普&购买一体方案"
   },

@@ -24,18 +24,6 @@
     "tag": "compare"
   },
   {
-    "link": "http3.html",
-    "name": "新协议",
-    "desc": "关于http3和http3测试页",
-    "tag": "http 3"
-  },
-  {
-    "link": "web-designed-by-AI.html",
-    "name": "现代简约网页",
-    "desc": "AI写的现代化（？）网页",
-    "tag": "Nice web"
-  },
-  {
     "link": "close-the-AD.html",
     "name": "广告菌可爱捏",
     "desc": "修复了用户关闭广告过于简单的bug（doge）",
@@ -52,11 +40,5 @@
     "name": "丝滑小车时钟",
     "desc": "一个有着流畅动画的小车时钟页面。",
     "tag": "Clock"
-  },
-  {
-    "link": "test.html",
-    "name": "测试页面",
-    "desc": "测试新想法的页面。",
-    "tag": "Test"
   }
 ]

@@ -279,49 +279,6 @@
             transform: scale(0.95);
         }
 
-        #footer {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 1000;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        #footer a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-            padding-bottom: 1px;
-            transition: color 0.3s, border-color 0.3s;
-        }
-
-        #footer a:hover {
-            color: white;
-            border-bottom-color: white;
-        }
-
-        #footer .contact-link {
-            display: inline-flex;
-            align-items: center;
-            padding: 3px 8px;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 999px;
-            color: white;
-            background: rgba(255, 255, 255, 0.12);
-            text-decoration: none;
-            transition: background 0.3s ease, border-color 0.3s ease;
-        }
-
-        #footer .contact-link:hover {
-            border-bottom-color: rgba(255, 255, 255, 0.7);
-            border-color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.22);
-        }
-
         @media (max-width: 600px) {
             #bg-switcher {
                 right: 12px;
@@ -347,19 +304,6 @@
                 font-size: 20px;
             }
 
-            #footer {
-                right: 12px;
-                bottom: calc(62px + env(safe-area-inset-bottom));
-                left: 12px;
-                justify-content: center;
-                flex-wrap: wrap;
-                line-height: 1.35;
-                text-align: center;
-            }
-
-            #footer .contact-line {
-                flex-basis: 100%;
-            }
         }
 
         @media (max-height: 520px) and (orientation: landscape) {
@@ -367,9 +311,6 @@
                 bottom: calc(20px + env(safe-area-inset-bottom));
             }
 
-            #footer {
-                bottom: calc(52px + env(safe-area-inset-bottom));
-            }
         }
 
     </style>
@@ -404,12 +345,6 @@
 
     <div id="seconds-progress-bar-container">
         <div id="seconds-progress-bar"></div>
-    </div>
-
-    <div id="footer">
-        <a href="http://gandashi.site/clockcar/index.html" target="_blank">Source page</a>
-        <span>本页面为L菌优化版本（侵删！）</span>
-        <span class="contact-line">联系我：<a class="contact-link" href="mailto:lhy20070708@qq.com">Email</a></span>
     </div>
 
 <script>

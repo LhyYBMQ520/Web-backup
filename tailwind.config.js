@@ -1,8 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './*.html',
-    './javascript/**/*.js'
+    // Only these pages load assets/tailwind.css; their scripts are inline.
+    './close-the-AD.html',
+    './speedtest.html'
   ],
   darkMode: 'class',
   theme: {
@@ -12,27 +13,10 @@ module.exports = {
         accent: '#FF3366',
         neutral: '#F8F9FA',
         secondary: '#36CFC9',
-        light: {
-          primary: '#165DFF',
-          secondary: '#FFFFFF'
-        },
-        dark: {
-          DEFAULT: '#1D2129',
-          primary: '#9333EA',
-          secondary: '#121212'
-        }
+        dark: '#1D2129'
       },
       fontFamily: {
-        inter: ['Inter', 'system-ui', 'sans-serif'],
-        site: [
-          'var(--en-font, "Poppins")',
-          'var(--zh-font, "ZCOOL KuaiLe")',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          '"Segoe UI"',
-          'Roboto',
-          'sans-serif'
-        ]
+        inter: ['Inter', 'system-ui', 'sans-serif']
       }
     }
   }

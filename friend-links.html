@@ -303,18 +303,20 @@
         }
 
         footer {
+            --accent: #1E40AF;
             margin-top: 60px;
             text-align: center;
             padding: 20px 0;
-        }
-
-        footer a {
-            transition: color 0.3s ease;
+            font-size: 0.9rem;
+            color: #444;
             font-weight: 500;
+            line-height: 1.8;
+            transition: color 0.3s ease;
         }
 
-        body.dark footer a {
-            color: #ffcc00;
+        body.dark footer {
+            --accent: #ffcc00;
+            color: #ddd;
         }
 
         #toTop {
@@ -445,11 +447,7 @@
         
         <!-- 页脚 -->
         <footer>
-            <div class="footer-copyright">
-                Copyright © LC（Lcat）| All Rights Reserved.
-                <br>© <span id="copyright-year-range"></span> By LC（Lcat）❤️
-                <br>本页面所有内容均已开源 <a href="https://github.com/LhyYBMQ520/Web-backup">Github Page</a>
-            </div>
+            <p>© <span id="copyrightYear">2025</span> Made with <i class="fa-solid fa-heart" style="color:var(--accent);" aria-hidden="true"></i> by LC（Lcat）· All Rights Reserved</p>
         </footer>
     </div>
 
@@ -489,7 +487,7 @@
             : `${startYear} - ${currentYear}/${currentMonth}`;
 
         // 将文本插入到页面
-        document.getElementById('copyright-year-range').textContent = displayText;
+        document.getElementById('copyrightYear').textContent = displayText;
 
 
         /* ===== 三态主题切换系统（系统/浅色/深色） ===== */
